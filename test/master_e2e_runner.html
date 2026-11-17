@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ProcessIQ Master End-to-End Release Validation</title>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="vendor/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- All containers required by app.js -->
+  <div id="demo-data-banner" class="hidden"></div>
+  <div class="stepper-item" data-stage="1"></div>
+  <div class="stepper-item" data-stage="2"></div>
+  <div class="stepper-item" data-stage="3"></div>
+  <div class="stepper-item" data-stage="4"></div>
+  <div class="stepper-item" data-stage="5"></div>
+
+  <section id="stage-1" class="stage-container"></section>
+  <section id="stage-2" class="stage-container hidden"></section>
+  <section id="stage-3" class="stage-container hidden"></section>
+  <section id="stage-4" class="stage-container hidden"></section>
+  <section id="stage-5" class="stage-container hidden"></section>
+
+  <!-- Module 1 Inputs Mock -->
+  <input type="text" id="in-m1-process">
+  <input type="text" id="in-m1-dept">
+  <input type="number" id="in-m1-fte">
+  <input type="number" id="in-m1-hours">
+  <input type="number" id="in-m1-days">
+  <input type="number" id="in-m1-rate">
+  <input type="checkbox" id="in-m1-overtime">
+  <div id="m1-overtime-fields" class="hidden">
+    <input type="number" id="in-m1-ot-hours">
+    <input type="number" id="in-m1-ot-rate">
+  </div>
+  <input type="range" id="in-m1-recovery" value="35">
+  <span id="val-m1-recovery">35%</span>
+
+  <!-- Module 1 Outputs -->
+  <span id="m1-monthly-hours">0 hrs</span>
+  <span id="m1-annual-hours">0 hrs</span>
+  <span id="m1-monthly-cost">$0</span>
+  <span id="m1-annual-cost">$0</span>
+  <span id="m1-recoverable-hours">0 hrs</span>
+  <span id="m1-recoverable-val">$0</span>
+
+  <!-- Module 2 Inputs Mock -->
+  <input type="number" id="in-m2-err-vol">
+  <input type="number" id="in-m2-err-rate">
+  <input type="number" id="in-m2-err-cost">
+  <input type="number" id="in-m2-rework-hrs">
+  <input type="number" id="in-m2-rework-rate">
+  <input type="number" id="in-m2-delays-vol">
+  <input type="number" id="in-m2-delays-cost">
+  <input type="number" id="in-m2-discounts-count">
+  <input type="number" id="in-m2-discounts-val">
+  <input type="number" id="in-m2-dups-count">
+  <input type="number" id="in-m2-dups-val">
+  <input type="number" id="in-m2-dups-unrec">
+  <input type="number" id="in-m2-penalties">
+  <input type="number" id="in-m2-other">
+
+  <!-- Module 2 Outputs -->
+  <span id="m2-total-monthly">$0</span>
+  <span id="m2-total-annual">$0</span>
+  <div id="m2-drivers-list"></div>
+  <div id="m2-warnings-list"></div>
+
+  <!-- Module 3 Elements -->
+  <button id="tier-quick" onclick="changeReadinessTier('quick')">Quick</button>
+  <button id="tier-professional" onclick="changeReadinessTier('professional')">Professional</button>
+  <button id="tier-advanced" onclick="changeReadinessTier('advanced')">Advanced</button>
+  <span id="m3-progress-text">0 of 15 Answered</span>
+  <div id="m3-progress-bar" style="width: 0%"></div>
+  <span id="m3-score">Assessment Pending</span>
+  <span id="m3-classification" class="badge-pending">Assessment Pending</span>
+  <p id="m3-desc">Evaluating answers...</p>
+  <div id="m3-questions-container"></div>
+  <canvas id="m3Chart"></canvas>
+
+  <!-- Module 4 Elements -->
+  <input type="number" id="in-m4-users">
+  <input type="number" id="in-m4-capex">
+  <input type="number" id="in-m4-integ">
+  <input type="number" id="in-m4-support">
+  <div id="m4-active-vendor"></div>
+  <div id="m4-year1-invest"></div>
+  <div id="m4-contract-total"></div>
+  <table><tbody id="m4-table-body"></tbody></table>
+
+  <!-- Edit Price Modal Mock -->
+  <div id="edit-pricing-modal" class="hidden">
+    <div id="modal-currency-symbol">$</div>
+    <div id="modal-currency-symbol-2">$</div>
+    <div id="modal-vendor-title"></div>
+    <div id="modal-vendor-subtitle"></div>
+    <div id="modal-ref-label"></div>
+    <div id="modal-ref-text"></div>
+    <div id="modal-price-label"></div>
+    <input type="number" id="modal-input-price">
+    <select id="modal-input-billing">
+      <option value="monthly">Monthly</option>
+      <option value="annually">Annually</option>
+    </select>
+    <input type="number" id="modal-input-users">
+    <input type="number" id="modal-input-usage">
+    <div id="modal-preview-monthly"></div>
+    <div id="modal-preview-annual"></div>
+    <div id="modal-preview-usage"></div>
+    <div id="modal-preview-total-year1"></div>
+    <div id="modal-preview-3yr"></div>
+  </div>
+
+  <!-- Dashboard Elements -->
+  <div id="dash-labor-cost"></div>
+  <div id="dash-leakage-cost"></div>
+  <div id="dash-capacity-value"></div>
+  <div id="dash-readiness-score"></div>
+  <div id="dash-approach-title"></div>
+  <div id="dash-approach-desc"></div>
+  <div id="dash-net-benefit"></div>
+  <div id="dash-roi"></div>
+  <div id="dash-payback"></div>
+  <div id="dash-scenarios-container"></div>
+  <div id="dash-scenarios-table-container"></div>
+  <canvas id="dashChart"></canvas>
+
+  <!-- Print Container Mock -->
+  <div id="print-executive-report"></div>
+
+  <!-- Results output for headless test runner -->
+  <div id="test-output">INITIALIZING_TEST_HARNESS</div>
+
+  <script src="../app.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const logs = [];
+      function assert(cond, msg) {
+        if (cond) logs.push(`[PASS] ${msg}`);
+        else logs.push(`[FAIL] ${msg}`);
+      }
+
+      try {
+        // =============================================================
+        // STEP 1: First-Time Application Load (Sample AP Baseline)
+        // =============================================================
+        assert(ProcessIQ.isSampleData === true, 'S1.1: Application boots with isSampleData === true');
+        assert(ProcessIQ.currentStage === 1, 'S1.2: Current stage is 1 (Welcome)');
+        assert(ProcessIQ.manualCost.processName === 'Accounts Payable', 'S1.3: Default process is Accounts Payable');
+        assert(ProcessIQ.readiness.tier === 'professional', 'S1.4: Default readiness tier is professional (15 Qs)');
+        assert(Object.keys(ProcessIQ.readiness.answers).length === 15, 'S1.5: Sample data includes 15 AP answers');
+        assert(runAIReadinessCalculations().overallScore === 60, 'S1.6: Sample AP readiness score is 60/100');
+
+        // =============================================================
+        // STEP 2: Clear Data & Start Fresh User Assessment
+        // =============================================================
+        clearData();
+        assert(ProcessIQ.isSampleData === false, 'S2.1: isSampleData set to false after clearData');
+        assert(Object.keys(ProcessIQ.readiness.answers).length === 0, 'S2.2: readiness.answers completely empty');
+        assert(ProcessIQ.readiness.isCompleted === false, 'S2.3: isCompleted is false');
+        assert(runAIReadinessCalculations().overallScore === 0, 'S2.4: Overall score is 0 with no answers');
+        assert(runAIReadinessCalculations().classification === 'Assessment Pending', 'S2.5: Classification is Assessment Pending');
+        assert(document.getElementById('m3-score').innerText === 'Assessment Pending', 'S2.6: Module 3 UI score is Assessment Pending');
+        assert(document.getElementById('dash-readiness-score').innerText === 'Assessment Pending', 'S2.7: Dashboard KPI is Assessment Pending');
+
+        // =============================================================
+        // STEP 3: Select Template & Edge Case Handling
+        // =============================================================
+        selectProcessTemplate('procurement');
+        assert(ProcessIQ.manualCost.processName === 'Procurement & Purchasing', 'S3.1: Procurement template loaded');
+        assert(ProcessIQ.manualCost.employeeCount === 9, 'S3.2: FTE count is 9');
+        assert(ProcessIQ.manualCost.hourlyRate === 46.0, 'S3.3: Hourly rate is $46.00');
+
+        // Test Negative Input Clamping
+        ProcessIQ.manualCost.employeeCount = -5;
+        ProcessIQ.manualCost.hoursPerDay = -10;
+        ProcessIQ.manualCost.overtimeHours = -5;
+        const negM1 = runManualCostCalculations();
+        assert(negM1.monthlyHours === 0 && negM1.totalAnnualLaborCost === 0, 'S3.4: Negative inputs safely clamped to 0');
+
+        // Restore realistic user inputs
+        ProcessIQ.manualCost.processName = 'Claims Adjudication';
+        ProcessIQ.manualCost.department = 'Insurance Operations';
+        ProcessIQ.manualCost.employeeCount = 10;
+        ProcessIQ.manualCost.hoursPerDay = 5.0;
+        ProcessIQ.manualCost.workingDays = 20;
+        ProcessIQ.manualCost.hourlyRate = 45.0;
+        ProcessIQ.manualCost.includeOvertime = true;
+        ProcessIQ.manualCost.overtimeHours = 30;
+        ProcessIQ.manualCost.overtimeRate = 67.5;
+        ProcessIQ.manualCost.recoverableCapacityPct = 30;
+
+        // =============================================================
+        // STEP 4 & 5: Calculate Labor Costs (Module 1 Verification)
+        // =============================================================
+        // Monthly hours = 10 * 5 * 20 = 1,000 hrs.
+        // Base monthly = 1,000 * $45 = $45,000.
+        // Overtime monthly = 30 * $67.5 = $2,025.
+        // Total monthly = $47,025.
+        // Total annual = $47,025 * 12 = $564,300.
+        // Recoverable capacity (30%) = $564,300 * 0.30 = $169,290.
+        const m1Calc = runManualCostCalculations();
+        assert(m1Calc.monthlyHours === 1000, `S5.1: Monthly hours is 1,000 (got ${m1Calc.monthlyHours})`);
+        assert(m1Calc.totalMonthlyLaborCost === 47025, `S5.2: Total monthly labor is $47,025 (got ${m1Calc.totalMonthlyLaborCost})`);
+        assert(m1Calc.totalAnnualLaborCost === 564300, `S5.3: Total annual labor is $564,300 (got ${m1Calc.totalAnnualLaborCost})`);
+        assert(m1Calc.recoverableAnnualValue === 169290, `S5.4: Recoverable capacity value is $169,290 (got ${m1Calc.recoverableAnnualValue})`);
+
+        // =============================================================
+        // STEP 6: Calculate Process Cost Leakage (Module 2 Verification)
+        // =============================================================
+        ProcessIQ.costLeakage.errors = { enabled: true, monthlyVolume: 4000, errorRatePct: 2.5, avgCostPerError: 40.0, isEstimate: true }; // 4000 * 0.025 * 40 = $4,000/mo ($48,000/yr)
+        ProcessIQ.costLeakage.rework = { enabled: true, monthlyHours: 50, hourlyRate: 50.0, isEstimate: true }; // 50 * 50 = $2,500/mo ($30,000/yr)
+        ProcessIQ.costLeakage.delays = { enabled: true, monthlyDelayedVolume: 80, avgCostPerDelay: 50.0, isEstimate: true }; // 80 * 50 = $4,000/mo ($48,000/yr)
+        ProcessIQ.costLeakage.missedDiscounts = { enabled: true, monthlyMissedCount: 10, avgDiscountValue: 300.0, isEstimate: false }; // 10 * 300 = $3,000/mo ($36,000/yr)
+        ProcessIQ.costLeakage.duplicatePayments = { enabled: true, monthlyDuplicateCount: 2, avgDuplicateAmount: 1500.0, unrecoveredPct: 50.0, isEstimate: true }; // 2 * 1500 * 0.5 = $1,500/mo ($18,000/yr)
+        ProcessIQ.costLeakage.penalties = { enabled: true, monthlyAmount: 1000.0, isEstimate: false }; // $1,000/mo ($12,000/yr)
+        ProcessIQ.costLeakage.otherLosses = { enabled: false, monthlyAmount: 0, isEstimate: false };
+
+        // Total monthly leakage = 4000 + 2500 + 4000 + 3000 + 1500 + 1000 = $16,000/mo.
+        // Total annual leakage = $16,000 * 12 = $192,000/yr.
+        // Direct cash leakage = missed discounts ($36k) + dups ($18k) + penalties ($12k) = $66,000/yr.
+        // Non-cash leakage = errors ($48k) + rework ($30k) + delays ($48k) = $126,000/yr.
+        const m2Calc = runCostLeakageCalculations();
+        assert(m2Calc.totalMonthly === 16000, `S6.1: Monthly leakage is $16,000 (got ${m2Calc.totalMonthly})`);
+        assert(m2Calc.totalAnnual === 192000, `S6.2: Annual leakage is $192,000 (got ${m2Calc.totalAnnual})`);
+        assert(m2Calc.warnings.length >= 2, `S6.3: Anti-double counting warnings detected (${m2Calc.warnings.length} warnings)`);
+
+        // =============================================================
+        // STEP 7: Module 3 User Readiness Questionnaire
+        // =============================================================
+        // Reset readiness answers
+        ProcessIQ.readiness.answers = {};
+        renderReadinessQuestionnaire();
+        assert(runAIReadinessCalculations().answeredCount === 0, 'S7.1: Zero answers initially in fresh assessment');
+
+        // Test option selection and answer updating
+        selectReadinessAnswer('q1', 1);
+        assert(ProcessIQ.readiness.answers['q1'] === 1, 'S7.2: q1 selected as 1');
+        selectReadinessAnswer('q1', 3);
+        assert(ProcessIQ.readiness.answers['q1'] === 3, 'S7.3: q1 updated to 3');
+
+        // Incomplete test (7 answers out of 15)
+        for (let i = 2; i <= 7; i++) {
+          selectReadinessAnswer(`q${i}`, 2);
+        }
+        const incompM3 = runAIReadinessCalculations();
+        assert(incompM3.answeredCount === 7, `S7.4: Incomplete count is 7 (got ${incompM3.answeredCount})`);
+        assert(incompM3.isCompleted === false, 'S7.5: isCompleted is false for 7/15');
+        assert(incompM3.overallScore === 0, 'S7.6: No synthetic score for incomplete assessment');
+        assert(incompM3.classification === 'Assessment Pending', 'S7.7: Status is Assessment Pending');
+
+        // Complete remaining questions (q8 through q15)
+        for (let i = 8; i <= 15; i++) {
+          selectReadinessAnswer(`q${i}`, 3);
+        }
+        // Answers: q1=3, q2..q7=2 (6*2=12), q8..q15=3 (8*3=24)
+        // Total points = 3 + 12 + 24 = 39 out of 60.
+        // Expected score = round((39/60)*100) = 65%
+        const fullM3 = runAIReadinessCalculations();
+        assert(fullM3.answeredCount === 15, 'S7.8: All 15 questions answered');
+        assert(fullM3.isCompleted === true, 'S7.9: Assessment marked completed');
+        assert(fullM3.overallScore === 65, `S7.10: Live calculated score is 65/100 (got ${fullM3.overallScore})`);
+        assert(fullM3.classification === 'Automation/AI Candidate', 'S7.11: Classification is Automation/AI Candidate');
+        assert(fullM3.strengths.length > 0, 'S7.12: Strengths populated');
+        assert(fullM3.weaknesses.length > 0, 'S7.13: Operational gaps/risks populated from <= 2 answers');
+
+        // =============================================================
+        // STEP 8: Module 4 Vendor Comparator & Pricing Reconciliations
+        // =============================================================
+        ProcessIQ.aiComparator.userCount = 10;
+        ProcessIQ.aiComparator.implementationCostOneTime = 20000;
+        ProcessIQ.aiComparator.integrationCostOneTime = 10000; // Capex = $30,000
+        ProcessIQ.aiComparator.annualMaintenanceSupportCost = 6000; // Support = $6,000
+        ProcessIQ.aiComparator.contractDurationYears = 3;
+
+        const m4Data = runAIComparatorCalculations();
+        assert(m4Data.results.length === 4, 'S8.1: Evaluates all 4 AI platforms');
+
+        // 1. M365 Copilot: 10 seats @ $30/mo * 12 = $3,600. Capex = $30,000. Support = $6,000.
+        // Year 1 Total = $3,600 + $0 + $6,000 + $30,000 = $39,600.
+        // 3-Year Total = $30,000 + 3 * ($3,600 + $6,000) = $30,000 + $28,800 = $58,800.
+        const copilot = m4Data.results.find(r => r.vendor.id === 'm365-copilot');
+        assert(copilot.year1Sub === 3600, `S8.2: M365 Copilot Year 1 Sub is $3,600 (got ${copilot.year1Sub})`);
+        assert(copilot.year1Capex === 30000, `S8.3: Capex is $30,000 (got ${copilot.year1Capex})`);
+        assert(copilot.annualSupport === 6000, `S8.4: Annual Support is $6,000 (got ${copilot.annualSupport})`);
+        assert(copilot.totalYear1 === 39600, `S8.5: M365 Copilot Year 1 Total is $39,600 (got ${copilot.totalYear1})`);
+        assert(copilot.contractTotal === 58800, `S8.6: M365 Copilot 3-Yr Total is $58,800 (got ${copilot.contractTotal})`);
+
+        // Test Custom User Pricing: override to $25/seat/month
+        openEditPriceModal('m365-copilot');
+        document.getElementById('modal-input-price').value = 25;
+        document.getElementById('modal-input-billing').value = 'monthly';
+        document.getElementById('modal-input-users').value = 10;
+        saveCustomPrice();
+        const customM4 = runAIComparatorCalculations();
+        const customCopilot = customM4.results.find(r => r.vendor.id === 'm365-copilot');
+        // Custom sub: 10 * $25 * 12 = $3,000. Total Year 1 = $3,000 + $6,000 + $30,000 = $39,000.
+        assert(customCopilot.isCustom === true, 'S8.7: Custom pricing marked active');
+        assert(customCopilot.year1Sub === 3000, `S8.8: Custom Year 1 Sub is $3,000 (got ${customCopilot.year1Sub})`);
+        assert(customCopilot.totalYear1 === 39000, `S8.9: Custom Year 1 Total is $39,000 (got ${customCopilot.totalYear1})`);
+
+        // Reset to default reference pricing
+        resetVendorPrice('m365-copilot');
+        assert(!ProcessIQ.aiComparator.customPricing['m365-copilot'], 'S8.10: Custom price deleted on reset');
+
+        // =============================================================
+        // STEP 9: Integrated Business Case & Anti-Double-Counting Reconciliation
+        // =============================================================
+        const consolidated = runConsolidatedCalculations();
+        const scA = consolidated.scenarios[0];
+        const scB = consolidated.scenarios[1];
+        const scC = consolidated.scenarios[2];
+
+        // Scenario A
+        assert(scA.totalOperatingCost === (564300 + 192000), 'S9.1: Scenario A operating cost equals baseline labor + leakage');
+        assert(scA.roiFormatted === 'N/A – Baseline', 'S9.2: Scenario A ROI formatted as N/A – Baseline');
+        assert(scA.paybackFormatted === 'N/A – Baseline Scenario', 'S9.3: Scenario A Payback formatted as N/A – Baseline Scenario');
+
+        // Scenario B:
+        // Labor Savings (20%) = round(564,300 * 0.20) = 112,860
+        // Leakage Savings (50%) = round(192,000 * 0.50) = 96,000
+        // Actual cash savings (subset) = round(66,000 * 0.50) = 33,000
+        // Gross savings = 112,860 + 96,000 = 208,860
+        // Reconciled: Capacity (112,860) + Avoided Leakage (96,000) = Gross (208,860). Cash (33,000) is a SUBSET!
+        assert(scB.capacityValueReleased === 112860, `S9.4: Scenario B capacity released is $112,860 (got ${scB.capacityValueReleased})`);
+        assert(scB.avoidedLeakage === 96000, `S9.5: Scenario B avoided leakage is $96,000 (got ${scB.avoidedLeakage})`);
+        assert(scB.actualCashSavings === 33000, `S9.6: Scenario B actual cash savings is $33,000 (got ${scB.actualCashSavings})`);
+        assert(scB.grossSavings === 208860, `S9.7: Scenario B gross savings is $208,860 (got ${scB.grossSavings})`);
+        assert(scB.capacityValueReleased + scB.avoidedLeakage === scB.grossSavings, 'S9.8: Anti-double-counting validated: Capacity + Avoided Leakage === Gross Savings');
+
+        // Scenario C:
+        // Capacity value = 169,290
+        // Hard cash savings (80% of 66k) = 52,800
+        // Cost avoidance (75% of 126k) = 94,500
+        // Total avoided leakage = 52,800 + 94,500 = 147,300
+        // Gross savings = 169,290 + 147,300 = 316,590
+        assert(scC.capacityValueReleased === 169290, `S9.9: Scenario C capacity released is $169,290 (got ${scC.capacityValueReleased})`);
+        assert(scC.avoidedLeakage === 147300, `S9.10: Scenario C avoided leakage is $147,300 (got ${scC.avoidedLeakage})`);
+        assert(scC.actualCashSavings === 52800, `S9.11: Scenario C actual cash savings is $52,800 (got ${scC.actualCashSavings})`);
+        assert(scC.grossSavings === 316590, `S9.12: Scenario C gross savings is $316,590 (got ${scC.grossSavings})`);
+        assert(scC.capacityValueReleased + scC.avoidedLeakage === scC.grossSavings, 'S9.13: Anti-double-counting validated for Scenario C');
+
+        // =============================================================
+        // STEP 10: Executive Dashboard Print Report Engine
+        // =============================================================
+        preparePrintReport();
+        const printHtml = document.getElementById('print-executive-report').innerHTML;
+        assert(printHtml.includes('ProcessIQ'), 'S10.1: Print report contains ProcessIQ branding');
+        assert(printHtml.includes('Claims Adjudication'), 'S10.2: Process name dynamically populated');
+        assert(printHtml.includes('Insurance Operations'), 'S10.3: Department dynamically populated');
+        assert(printHtml.includes('65') && printHtml.includes('/ 100'), 'S10.4: Verified readiness score 65/100 rendered in KPI card');
+        assert(printHtml.includes('Automation/AI Candidate'), 'S10.5: Verified classification rendered');
+        assert(printHtml.includes('Page 1 of 2') && printHtml.includes('Page 2 of 2'), 'S10.6: 2-Page structure verified');
+        assert(!printHtml.includes('DEMONSTRATION SAMPLE'), 'S10.7: DEMONSTRATION SAMPLE omitted in user mode');
+
+        // =============================================================
+        // STEP 11: Currency Switching Across Reports
+        // =============================================================
+        updateCurrency('EUR');
+        assert(ProcessIQ.currency === 'EUR', 'S11.1: Currency changed to EUR');
+        preparePrintReport();
+        const eurPrint = document.getElementById('print-executive-report').innerText;
+        assert(eurPrint.includes('€') && eurPrint.includes('Currency: EUR'), 'S11.2: Print report reflects Euro symbol and header');
+
+        updateCurrency('GBP');
+        assert(ProcessIQ.currency === 'GBP', 'S11.3: Currency changed to GBP');
+        preparePrintReport();
+        const gbpPrint = document.getElementById('print-executive-report').innerText;
+        assert(gbpPrint.includes('£') && gbpPrint.includes('Currency: GBP'), 'S11.4: Print report reflects Pound symbol');
+
+        // Restore USD
+        updateCurrency('USD');
+
+        // =============================================================
+        // STEP 12: Tier Switching (Quick, Professional, Advanced)
+        // =============================================================
+        changeReadinessTier('quick');
+        assert(ProcessIQ.readiness.tier === 'quick', 'S12.1: Switched to quick tier');
+        assert(runAIReadinessCalculations().questionCount === 10, 'S12.2: Quick tier has 10 questions');
+        assert(runAIReadinessCalculations().isCompleted === true, 'S12.3: Quick tier is completed (10/10 preserved)');
+
+        changeReadinessTier('advanced');
+        assert(ProcessIQ.readiness.tier === 'advanced', 'S12.4: Switched to advanced tier');
+        assert(runAIReadinessCalculations().questionCount === 25, 'S12.5: Advanced tier has 25 questions');
+        assert(runAIReadinessCalculations().answeredCount === 15, 'S12.6: Preserved 15 previously answered questions');
+        assert(runAIReadinessCalculations().isCompleted === false, 'S12.7: Advanced tier is incomplete');
+        assert(document.getElementById('m3-score').innerText === 'Assessment Pending', 'S12.8: UI reverts to Assessment Pending in Advanced tier');
+
+        // Restore Professional Tier
+        changeReadinessTier('professional');
+
+        // =============================================================
+        // STEP 13: Detailed Business Case PDF Compilation
+        // =============================================================
+        loadSampleData();
+        let pdfDataUri = '';
+        const origSave = window.jspdf.jsPDF.API.save;
+        window.jspdf.jsPDF.API.save = function(name) {
+          pdfDataUri = this.output('datauristring');
+        };
+        downloadPDF();
+        window.jspdf.jsPDF.API.save = origSave;
+        assert(pdfDataUri.length > 5000, `S13.1: Detailed Business Case PDF compiled (${pdfDataUri.length} chars datauri)`);
+        assert(pdfDataUri.startsWith('data:application/pdf'), 'S13.2: PDF data URI header verified');
+
+        // Expose base64 in DOM for disk capture
+        const pdfHolder = document.createElement('div');
+        pdfHolder.id = 'captured-pdf-b64';
+        pdfHolder.textContent = pdfDataUri.split(',')[1];
+        document.body.appendChild(pdfHolder);
+
+        // =============================================================
+        // STEP 14 & 15: Sample Data Reload & State Isolation
+        // =============================================================
+        loadSampleData();
+        assert(ProcessIQ.isSampleData === true, 'S15.1: isSampleData restored to true');
+        assert(ProcessIQ.manualCost.processName === 'Accounts Payable', 'S15.2: AP sample process restored');
+        assert(ProcessIQ.manualCost.employeeCount === 12, 'S15.3: AP baseline 12 FTE restored');
+        assert(runAIReadinessCalculations().overallScore === 60, 'S15.4: AP sample score 60/100 restored');
+        preparePrintReport();
+        const demoPrint = document.getElementById('print-executive-report').innerHTML;
+        assert(demoPrint.includes('DEMONSTRATION SAMPLE'), 'S15.5: DEMONSTRATION SAMPLE badge displayed in sample mode');
+
+        clearData();
+        assert(ProcessIQ.isSampleData === false, 'S15.6: Clean slate after clearData');
+        assert(Object.keys(ProcessIQ.readiness.answers).length === 0, 'S15.7: All readiness answers cleared');
+
+      } catch (e) {
+        logs.push(`[ERROR] ${e.message}\n${e.stack}`);
+      }
+
+      document.getElementById('test-output').innerHTML = logs.join('\n');
+    });
+  </script>
+</body>
+</html>

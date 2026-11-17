@@ -1,0 +1,33 @@
+{
+  "name": "processiq",
+  "version": "1.0.0",
+  "description": "Know your process cost before you invest in AI. Enterprise consulting-style business transformation and AI readiness assessment web application.",
+  "private": true,
+  "scripts": {
+    "dev": "python -m http.server 3000 --directory .",
+    "test": "python test/test_runner.py",
+    "security-scan": "python test/security_scanner.py"
+  },
+  "keywords": [
+    "ai-readiness",
+    "process-costing",
+    "business-case",
+    "roi-calculator",
+    "enterprise-transformation",
+    "consulting",
+    "nextjs",
+    "react",
+    "tailwind"
+  ],
+  "author": "Yuvraj Malpure",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "chart.js": "^4.4.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
+  }
+}

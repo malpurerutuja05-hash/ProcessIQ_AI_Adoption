@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ProcessIQ Comprehensive Financial Logic & Custom Pricing Audit</title>
+</head>
+<body>
+  <!-- Mock containers required by app.js rendering -->
+  <div id="demo-data-banner" class="hidden"></div>
+  <div class="stepper-item" data-stage="1"></div>
+  <div class="stepper-item" data-stage="2"></div>
+  <div class="stepper-item" data-stage="3"></div>
+  <div class="stepper-item" data-stage="4"></div>
+  <div class="stepper-item" data-stage="5"></div>
+
+  <section id="stage-1" class="stage-container"></section>
+  <section id="stage-2" class="stage-container hidden"></section>
+  <section id="stage-3" class="stage-container hidden"></section>
+  <section id="stage-4" class="stage-container hidden"></section>
+  <section id="stage-5" class="stage-container hidden"></section>
+
+  <!-- Module 4 elements -->
+  <div id="m4-active-vendor"></div>
+  <div id="m4-year1-invest"></div>
+  <div id="m4-contract-total"></div>
+  <table>
+    <tbody id="m4-table-body"></tbody>
+  </table>
+
+  <!-- Dashboard elements -->
+  <div id="dash-labor-cost"></div>
+  <div id="dash-leakage-cost"></div>
+  <div id="dash-capacity-value"></div>
+  <div id="dash-readiness-score"></div>
+  <div id="dash-approach-title"></div>
+  <div id="dash-approach-desc"></div>
+  <div id="dash-net-benefit"></div>
+  <div id="dash-roi"></div>
+  <div id="dash-payback"></div>
+  <div id="dash-scenarios-container"></div>
+  <div id="dash-scenarios-table-container"></div>
+  <canvas id="dashChart"></canvas>
+
+  <!-- Edit Pricing Modal Mock -->
+  <div id="edit-pricing-modal" class="hidden">
+    <div id="modal-currency-symbol">$</div>
+    <div id="modal-currency-symbol-2">$</div>
+    <div id="modal-vendor-title"></div>
+    <div id="modal-vendor-subtitle"></div>
+    <div id="modal-ref-label"></div>
+    <div id="modal-ref-text"></div>
+    <div id="modal-price-label"></div>
+    <input type="number" id="modal-input-price">
+    <select id="modal-input-billing">
+      <option value="monthly">Monthly</option>
+      <option value="annually">Annually</option>
+    </select>
+    <input type="number" id="modal-input-users">
+    <input type="number" id="modal-input-usage">
+    <div id="modal-preview-monthly"></div>
+    <div id="modal-preview-annual"></div>
+    <div id="modal-preview-usage"></div>
+    <div id="modal-preview-total-year1"></div>
+    <div id="modal-preview-3yr"></div>
+  </div>
+
+  <div id="test-output">RUNNING_COMPREHENSIVE_AUDIT</div>
+
+  <!-- Dedicated Print Container Mock -->
+  <div id="print-executive-report" class="print-report-container"></div>
+
+  <!-- Load core app script -->
+  <script src="../app.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const results = [];
+
+      function assert(condition, message) {
+        if (condition) {
+          results.push(`[PASS] ${message}`);
+        } else {
+          results.push(`[FAIL] ${message}`);
+        }
+      }
+
+      try {
+        // Test 1: Global definitions
+        assert(typeof goToStage === 'function', '1. goToStage is defined');
+        assert(typeof openEditPriceModal === 'function', '2. openEditPriceModal is defined');
+        assert(typeof saveCustomPrice === 'function', '3. saveCustomPrice is defined');
+        assert(typeof resetVendorPrice === 'function', '4. resetVendorPrice is defined');
+        assert(typeof downloadPDF === 'function', '5. downloadPDF is defined');
+        assert(typeof downloadCSV === 'function', '6. downloadCSV is defined');
+
+        // Test 2: Load sample data (AP baseline)
+        loadSampleData();
+        const baseCalc = runConsolidatedCalculations();
+        assert(baseCalc.annualLabor === 617652, `7. AP Baseline Labor is $617,652 (got ${baseCalc.annualLabor})`);
+        assert(baseCalc.annualLeakage === 340200, `8. AP Baseline Leakage is $340,200 (got ${baseCalc.annualLeakage})`);
+        assert((baseCalc.annualLabor + baseCalc.annualLeakage) === 957852, `9. AP Baseline Operating Run-Rate is $957,852 (got ${baseCalc.annualLabor + baseCalc.annualLeakage})`);
+
+        // Test 3: Scenario A Baseline (Payback N/A, ROI N/A, 0 savings)
+        const scA = baseCalc.scenarios[0];
+        assert(scA.grossSavings === 0, '10. Scenario A Gross Savings is $0');
+        assert(scA.aiCost === 0, '11. Scenario A Tech Opex is $0');
+        assert(scA.netBenefit === 0, '12. Scenario A Net Recurring Benefit is $0');
+        assert(scA.roiFormatted === 'N/A – Baseline', `13. Scenario A ROI is 'N/A – Baseline' (got '${scA.roiFormatted}')`);
+        assert(scA.paybackFormatted === 'N/A – Baseline Scenario', `14. Scenario A Payback is 'N/A – Baseline Scenario' (got '${scA.paybackFormatted}')`);
+
+        // Test 4: Scenario B (Automation First)
+        const scB = baseCalc.scenarios[1];
+        assert(scB.laborCost === 494122, `15. Scenario B Remaining Labor is $494,122 (got ${scB.laborCost})`);
+        assert(scB.leakageCost === 170100, `16. Scenario B Remaining Leakage is $170,100 (got ${scB.leakageCost})`);
+        assert(scB.actualCashSavings === 58920, `17. Scenario B Actual Cash Savings is $58,920 (got ${scB.actualCashSavings})`);
+        assert(scB.avoidedLeakage === 170100, `18. Scenario B Avoided Leakage is $170,100 (got ${scB.avoidedLeakage})`);
+        assert(scB.capacityValueReleased === 123530, `19. Scenario B Capacity Value is $123,530 (got ${scB.capacityValueReleased})`);
+        assert(scB.grossSavings === 293630, `20. Scenario B Reconciled Gross Savings is $293,630 (got ${scB.grossSavings})`);
+        assert(scB.aiCost === 5000, `21. Scenario B Tech Opex is $5,000 (got ${scB.aiCost})`);
+        assert(scB.netBenefit === 288630, `22. Scenario B Net Recurring Benefit is $288,630 (got ${scB.netBenefit})`);
+        assert(scB.capex === 15000, `23. Scenario B One-Time Capex is $15,000 (got ${scB.capex})`);
+        assert(scB.firstYearNetBenefit === 273630, `24. Scenario B First-Year Net Benefit is $273,630 (got ${scB.firstYearNetBenefit})`);
+        assert(scB.roi === 1924, `25. Scenario B Recurring ROI is 1,924% (got ${scB.roi}%)`);
+        assert(scB.firstYearRoi === 1824, `26. Scenario B First-Year Net ROI is 1,824% (got ${scB.firstYearRoi}%)`);
+        assert(scB.payback === 0.6, `27. Scenario B Payback is 0.6 mo (got ${scB.payback})`);
+
+        // Test 5: Scenario C (Enterprise AI - Reference Rates)
+        const scC = baseCalc.scenarios[2];
+        assert(scC.laborCost === 401474, `28. Scenario C Remaining Labor is $401,474 (got ${scC.laborCost})`);
+        assert(scC.leakageCost === 79158, `29. Scenario C Remaining Leakage is $79,158 (got ${scC.leakageCost})`);
+        assert(scC.actualCashSavings === 94272, `30. Scenario C Actual Cash Savings is $94,272 (got ${scC.actualCashSavings})`);
+        assert(scC.avoidedLeakage === 261042, `31. Scenario C Avoided Leakage is $261,042 (got ${scC.avoidedLeakage})`);
+        assert(scC.capacityValueReleased === 216178, `32. Scenario C Capacity Value is $216,178 (got ${scC.capacityValueReleased})`);
+        assert(scC.grossSavings === 477220, `33. Scenario C Gross Savings is $477,220 (got ${scC.grossSavings})`);
+        assert(scC.aiCost === 13400, `34. Scenario C Default Tech Opex is $13,400 (got ${scC.aiCost})`);
+        assert(scC.netBenefit === 463820, `35. Scenario C Default Net Recurring is $463,820 (got ${scC.netBenefit})`);
+        assert(scC.capex === 40000, `36. Scenario C One-Time Capex is $40,000 (got ${scC.capex})`);
+        assert(scC.firstYearNetBenefit === 423820, `37. Scenario C First-Year Net Benefit is $423,820 (got ${scC.firstYearNetBenefit})`);
+        assert(scC.roi === 1160, `38. Scenario C Recurring ROI is 1,160% (got ${scC.roi}%)`);
+        assert(scC.firstYearRoi === 1060, `39. Scenario C First-Year Net ROI is 1,060% (got ${scC.firstYearRoi}%)`);
+        assert(scC.payback === 1.0, `40. Scenario C Payback is 1.0 mo (got ${scC.payback})`);
+
+        // Test 6: Module 4 Comparator & Default Vendor Totals
+        const m4Data = runAIComparatorCalculations();
+        assert(m4Data.results.length === 4, `41. AI Comparator evaluates all 4 vendors (got ${m4Data.results.length})`);
+        const copilot = m4Data.results.find(r => r.vendor.id === 'm365-copilot');
+        assert(copilot.year1Sub === 5400, `42. M365 Copilot default Year 1 Sub is $5,400 (got ${copilot.year1Sub})`);
+        assert(copilot.totalYear1 === 53400, `43. M365 Copilot default Total Year 1 is $53,400 (got ${copilot.totalYear1})`);
+        assert(copilot.contractTotal === 80200, `44. M365 Copilot default 3-Yr Total is $80,200 (got ${copilot.contractTotal})`);
+
+        // Test 7: Editable Pricing - Open Modal
+        openEditPriceModal('m365-copilot');
+        const modal = document.getElementById('edit-pricing-modal');
+        assert(!modal.classList.contains('hidden'), '45. Edit Price modal opens and is visible');
+        assert(document.getElementById('modal-input-price').value == 30, '46. Modal pre-populates official reference price $30.00');
+
+        // Test 8: Change price to $25/mo, test live calculation preview
+        document.getElementById('modal-input-price').value = 25;
+        document.getElementById('modal-input-billing').value = 'monthly';
+        document.getElementById('modal-input-users').value = 15;
+        updateModalPreview();
+        assert(document.getElementById('modal-preview-annual').innerText.includes('4,500'), '47. Live preview calculates $4,500 annual licensing');
+        assert(document.getElementById('modal-preview-total-year1').innerText.includes('52,500'), '48. Live preview calculates $52,500 Year 1 total');
+        assert(document.getElementById('modal-preview-3yr').innerText.includes('77,500'), '49. Live preview calculates $77,500 3-Year total');
+
+        // Test 9: Save Custom Price
+        saveCustomPrice();
+        assert(modal.classList.contains('hidden'), '50. Modal closes after saving');
+        assert(ProcessIQ.aiComparator.customPricing['m365-copilot'].isCustom === true, '51. Custom pricing active in ProcessIQ state');
+
+        // Test 10: Verify table rendering with Custom Price badge & values
+        renderModule4();
+        const tbodyHtml = document.getElementById('m4-table-body').innerHTML;
+        assert(tbodyHtml.includes('Custom Price Entered by User'), '52. Table row displays Custom Price Entered by User badge');
+        assert(tbodyHtml.includes('4,500'), '53. Table row displays updated custom subscription cost $4,500');
+        assert(tbodyHtml.includes('52,500'), '54. Table row displays updated Year 1 total $52,500');
+
+        // Test 11: Verify updated custom pricing flows into Consolidated Dashboard & Scenario C
+        const customCalc = runConsolidatedCalculations();
+        const customScC = customCalc.scenarios[2];
+        assert(customScC.aiCost === 12500, `55. Scenario C Tech Opex updated to $12,500 (got ${customScC.aiCost})`);
+        assert(customScC.netBenefit === 464720, `56. Scenario C Net Benefit increased by $900 to $464,720 (got ${customScC.netBenefit})`);
+        assert(customScC.firstYearNetBenefit === 424720, `57. Scenario C 1st-Year Net Benefit is $424,720 (got ${customScC.firstYearNetBenefit})`);
+        assert(customScC.roi === 1162, `58. Scenario C Recurring ROI updated to 1,162% (got ${customScC.roi}%)`);
+        assert(customScC.payback === 1.0, `59. Scenario C Payback is 1.0 mo (got ${customScC.payback})`);
+
+        // Test 12: Reset to default restores original reference rate
+        resetVendorPrice('m365-copilot');
+        assert(!ProcessIQ.aiComparator.customPricing['m365-copilot'], '60. Custom pricing deleted from state');
+        renderModule4();
+        const resetCalc = runConsolidatedCalculations();
+        const resetScC = resetCalc.scenarios[2];
+        assert(resetScC.aiCost === 13400, `61. Scenario C Tech Opex restored to $13,400 (got ${resetScC.aiCost})`);
+        assert(resetScC.netBenefit === 463820, `62. Scenario C Net Benefit restored to $463,820 (got ${resetScC.netBenefit})`);
+        assert(resetScC.roi === 1160, `63. Scenario C ROI restored to 1,160% (got ${resetScC.roi}%)`);
+
+        // Test 13: Executive Dashboard Print Report Engine
+        assert(typeof preparePrintReport === 'function', '64. preparePrintReport function is defined');
+        assert(typeof printExecutiveReport === 'function', '65. printExecutiveReport function is defined');
+
+        // Render print report with Sample Data active
+        ProcessIQ.isSampleData = true;
+        preparePrintReport();
+        const printContainer = document.getElementById('print-executive-report');
+        const printHtml = printContainer.innerHTML;
+
+        assert(printHtml.includes('ProcessIQ'), '66. Print Report contains ProcessIQ branding');
+        assert(printHtml.includes('Know your process cost before you invest in AI.'), '67. Print Report contains mandatory tagline');
+        assert(printHtml.includes('Created by') && printHtml.includes('Yuvraj Malpure'), '68. Print Report contains author attribution Created by Yuvraj Malpure');
+        assert(printHtml.includes('DEMONSTRATION SAMPLE'), '69. Print Report displays DEMONSTRATION SAMPLE badge when sample data active');
+        assert(printHtml.includes('Accounts Payable'), '70. Print Report includes evaluated process name');
+
+        // Section 2: 4 Executive KPI Cards
+        assert(printHtml.includes('Annual Manual Labor Cost') && printHtml.includes('617,652'), '71. KPI Card 1 displays baseline labor $617,652');
+        assert(printHtml.includes('Annual Process Cost Leakage') && printHtml.includes('340,200'), '72. KPI Card 2 displays leakage $340,200');
+        assert(printHtml.includes('AI Readiness Score') && printHtml.includes('72'), '73. KPI Card 3 displays readiness score 72');
+        assert(printHtml.includes('Net Annual Economic Benefit') && printHtml.includes('463,820'), '74. KPI Card 4 displays net benefit $463,820');
+
+        // Section 3: Scenario Comparison Table
+        assert(printHtml.includes('Scenario A: Current Baseline') && printHtml.includes('Scenario B: Automation First') && printHtml.includes('Scenario C: Enterprise AI'), '75. Scenario table contains Scenarios A, B, and C');
+        assert(printHtml.includes('N/A – Baseline Scenario'), '76. Scenario A payback displays N/A – Baseline Scenario');
+        assert(printHtml.includes('N/A – Baseline'), '77. Scenario A ROI displays N/A – Baseline');
+        assert(printHtml.includes('293,630'), '78. Scenario B gross savings displays $293,630');
+        assert(printHtml.includes('288,630'), '79. Scenario B net recurring benefit displays $288,630');
+        assert(printHtml.includes('477,220'), '80. Scenario C gross savings displays $477,220');
+
+        // Capacity vs Cash distinction note
+        assert(printHtml.includes('Capacity Value Released') && printHtml.includes('Actual Cash Savings'), '81. Financial governance note distinguishes capacity value from cash savings');
+        assert(printHtml.includes('Page 1 of 2'), '82. Page 1 contains explicit Page 1 of 2 indicator');
+        assert(printHtml.includes('print-page-break'), '83. Contains print-page-break between Page 1 and Page 2');
+
+        // Section 4: AI Readiness Diagnostics on Page 2
+        assert(printHtml.includes('Process Maturity &amp; Standardization') || printHtml.includes('Process Maturity & Standardization'), '84. Page 2 includes Process Maturity dimension');
+        assert(printHtml.includes('Data Quality &amp; System Accessibility') || printHtml.includes('Data Quality & System Accessibility'), '85. Page 2 includes Data Quality dimension');
+        assert(printHtml.includes('Key Operational Strengths'), '86. Page 2 includes Key Operational Strengths');
+        assert(printHtml.includes('Critical Improvement Gaps &amp; Risks') || printHtml.includes('Critical Improvement Gaps & Risks'), '87. Page 2 includes Critical Improvement Gaps');
+
+        // Section 5: Strategic Recommendation & 3 Next Steps
+        assert(printHtml.includes('Recommended Strategic Approach') && printHtml.includes('Supervised AI Copilot Pilot'), '88. Page 2 includes strategic recommendation');
+        assert(printHtml.includes('Days 1–10') && printHtml.includes('Days 11–20') && printHtml.includes('Days 21–30'), '89. Page 2 includes 3-phase tactical roadmap');
+
+        // Section 6: Sign-off, Confidentiality, and Page 2 Footer
+        assert(printHtml.includes('Confidentiality, Local Execution &amp; Compliance Notice') || printHtml.includes('Confidentiality, Local Execution & Compliance Notice'), '90. Page 2 includes client-side confidentiality notice');
+        assert(printHtml.includes('Prepared By') && printHtml.includes('Approved By'), '91. Page 2 includes executive sign-off signature blocks');
+        assert(printHtml.includes('Page 2 of 2'), '92. Page 2 contains explicit Page 2 of 2 indicator');
+
+        // Test non-sample data: DEMONSTRATION SAMPLE should be omitted
+        ProcessIQ.isSampleData = false;
+        preparePrintReport();
+        const nonSampleHtml = document.getElementById('print-executive-report').innerHTML;
+        assert(!nonSampleHtml.includes('DEMONSTRATION SAMPLE'), '93. DEMONSTRATION SAMPLE badge omitted when sample data inactive');
+
+        // Restore sample data for subsequent tests
+        ProcessIQ.isSampleData = true;
+        preparePrintReport();
+
+      } catch (err) {
+        results.push(`[ERROR] Uncaught exception: ${err.message}\nStack: ${err.stack}`);
+      }
+
+      document.getElementById('test-output').innerHTML = results.join('\n');
+    });
+  </script>
+</body>
+</html>

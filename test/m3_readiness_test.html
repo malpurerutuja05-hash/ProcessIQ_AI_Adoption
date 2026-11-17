@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ProcessIQ Module 3 AI Readiness Comprehensive Test Suite</title>
+</head>
+<body>
+  <!-- Mock containers required by app.js rendering -->
+  <div id="demo-data-banner" class="hidden"></div>
+  <div class="stepper-item" data-stage="1"></div>
+  <div class="stepper-item" data-stage="2"></div>
+  <div class="stepper-item" data-stage="3"></div>
+  <div class="stepper-item" data-stage="4"></div>
+  <div class="stepper-item" data-stage="5"></div>
+
+  <section id="stage-1" class="stage-container"></section>
+  <section id="stage-2" class="stage-container hidden"></section>
+  <section id="stage-3" class="stage-container hidden"></section>
+  <section id="stage-4" class="stage-container hidden"></section>
+  <section id="stage-5" class="stage-container hidden"></section>
+
+  <!-- Module 3 DOM elements -->
+  <button id="tier-quick" onclick="changeReadinessTier('quick')">Quick</button>
+  <button id="tier-professional" onclick="changeReadinessTier('professional')">Professional</button>
+  <button id="tier-advanced" onclick="changeReadinessTier('advanced')">Advanced</button>
+
+  <span id="m3-progress-text">0 of 15 Answered</span>
+  <div id="m3-progress-bar" style="width: 0%"></div>
+  <span id="m3-score">Assessment Pending</span>
+  <span id="m3-classification" class="badge-pending">Assessment Pending</span>
+  <p id="m3-desc">Evaluating answers...</p>
+  <div id="m3-questions-container"></div>
+  <canvas id="m3Chart"></canvas>
+
+  <!-- Module 4 elements -->
+  <div id="m4-active-vendor"></div>
+  <div id="m4-year1-invest"></div>
+  <div id="m4-contract-total"></div>
+  <table><tbody id="m4-table-body"></tbody></table>
+
+  <!-- Dashboard elements -->
+  <div id="dash-labor-cost"></div>
+  <div id="dash-leakage-cost"></div>
+  <div id="dash-capacity-value"></div>
+  <div id="dash-readiness-score"></div>
+  <div id="dash-approach-title"></div>
+  <div id="dash-approach-desc"></div>
+  <div id="dash-net-benefit"></div>
+  <div id="dash-roi"></div>
+  <div id="dash-payback"></div>
+  <div id="dash-scenarios-container"></div>
+  <div id="dash-scenarios-table-container"></div>
+  <canvas id="dashChart"></canvas>
+
+  <!-- Print Container Mock -->
+  <div id="print-executive-report"></div>
+
+  <!-- Test Results Output Container -->
+  <div id="test-output">RUNNING_M3_TESTS</div>
+
+  <script src="../app.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const results = [];
+      function assert(condition, message) {
+        if (condition) {
+          results.push(`[PASS] ${message}`);
+        } else {
+          results.push(`[FAIL] ${message}`);
+        }
+      }
+
+      try {
+        // -------------------------------------------------------------
+        // TEST 1: Initial Load in Sample Data Mode
+        // -------------------------------------------------------------
+        loadSampleData();
+        const initM3 = runAIReadinessCalculations();
+        assert(ProcessIQ.isSampleData === true, '1. Sample data active initially');
+        assert(initM3.questionCount === 15, '2. Professional tier has 15 questions');
+        assert(initM3.answeredCount === 15, '3. Sample data has all 15 questions answered');
+        assert(initM3.isCompleted === true, '4. Sample data assessment is marked completed');
+        assert(initM3.overallScore === 60, `5. Sample AP readiness score is 60/100 (got ${initM3.overallScore})`);
+        assert(initM3.classification === 'Automation/AI Candidate', '6. Classification is Automation/AI Candidate');
+
+        // Check DOM buttons in sample mode
+        const q1Card = document.getElementById('m3-question-card-q1');
+        assert(q1Card !== null, '7. Question cards rendered in DOM');
+        const q1Btns = q1Card.querySelectorAll('.readiness-opt-btn');
+        assert(q1Btns.length === 5, '8. Question card has 5 option buttons');
+        // AP sample for q1 is 2
+        assert(q1Btns[2].className.includes('border-blue-600'), '9. Option 2 is highlighted active for q1');
+        assert(!q1Btns[0].className.includes('border-blue-600'), '10. Option 0 is inactive for q1');
+
+        // -------------------------------------------------------------
+        // TEST 2: Clear & Enter My Own Data Resets All Answers & Status
+        // -------------------------------------------------------------
+        clearData();
+        const clearM3 = runAIReadinessCalculations();
+        assert(ProcessIQ.isSampleData === false, '11. clearData sets isSampleData to false');
+        assert(Object.keys(ProcessIQ.readiness.answers).length === 0, '12. readiness.answers is completely empty');
+        assert(clearM3.answeredCount === 0, '13. Answered count is 0');
+        assert(clearM3.isCompleted === false, '14. isCompleted is false after clearData');
+        assert(clearM3.overallScore === 0, '15. Overall score is 0 (no synthetic score generated)');
+        assert(clearM3.classification === 'Assessment Pending', '16. Classification is Assessment Pending');
+        assert(clearM3.badgeClass === 'badge-pending', '17. Badge class is badge-pending');
+
+        // DOM verification after clearData
+        const pText = document.getElementById('m3-progress-text').innerText;
+        assert(pText.includes('0 of 15 Answered (0%)'), `18. Progress text displays 0 of 15 Answered (0%) (got '${pText}')`);
+        const pBarWidth = document.getElementById('m3-progress-bar').style.width;
+        assert(pBarWidth === '0%', `19. Progress bar width is 0% (got '${pBarWidth}')`);
+        const scoreText = document.getElementById('m3-score').innerText;
+        assert(scoreText === 'Assessment Pending', `20. m3-score displays Assessment Pending (got '${scoreText}')`);
+        const dashScore = document.getElementById('dash-readiness-score').innerText;
+        assert(dashScore === 'Assessment Pending', `21. Dashboard KPI displays Assessment Pending (got '${dashScore}')`);
+        const dashApproach = document.getElementById('dash-approach-title').innerText;
+        assert(dashApproach === 'Assessment Pending', `22. Dashboard approach recommendation displays Assessment Pending (got '${dashApproach}')`);
+
+        // Check that all question buttons in DOM are unselected
+        const freshCard = document.getElementById('m3-question-card-q1');
+        const freshBtns = freshCard.querySelectorAll('.readiness-opt-btn');
+        let anyActive = false;
+        freshBtns.forEach(b => {
+          if (b.className.includes('border-blue-600')) anyActive = true;
+        });
+        assert(!anyActive, '23. All 5 option buttons for q1 are completely unselected');
+
+        // -------------------------------------------------------------
+        // TEST 3: Select Single Answer & Visual Active State
+        // -------------------------------------------------------------
+        selectReadinessAnswer('q1', 3);
+        assert(ProcessIQ.readiness.answers['q1'] === 3, '24. State updated: answers.q1 === 3');
+        const cardQ1 = document.getElementById('m3-question-card-q1');
+        const btnsQ1 = cardQ1.querySelectorAll('.readiness-opt-btn');
+        assert(btnsQ1[3].className.includes('border-blue-600') && btnsQ1[3].className.includes('bg-blue-50'), '25. Clicked button (3/4) has active blue styling');
+        assert(!btnsQ1[0].className.includes('border-blue-600'), '26. Sibling button (0/4) is inactive');
+        assert(!btnsQ1[1].className.includes('border-blue-600'), '27. Sibling button (1/4) is inactive');
+        assert(!btnsQ1[2].className.includes('border-blue-600'), '28. Sibling button (2/4) is inactive');
+        assert(!btnsQ1[4].className.includes('border-blue-600'), '29. Sibling button (4/4) is inactive');
+
+        const pText1 = document.getElementById('m3-progress-text').innerText;
+        assert(pText1.includes('1 of 15 Answered (7%)'), `30. Progress updated to 1 of 15 Answered (7%) (got '${pText1}')`);
+        assert(document.getElementById('m3-score').innerText === 'Assessment Pending', '31. Score remains Assessment Pending with 1 answer');
+
+        // -------------------------------------------------------------
+        // TEST 4: Changing Previously Selected Answers
+        // -------------------------------------------------------------
+        // Change q1 from 3 to 1
+        selectReadinessAnswer('q1', 1);
+        assert(ProcessIQ.readiness.answers['q1'] === 1, '32. State updated to answers.q1 === 1');
+        assert(btnsQ1[1].className.includes('border-blue-600'), '33. Button 1/4 is now active');
+        assert(!btnsQ1[3].className.includes('border-blue-600'), '34. Button 3/4 reverted to inactive');
+
+        // Change q1 from 1 to 4
+        selectReadinessAnswer('q1', 4);
+        assert(ProcessIQ.readiness.answers['q1'] === 4, '35. State updated to answers.q1 === 4');
+        assert(btnsQ1[4].className.includes('border-blue-600'), '36. Button 4/4 is now active');
+        assert(!btnsQ1[1].className.includes('border-blue-600'), '37. Button 1/4 reverted to inactive');
+
+        // Change q1 from 4 to 0 (test zero/lowest option)
+        selectReadinessAnswer('q1', 0);
+        assert(ProcessIQ.readiness.answers['q1'] === 0, '38. State updated to answers.q1 === 0');
+        assert(btnsQ1[0].className.includes('border-blue-600'), '39. Button 0/4 is active');
+        assert(!btnsQ1[4].className.includes('border-blue-600'), '40. Button 4/4 reverted to inactive');
+
+        // -------------------------------------------------------------
+        // TEST 5: Test Every Option (0, 1, 2, 3, 4) on Question 2
+        // -------------------------------------------------------------
+        const cardQ2 = document.getElementById('m3-question-card-q2');
+        const btnsQ2 = cardQ2.querySelectorAll('.readiness-opt-btn');
+        [0, 1, 2, 3, 4].forEach(val => {
+          selectReadinessAnswer('q2', val);
+          assert(ProcessIQ.readiness.answers['q2'] === val, `41.${val}. Option ${val} sets state correctly`);
+          assert(btnsQ2[val].className.includes('border-blue-600'), `42.${val}. Option ${val} button shows active styling`);
+        });
+
+        // -------------------------------------------------------------
+        // TEST 6: Incomplete Assessment & No Synthetic Score
+        // -------------------------------------------------------------
+        // Set answers for q3 through q8 (total 8 answered out of 15)
+        selectReadinessAnswer('q3', 3);
+        selectReadinessAnswer('q4', 2);
+        selectReadinessAnswer('q5', 3);
+        selectReadinessAnswer('q6', 1);
+        selectReadinessAnswer('q7', 2);
+        selectReadinessAnswer('q8', 3);
+
+        const partialM3 = runAIReadinessCalculations();
+        assert(partialM3.answeredCount === 8, `43. 8 questions answered (got ${partialM3.answeredCount})`);
+        assert(partialM3.isCompleted === false, '44. isCompleted remains false');
+        assert(partialM3.overallScore === 0, '45. No synthetic score generated for unanswered questions (score is 0)');
+        assert(partialM3.classification === 'Assessment Pending', '46. Classification is Assessment Pending');
+
+        const pText8 = document.getElementById('m3-progress-text').innerText;
+        assert(pText8.includes('8 of 15 Answered (53%)'), `47. Progress text is 8 of 15 Answered (53%) (got '${pText8}')`);
+        assert(document.getElementById('m3-progress-bar').style.width === '53%', '48. Progress bar width is 53%');
+        assert(document.getElementById('m3-score').innerText === 'Assessment Pending', '49. Module 3 score shows Assessment Pending');
+        assert(document.getElementById('dash-readiness-score').innerText === 'Assessment Pending', '50. Dashboard KPI shows Assessment Pending');
+
+        // Print report in pending state
+        preparePrintReport();
+        const printPendingHtml = document.getElementById('print-executive-report').innerHTML;
+        assert(printPendingHtml.includes('Pending'), '51. Print report KPI card shows Pending status');
+
+        // -------------------------------------------------------------
+        // TEST 7: Complete Assessment & Dynamic Propagation
+        // -------------------------------------------------------------
+        // Answer remaining 7 questions (q9 through q15)
+        // User answers:
+        // q1: 0, q2: 4, q3: 3, q4: 2, q5: 3, q6: 1, q7: 2, q8: 3
+        // q9: 4, q10: 4, q11: 4, q12: 3, q13: 4, q14: 4, q15: 3
+        // Total points: 0+4+3+2+3+1+2+3 + 4+4+4+3+4+4+3 = 44 points out of 60
+        // Expected score: round((44 / 60) * 100) = round(73.333) = 73%
+        selectReadinessAnswer('q9', 4);
+        selectReadinessAnswer('q10', 4);
+        selectReadinessAnswer('q11', 4);
+        selectReadinessAnswer('q12', 3);
+        selectReadinessAnswer('q13', 4);
+        selectReadinessAnswer('q14', 4);
+        selectReadinessAnswer('q15', 3);
+
+        const compM3 = runAIReadinessCalculations();
+        assert(compM3.answeredCount === 15, '52. All 15 questions answered');
+        assert(compM3.isCompleted === true, '53. Assessment is completed');
+        assert(compM3.overallScore === 73, `54. Live verified score is 73/100 (got ${compM3.overallScore})`);
+        assert(compM3.classification === 'Automation/AI Candidate', `55. Classification is Automation/AI Candidate (got '${compM3.classification}')`);
+        assert(compM3.strengths.length > 0, '56. Strengths dynamically populated from user answers >= 3');
+        assert(compM3.weaknesses.length > 0, '57. Weaknesses dynamically populated from user answers <= 1');
+
+        // Verify UI updates
+        const pText15 = document.getElementById('m3-progress-text').innerText;
+        assert(pText15.includes('15 of 15 Answered (100%)'), `58. Progress text displays 15 of 15 Answered (100%) (got '${pText15}')`);
+        assert(document.getElementById('m3-progress-bar').style.width === '100%', '59. Progress bar is 100%');
+        assert(document.getElementById('m3-score').innerText === '73/100', `60. Module 3 score displays 73/100 (got '${document.getElementById('m3-score').innerText}')`);
+        assert(document.getElementById('dash-readiness-score').innerText === '73/100', `61. Dashboard KPI displays 73/100 (got '${document.getElementById('dash-readiness-score').innerText}')`);
+        assert(document.getElementById('dash-approach-title').innerText.includes('Supervised AI Copilot Pilot'), '62. Approach recommendation reflects 73/100 tier');
+
+        // Verify Print Report updates with user score
+        preparePrintReport();
+        const printCompHtml = document.getElementById('print-executive-report').innerHTML;
+        assert(printCompHtml.includes('73') && printCompHtml.includes('/ 100'), '63. Print report displays 73 / 100');
+        assert(printCompHtml.includes('Automation/AI Candidate'), '64. Print report displays user classification');
+
+        // -------------------------------------------------------------
+        // TEST 8: Tier Switching (Quick, Professional, Advanced)
+        // -------------------------------------------------------------
+        // Switch to Quick Tier (10 questions)
+        changeReadinessTier('quick');
+        assert(ProcessIQ.readiness.tier === 'quick', '65. Tier switched to quick');
+        const qContainer = document.getElementById('m3-questions-container');
+        assert(qContainer.children.length === 10, `66. Quick tier displays 10 question cards (got ${qContainer.children.length})`);
+        // Questions q1..q10 were answered, so quick tier should be completed!
+        const quickM3 = runAIReadinessCalculations();
+        assert(quickM3.questionCount === 10, '67. Quick tier has 10 applicable questions');
+        assert(quickM3.answeredCount === 10, '68. All 10 quick questions have preserved answers');
+        assert(quickM3.isCompleted === true, '69. Quick tier assessment is completed');
+
+        // Switch to Advanced Tier (25 questions)
+        changeReadinessTier('advanced');
+        assert(ProcessIQ.readiness.tier === 'advanced', '70. Tier switched to advanced');
+        assert(qContainer.children.length === 25, `71. Advanced tier displays 25 question cards (got ${qContainer.children.length})`);
+        const advM3 = runAIReadinessCalculations();
+        assert(advM3.questionCount === 25, '72. Advanced tier has 25 applicable questions');
+        assert(advM3.answeredCount === 15, '73. Advanced tier preserves 15 previously answered questions');
+        assert(advM3.isCompleted === false, '74. Advanced tier is incomplete (needs remaining 10 questions)');
+        assert(document.getElementById('m3-score').innerText === 'Assessment Pending', '75. Score reverts to Assessment Pending in Advanced tier');
+        assert(document.getElementById('m3-progress-text').innerText.includes('15 of 25 Answered (60%)'), '76. Progress displays 15 of 25 Answered (60%)');
+
+        // -------------------------------------------------------------
+        // TEST 9: Reloading Sample Data Re-isolates Demo Answers
+        // -------------------------------------------------------------
+        loadSampleData();
+        assert(ProcessIQ.isSampleData === true, '77. loadSampleData restores isSampleData = true');
+        assert(ProcessIQ.readiness.tier === 'professional', '78. Sample data resets to professional tier');
+        const reloadedM3 = runAIReadinessCalculations();
+        assert(reloadedM3.answeredCount === 15, '79. Sample data restores 15 answers');
+        assert(reloadedM3.overallScore === 60, `80. Sample data score is restored to 60/100 (got ${reloadedM3.overallScore})`);
+        assert(ProcessIQ.readiness.answers['q1'] === 2, '81. q1 answer restored to sample demo default of 2');
+
+        // Clear again to ensure clean slate transitions
+        clearData();
+        assert(ProcessIQ.isSampleData === false, '82. clearData clears sample data again');
+        assert(Object.keys(ProcessIQ.readiness.answers).length === 0, '83. answers empty again');
+        assert(runAIReadinessCalculations().isCompleted === false, '84. isCompleted is false again');
+
+      } catch (err) {
+        results.push(`[ERROR] ${err.message}\n${err.stack}`);
+      }
+
+      const out = document.getElementById('test-output');
+      out.innerHTML = results.join('\n');
+    });
+  </script>
+</body>
+</html>

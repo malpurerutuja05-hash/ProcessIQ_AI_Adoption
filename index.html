@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProcessIQ | Know your process cost before you invest in AI</title>
+  <meta name="description" content="ProcessIQ: Guided business transformation and AI readiness assessment. Understand process costs, discover improvement opportunities, and make smarter AI investment decisions.">
+  
+  <!-- Security & MIME Meta -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js & jsPDF + AutoTable CDN for Client-Side Generation -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Custom Enterprise Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
+
+  <!-- TOP GLOBAL HEADER -->
+  <header class="consulting-nav sticky top-0 z-50 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="goToStage(1)">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-lg tracking-tighter shadow-md">
+          IQ
+        </div>
+        <div>
+          <span class="font-extrabold text-lg tracking-tight">PROCESSIQ</span>
+          <span class="hidden sm:inline-block ml-2 text-xs text-blue-300 font-medium tracking-wide">Transformation Assistant</span>
+        </div>
+      </div>
+
+      <!-- Quick Stage Jumper -->
+      <nav class="hidden md:flex space-x-1 text-xs font-semibold">
+        <button onclick="goToStage(1)" class="px-2.5 py-1.5 rounded-md hover:bg-slate-800 transition">1. Welcome</button>
+        <button onclick="goToStage(2)" class="px-2.5 py-1.5 rounded-md hover:bg-slate-800 transition">2. Select Process</button>
+        <button onclick="goToStage(3)" class="px-2.5 py-1.5 rounded-md hover:bg-slate-800 transition">3. Enter Info</button>
+        <button onclick="goToStage(4)" class="px-2.5 py-1.5 rounded-md hover:bg-slate-800 transition">4. Results</button>
+        <button onclick="goToStage(5)" class="px-2.5 py-1.5 rounded-md hover:bg-slate-800 transition">5. Report</button>
+      </nav>
+
+      <!-- Global Actions -->
+      <div class="flex items-center space-x-2.5">
+        <!-- Currency Select -->
+        <select id="currency-select" onchange="updateCurrency(this.value)" class="bg-slate-800 text-white text-xs border border-slate-700 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-400">
+          <option value="USD" selected>USD ($)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="CAD">CAD (CA$)</option>
+          <option value="AUD">AUD (A$)</option>
+          <option value="INR">INR (₹)</option>
+          <option value="JPY">JPY (¥)</option>
+        </select>
+
+        <!-- Save Button -->
+        <button onclick="saveProgress()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1.5 rounded-md text-xs font-medium flex items-center space-x-1 transition" title="Save progress in browser">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+          <span class="hidden lg:inline">Save</span>
+        </button>
+
+        <!-- PDF Button -->
+        <button onclick="downloadPDF()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-xs font-bold shadow flex items-center space-x-1.5 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          <span class="hidden sm:inline">REPORT</span>
+          <span class="sm:hidden">PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- DEMONSTRATION SAMPLE DATA BANNER -->
+  <div id="demo-data-banner" class="demo-banner px-4 py-2.5 text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
+    <div class="flex items-center space-x-2">
+      <span class="px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-amber-200 text-amber-900 text-[10px]">Demonstration Example</span>
+      <span>You are viewing a fictional <strong>Accounts Payable</strong> demonstration example.</span>
+    </div>
+    <div class="flex items-center space-x-3">
+      <button onclick="clearData();goToStage(2)" class="font-bold underline hover:text-amber-900 transition">Clear & Enter My Own Data</button>
+      <span class="text-amber-400">|</span>
+      <button onclick="confirmStartAgain()" class="hover:text-amber-900 transition">Start Again</button>
+    </div>
+  </div>
+
+  <!-- GUIDED STAGE PROGRESS STEPPER -->
+  <div class="bg-white border-b border-slate-200 shadow-sm sticky top-16 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center justify-between overflow-x-auto no-scrollbar py-1">
+        
+        <!-- Step 1 -->
+        <div onclick="goToStage(1)" class="stepper-item active cursor-pointer flex items-center space-x-2 mr-4" data-stage="1">
+          <div class="stepper-circle">1</div>
+          <div class="whitespace-nowrap">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 1</div>
+            <div class="text-xs font-semibold text-slate-800">Welcome</div>
+          </div>
+        </div>
+        <div class="w-8 h-0.5 bg-slate-200 hidden sm:block"></div>
+
+        <!-- Step 2 -->
+        <div onclick="goToStage(2)" class="stepper-item cursor-pointer flex items-center space-x-2 mr-4" data-stage="2">
+          <div class="stepper-circle">2</div>
+          <div class="whitespace-nowrap">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 2</div>
+            <div class="text-xs font-semibold text-slate-800">Select Process</div>
+          </div>
+        </div>
+        <div class="w-8 h-0.5 bg-slate-200 hidden sm:block"></div>
+
+        <!-- Step 3 -->
+        <div onclick="goToStage(3)" class="stepper-item cursor-pointer flex items-center space-x-2 mr-4" data-stage="3">
+          <div class="stepper-circle">3</div>
+          <div class="whitespace-nowrap">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 3</div>
+            <div class="text-xs font-semibold text-slate-800">Enter Information</div>
+          </div>
+        </div>
+        <div class="w-8 h-0.5 bg-slate-200 hidden sm:block"></div>
+
+        <!-- Step 4 -->
+        <div onclick="goToStage(4)" class="stepper-item cursor-pointer flex items-center space-x-2 mr-4" data-stage="4">
+          <div class="stepper-circle">4</div>
+          <div class="whitespace-nowrap">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 4</div>
+            <div class="text-xs font-semibold text-slate-800">Analyze Results</div>
+          </div>
+        </div>
+        <div class="w-8 h-0.5 bg-slate-200 hidden sm:block"></div>
+
+        <!-- Step 5 -->
+        <div onclick="goToStage(5)" class="stepper-item cursor-pointer flex items-center space-x-2" data-stage="5">
+          <div class="stepper-circle">5</div>
+          <div class="whitespace-nowrap">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 5</div>
+            <div class="text-xs font-semibold text-slate-800">Download Case</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN GUIDED STAGES CONTAINER -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ======================================================= -->
+    <!-- STAGE 1: WELCOME EXPERIENCE                             -->
+    <!-- ======================================================= -->
+    <section id="stage-1" class="stage-container">
+      <div class="hero-gradient text-white p-8 sm:p-12 rounded-2xl shadow-xl mb-8 relative overflow-hidden">
+        <div class="max-w-3xl">
+          <span class="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-400/30 rounded-full text-xs font-bold uppercase tracking-wider mb-4">
+            Self-Explanatory Business Transformation
+          </span>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Welcome to ProcessIQ</h1>
+          <p class="mt-3 text-base sm:text-lg text-slate-300 leading-relaxed font-light">
+            Understand your process costs. Discover improvement opportunities. Make smarter AI investment decisions.
+          </p>
+
+          <div class="mt-4 p-3.5 bg-slate-800/80 border border-slate-700 rounded-lg text-xs text-slate-300 leading-relaxed max-w-2xl">
+            <strong class="text-white">No technical or AI expertise required:</strong> 
+            You do not need to be a financial analyst or AI engineer. ProcessIQ guides you through plain-language questions about how work is done today.
+          </div>
+
+          <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <button id="btn-start-assessment" onclick="goToStage(2)" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-xl text-sm font-bold shadow-lg flex items-center justify-center space-x-2 transition-all transform hover:-translate-y-0.5">
+              <span>START MY ASSESSMENT</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+            <button id="btn-explore-sample" onclick="loadSampleData();goToStage(4)" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white px-5 py-3.5 rounded-xl text-xs font-semibold shadow transition flex items-center justify-center space-x-1.5">
+              <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              <span>Explore Accounts Payable Sample Data</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- THREE CORE BENEFITS -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="card-enterprise p-6">
+          <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <h3 class="font-bold text-base text-slate-900 mb-2">1. Understand Hidden Process Costs</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Quantify the exact baseline labor hours, overtime burden, and fully-loaded employee wages currently consumed by manual work.
+          </p>
+        </div>
+
+        <div class="card-enterprise p-6">
+          <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+          <h3 class="font-bold text-base text-slate-900 mb-2">2. Discover Automation & AI Opportunities</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Pinpoint where your process loses money through errors, rework, and delays, then evaluate whether your data and systems are ready for AI.
+          </p>
+        </div>
+
+        <div class="card-enterprise p-6">
+          <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          </div>
+          <h3 class="font-bold text-base text-slate-900 mb-2">3. Download Business Case Report</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Generate an executive-ready multi-page PDF business case with ROI calculations, comparison scenarios, and a 30-day tactical roadmap.
+          </p>
+        </div>
+      </div>
+
+      <!-- LOCAL BROWSER PRIVACY STATEMENT -->
+      <div class="p-4 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between text-xs text-slate-600">
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          <span><strong>Privacy Guarantee:</strong> All calculations are performed locally in your browser. No financial data leaves your computer.</span>
+        </div>
+        <button id="btn-start-assessment-privacy" onclick="goToStage(2)" class="font-bold text-blue-600 hover:text-blue-800 underline ml-4">
+          Start Assessment →
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- STAGE 2: SELECT YOUR PROCESS                            -->
+    <!-- ======================================================= -->
+    <section id="stage-2" class="stage-container hidden">
+      <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Step 2 of 5</span>
+          <h2 class="text-2xl font-extrabold text-slate-900">What process would you like to evaluate?</h2>
+          <p class="text-xs text-slate-500 mt-1">Select an example to load standard operational benchmarks, or enter a custom process below.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="goToStage(1)" class="px-3.5 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+            ← Back
+          </button>
+          <button onclick="goToStage(3)" class="px-4 py-1.5 bg-blue-600 rounded-lg text-xs font-bold text-white hover:bg-blue-700 shadow transition">
+            Continue to Step 3 →
+          </button>
+        </div>
+      </div>
+
+      <!-- FINANCE PROCESSES -->
+      <div class="mb-8">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center space-x-2">
+          <span>Finance & Accounting Processes</span>
+          <span class="w-full h-px bg-slate-200"></span>
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div onclick="selectProcessTemplate('ap')" data-key="ap" class="process-card selected">
+            <div class="font-bold text-sm text-slate-900">Accounts Payable</div>
+            <div class="text-[11px] text-slate-500 mt-1">Vendor invoices, 3-way matching & batch payments.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 12 FTEs | $42/hr</div>
+          </div>
+          <div onclick="selectProcessTemplate('ar')" data-key="ar" class="process-card">
+            <div class="font-bold text-sm text-slate-900">Accounts Receivable</div>
+            <div class="text-[11px] text-slate-500 mt-1">Customer billing, cash allocation & collections.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 8 FTEs | $40/hr</div>
+          </div>
+          <div onclick="selectProcessTemplate('bank_rec')" data-key="bank_rec" class="process-card">
+            <div class="font-bold text-sm text-slate-900">Bank Reconciliation</div>
+            <div class="text-[11px] text-slate-500 mt-1">Statement matching, ledger feeds & exceptions.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 4 FTEs | $44/hr</div>
+          </div>
+          <div onclick="selectProcessTemplate('gl')" data-key="gl" class="process-card">
+            <div class="font-bold text-sm text-slate-900">General Ledger Closing</div>
+            <div class="text-[11px] text-slate-500 mt-1">Month-end balances, roll-forwards & closing entries.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 6 FTEs | $52/hr</div>
+          </div>
+          <div onclick="selectProcessTemplate('journal')" data-key="journal" class="process-card">
+            <div class="font-bold text-sm text-slate-900">Journal Processing</div>
+            <div class="text-[11px] text-slate-500 mt-1">Manual journal entries & supporting doc review.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 5 FTEs | $45/hr</div>
+          </div>
+          <div onclick="selectProcessTemplate('treasury')" data-key="treasury" class="process-card">
+            <div class="font-bold text-sm text-slate-900">Treasury Operations</div>
+            <div class="text-[11px] text-slate-500 mt-1">Cash positioning, wire approvals & FX liquidity.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 3 FTEs | $58/hr</div>
+          </div>
+          <div onclick="selectProcessTemplate('fin_rep')" data-key="fin_rep" class="process-card">
+            <div class="font-bold text-sm text-slate-900">Financial Reporting</div>
+            <div class="text-[11px] text-slate-500 mt-1">Variance commentary, board packs & KPI reports.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 5 FTEs | $55/hr</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OPERATIONS PROCESSES -->
+      <div class="mb-8">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center space-x-2">
+          <span>Operations & Human Resources Processes</span>
+          <span class="w-full h-px bg-slate-200"></span>
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div onclick="selectProcessTemplate('procurement')" data-key="procurement" class="process-card">
+            <div class="font-bold text-sm text-slate-900">Procurement</div>
+            <div class="text-[11px] text-slate-500 mt-1">Purchase requisitions, vendor RFQs & PO dispatch.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 9 FTEs | $46/hr</div>
+          </div>
+          <div onclick="selectProcessTemplate('order_proc')" data-key="order_proc" class="process-card">
+            <div class="font-bold text-sm text-slate-900">Order Processing</div>
+            <div class="text-[11px] text-slate-500 mt-1">Sales order validation, ERP entry & fulfillment.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 14 FTEs | $38/hr</div>
+          </div>
+          <div onclick="selectProcessTemplate('cust_service')" data-key="cust_service" class="process-card">
+            <div class="font-bold text-sm text-slate-900">Customer Service</div>
+            <div class="text-[11px] text-slate-500 mt-1">Inbound client ticketing, status checks & triage.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 16 FTEs | $32/hr</div>
+          </div>
+          <div onclick="selectProcessTemplate('inventory')" data-key="inventory" class="process-card">
+            <div class="font-bold text-sm text-slate-900">Inventory Management</div>
+            <div class="text-[11px] text-slate-500 mt-1">Cycle count logs, warehouse transfers & scrap.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 7 FTEs | $36/hr</div>
+          </div>
+          <div onclick="selectProcessTemplate('hr_ops')" data-key="hr_ops" class="process-card">
+            <div class="font-bold text-sm text-slate-900">HR Operations</div>
+            <div class="text-[11px] text-slate-500 mt-1">Employee onboarding paperwork & leave tracking.</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 5 FTEs | $42/hr</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOM PROCESS INPUT -->
+      <div class="card-enterprise p-6 mb-8 bg-slate-50/50">
+        <h4 class="font-bold text-sm text-slate-900 mb-2">Or Enter a Custom Process</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Process Name</label>
+            <input type="text" id="in-custom-name" oninput="ProcessIQ.manualCost.processName=this.value;renderAll()" placeholder="e.g. Clinical Trial Patient Onboarding" class="w-full">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Department / Business Unit</label>
+            <input type="text" id="in-custom-dept" oninput="ProcessIQ.manualCost.department=this.value;renderAll()" placeholder="e.g. Clinical Operations" class="w-full">
+          </div>
+        </div>
+      </div>
+
+      <!-- NAVIGATION BUTTONS -->
+      <div class="flex items-center justify-between pt-4 border-t border-slate-200">
+        <button onclick="goToStage(1)" class="px-5 py-2.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+          ← Back to Welcome
+        </button>
+        <button onclick="goToStage(3)" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 shadow transition flex items-center space-x-1.5">
+          <span>Continue to Step 3: Enter Information</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- STAGE 3: ENTER PROCESS INFORMATION (MODULES 1 TO 4)    -->
+    <!-- ======================================================= -->
+    <section id="stage-3" class="stage-container hidden">
+      <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Step 3 of 5</span>
+          <h2 class="text-2xl font-extrabold text-slate-900">Enter Process Information</h2>
+          <p class="text-xs text-slate-500 mt-1">Follow the guided modules below. Hover or click any question to see simple explanations and examples.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="goToStage(2)" class="px-3.5 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+            ← Change Process
+          </button>
+          <button onclick="goToStage(4)" class="px-4 py-1.5 bg-blue-600 rounded-lg text-xs font-bold text-white hover:bg-blue-700 shadow transition">
+            View Results →
+          </button>
+        </div>
+      </div>
+
+      <!-- MODULE SUB-TABS -->
+      <div class="bg-white border border-slate-200 rounded-xl p-1 mb-6 flex overflow-x-auto no-scrollbar space-x-1 text-xs font-semibold shadow-sm">
+        <button onclick="switchInputSubmodule('manual-cost')" data-submodule="manual-cost" class="submodule-tab active px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+          Module 1: Labor Cost
+        </button>
+        <button onclick="switchInputSubmodule('cost-leakage')" data-submodule="cost-leakage" class="submodule-tab px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+          Module 2: Process Leakage
+        </button>
+        <button onclick="switchInputSubmodule('ai-readiness')" data-submodule="ai-readiness" class="submodule-tab px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+          Module 3: AI Readiness (Questions)
+        </button>
+        <button onclick="switchInputSubmodule('ai-comparator')" data-submodule="ai-comparator" class="submodule-tab px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+          Module 4: AI Comparator
+        </button>
+      </div>
+
+      <!-- SUBMODULE 1: MANUAL LABOR COST -->
+      <div id="submodule-manual-cost" class="submodule-pane">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="card-enterprise p-6 lg:col-span-2 space-y-5">
+            <div class="guidance-box text-xs text-slate-700 space-y-1">
+              <strong class="text-blue-900 font-bold block">Module 1 Guidance:</strong>
+              Tell us how many employees work on this task, how much time they dedicate, and their estimated hourly cost.
+            </div>
+
+            <!-- Process Name -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-xs font-bold text-slate-900">What is the name of this workflow?</label>
+                <span class="explainer-pill">Text</span>
+              </div>
+              <input type="text" id="in-m1-name" class="w-full text-xs">
+              <p class="text-[11px] text-slate-400 mt-1">Example: Accounts Payable, Order Intake, or Customer Email Triaging.</p>
+            </div>
+
+            <!-- FTE Employees -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-xs font-bold text-slate-900">How many full-time equivalent (FTE) employees execute this?</label>
+                <span class="explainer-pill">FTE Headcount</span>
+              </div>
+              <input type="number" id="in-m1-emp" min="0" step="1" class="w-full text-xs">
+              <p class="text-[11px] text-slate-500 mt-1">
+                <strong class="text-slate-700">What is an FTE?</strong> Full-Time Equivalent counts the combined effort. If 2 full-time staff and 1 half-time person work on this, enter <strong>2.5</strong>.
+              </p>
+            </div>
+
+            <!-- Hours per Day & Days per Month -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="text-xs font-bold text-slate-900">Hours spent per person / day</label>
+                  <span class="explainer-pill">Hours / Day</span>
+                </div>
+                <input type="number" id="in-m1-hours" min="0" max="24" step="0.25" class="w-full text-xs">
+                <p class="text-[11px] text-slate-400 mt-1">Example: If an employee spends 4 hours daily, enter 4.0.</p>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="text-xs font-bold text-slate-900">Working days per month</label>
+                  <span class="explainer-pill">Days / Month</span>
+                </div>
+                <input type="number" id="in-m1-days" min="1" max="31" step="1" class="w-full text-xs">
+                <p class="text-[11px] text-slate-400 mt-1">Standard business month is usually 21 to 22 days.</p>
+              </div>
+            </div>
+
+            <!-- Hourly Rate -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-xs font-bold text-slate-900">Average fully-loaded hourly employee cost</label>
+                <span class="explainer-pill">Currency / Hour</span>
+              </div>
+              <input type="number" id="in-m1-rate" min="0" step="1" class="w-full text-xs">
+              <p class="text-[11px] text-slate-500 mt-1">
+                <strong class="text-slate-700">What is fully-loaded cost?</strong> Includes base hourly salary plus benefits, taxes, and standard office overhead (typically 1.25x to 1.35x base wage).
+              </p>
+            </div>
+
+            <!-- Overtime -->
+            <div class="pt-2 border-t border-slate-100">
+              <label class="flex items-center space-x-2 text-xs font-semibold text-slate-800 cursor-pointer">
+                <input type="checkbox" id="in-m1-overtime" class="rounded text-blue-600 focus:ring-blue-500">
+                <span>Does the team regularly incur monthly overtime for this process?</span>
+              </label>
+            </div>
+
+            <!-- Recoverable Capacity Slider -->
+            <div class="pt-3 border-t border-slate-100">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-xs font-bold text-slate-900">Estimated recoverable capacity target</label>
+                <span class="text-xs font-bold text-blue-600" id="val-m1-recovery">35%</span>
+              </div>
+              <input type="range" id="in-m1-recovery" min="0" max="100" step="5" class="w-full">
+              <p class="text-[11px] text-slate-500 mt-1">
+                <strong class="text-slate-700">What is Recoverable Capacity?</strong> The portion of routine time that automation or AI could liberate so employees can focus on higher-value exceptions and client service.
+              </p>
+            </div>
+
+            <div class="pt-3 flex justify-end">
+              <button onclick="switchInputSubmodule('cost-leakage')" class="px-5 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 shadow transition">
+                Next: Module 2 (Process Leakage) →
+              </button>
+            </div>
+          </div>
+
+          <!-- M1 Side Summary -->
+          <div class="space-y-4">
+            <div class="card-enterprise p-5 kpi-card">
+              <div class="text-xs font-semibold text-slate-500 uppercase">Monthly Labor Commitment</div>
+              <div class="text-2xl font-black text-slate-900 mt-1" id="m1-monthly-labor">$0</div>
+              <div class="text-xs text-slate-500 mt-2 flex justify-between">
+                <span>Annualized Labor:</span>
+                <span class="font-bold text-slate-800" id="m1-annual-labor">$0</span>
+              </div>
+            </div>
+
+            <div class="card-enterprise p-5 kpi-card emerald">
+              <div class="text-xs font-semibold text-slate-500 uppercase">Potential Capacity Value</div>
+              <div class="text-2xl font-black text-emerald-600 mt-1" id="m1-recoverable-value">$0</div>
+              <div class="text-xs text-slate-500 mt-2 flex justify-between">
+                <span>Recoverable Hours:</span>
+                <span class="font-bold text-emerald-700" id="m1-recoverable-hours">0 hrs</span>
+              </div>
+            </div>
+
+            <div class="card-enterprise p-4">
+              <h4 class="text-xs font-bold text-slate-700 mb-2">Labor Commitment Breakdown</h4>
+              <div class="h-44 w-full">
+                <canvas id="m1Chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBMODULE 2: PROCESS COST LEAKAGE -->
+      <div id="submodule-cost-leakage" class="submodule-pane hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="card-enterprise p-6 lg:col-span-2 space-y-4">
+            <div class="guidance-box text-xs text-slate-700 space-y-1">
+              <strong class="text-rose-900 font-bold block">Module 2 Guidance: Where does this process lose money?</strong>
+              Every manual process experiences defects. Enter estimates for transaction errors, rework hours, delays, and penalties.
+            </div>
+
+            <!-- Error Leakage -->
+            <div class="p-3.5 border rounded-lg bg-slate-50/50">
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="font-bold text-xs text-slate-900">1. Data Entry & Transaction Errors</label>
+                <span class="explainer-pill">Errors</span>
+              </div>
+              <p class="text-[11px] text-slate-500 mb-2">How many transactions occur each month, what percentage contain mistakes, and what does it cost to fix each one?</p>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <span class="text-[10px] text-slate-500">Monthly Volume</span>
+                  <input type="number" id="in-m2-err-vol" class="w-full text-xs" value="8500" oninput="ProcessIQ.costLeakage.errors.monthlyVolume=this.value;renderAll()">
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-500">Error Rate (%)</span>
+                  <input type="number" id="in-m2-err-rate" class="w-full text-xs" value="2.8" step="0.1" oninput="ProcessIQ.costLeakage.errors.errorRatePct=this.value;renderAll()">
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-500">Cost Per Error</span>
+                  <input type="number" id="in-m2-err-cost" class="w-full text-xs" value="35" oninput="ProcessIQ.costLeakage.errors.avgCostPerError=this.value;renderAll()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Rework Hours -->
+            <div class="p-3.5 border rounded-lg bg-slate-50/50">
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="font-bold text-xs text-slate-900">2. Internal Labor Rework & Re-Keying</label>
+                <span class="explainer-pill">Rework</span>
+              </div>
+              <p class="text-[11px] text-slate-500 mb-2">How many operator hours per month are wasted re-entering malformed data or correcting downstream defects?</p>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <span class="text-[10px] text-slate-500">Monthly Rework Hours</span>
+                  <input type="number" id="in-m2-rework-hrs" class="w-full text-xs" value="75" oninput="ProcessIQ.costLeakage.rework.monthlyHours=this.value;renderAll()">
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-500">Rework Hourly Rate</span>
+                  <input type="number" id="in-m2-rework-rate" class="w-full text-xs" value="48" oninput="ProcessIQ.costLeakage.rework.hourlyRate=this.value;renderAll()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Delays & Discounts -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="p-3 border rounded-lg bg-slate-50/50">
+                <label class="font-bold text-xs text-slate-900 block mb-1">3. Transaction Delays</label>
+                <span class="text-[10px] text-slate-500 block mb-1">Delayed Volume × Cost/Delay</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="number" id="in-m2-delays-vol" placeholder="Delayed / Mo" class="w-full text-xs" value="120" oninput="ProcessIQ.costLeakage.delays.monthlyDelayedVolume=this.value;renderAll()">
+                  <input type="number" id="in-m2-delays-cost" placeholder="Cost / Delay" class="w-full text-xs" value="45" oninput="ProcessIQ.costLeakage.delays.avgCostPerDelay=this.value;renderAll()">
+                </div>
+              </div>
+
+              <div class="p-3 border rounded-lg bg-slate-50/50">
+                <label class="font-bold text-xs text-slate-900 block mb-1">4. Missed Discounts</label>
+                <span class="text-[10px] text-slate-500 block mb-1">Missed early payment discounts</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="number" id="in-m2-disc-count" placeholder="Missed / Mo" class="w-full text-xs" value="15" oninput="ProcessIQ.costLeakage.missedDiscounts.monthlyMissedCount=this.value;renderAll()">
+                  <input type="number" id="in-m2-disc-val" placeholder="Avg Discount Value" class="w-full text-xs" value="380" oninput="ProcessIQ.costLeakage.missedDiscounts.avgDiscountValue=this.value;renderAll()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Duplicate Payments & Penalties -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="p-3 border rounded-lg bg-slate-50/50">
+                <label class="font-bold text-xs text-slate-900 block mb-1">5. Duplicate Payments</label>
+                <span class="text-[10px] text-slate-500 block mb-1">Count × Avg Amount</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="number" id="in-m2-dup-count" placeholder="Duplicates" class="w-full text-xs" value="4" oninput="ProcessIQ.costLeakage.duplicatePayments.monthlyDuplicateCount=this.value;renderAll()">
+                  <input type="number" id="in-m2-dup-amt" placeholder="Avg Amount" class="w-full text-xs" value="1450" oninput="ProcessIQ.costLeakage.duplicatePayments.avgDuplicateAmount=this.value;renderAll()">
+                </div>
+              </div>
+
+              <div class="p-3 border rounded-lg bg-slate-50/50">
+                <label class="font-bold text-xs text-slate-900 block mb-1">6. Penalties & Fines</label>
+                <span class="text-[10px] text-slate-500 block mb-1">Monthly regulatory/SLA penalties</span>
+                <input type="number" id="in-m2-penalties" class="w-full text-xs" value="1800" oninput="ProcessIQ.costLeakage.penalties.monthlyAmount=this.value;renderAll()">
+              </div>
+            </div>
+
+            <!-- Overlap Warnings Box -->
+            <div id="m2-warnings" class="space-y-2 pt-2"></div>
+
+            <div class="pt-3 flex justify-between">
+              <button onclick="switchInputSubmodule('manual-cost')" class="px-4 py-2 border rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+                ← Back to Module 1
+              </button>
+              <button onclick="switchInputSubmodule('ai-readiness')" class="px-5 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 shadow transition">
+                Next: Module 3 (AI Readiness) →
+              </button>
+            </div>
+          </div>
+
+          <!-- M2 Side Summary -->
+          <div class="space-y-4">
+            <div class="card-enterprise p-5 kpi-card crimson">
+              <div class="text-xs font-semibold text-slate-500 uppercase">Total Monthly Leakage</div>
+              <div class="text-2xl font-black text-rose-600 mt-1" id="m2-monthly-leakage">$0</div>
+              <div class="text-xs text-slate-500 mt-2 flex justify-between">
+                <span>Annualized Leakage:</span>
+                <span class="font-bold text-rose-700" id="m2-annual-leakage">$0</span>
+              </div>
+            </div>
+
+            <div class="card-enterprise p-5">
+              <div class="text-xs font-semibold text-slate-500 uppercase">Top Cost Driver</div>
+              <div class="text-base font-bold text-slate-800 mt-1" id="m2-top-driver">-</div>
+              <div class="text-xs text-slate-400 mt-1">Identified via Pareto ranking</div>
+            </div>
+
+            <div class="card-enterprise p-4">
+              <h4 class="text-xs font-bold text-slate-700 mb-2">Cost Leakage by Category</h4>
+              <div class="h-52 w-full">
+                <canvas id="m2Chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBMODULE 3: AI READINESS QUESTIONNAIRE -->
+      <div id="submodule-ai-readiness" class="submodule-pane hidden">
+        <div class="card-enterprise p-6 mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Module 3: Is My Process AI-Ready?</h3>
+              <p class="text-xs text-slate-500">Select an assessment depth below. Answer questions on how work is documented and governed.</p>
+            </div>
+
+            <!-- Tier Selector -->
+            <div class="inline-flex rounded-lg border border-slate-200 bg-white p-1 text-xs font-semibold shadow-sm">
+              <button onclick="changeReadinessTier('quick')" id="tier-quick" class="px-3 py-1.5 rounded-md hover:bg-slate-100 transition">
+                Quick (10 Qs)
+              </button>
+              <button onclick="changeReadinessTier('professional')" id="tier-professional" class="px-3 py-1.5 rounded-md bg-blue-600 text-white shadow-sm transition">
+                Professional (15 Qs)
+              </button>
+              <button onclick="changeReadinessTier('advanced')" id="tier-advanced" class="px-3 py-1.5 rounded-md hover:bg-slate-100 transition">
+                Advanced (25 Qs)
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 border-t border-slate-100 pt-4">
+            <div>
+              <span class="text-xs text-slate-500 block">Assessment Progress</span>
+              <span class="text-lg font-bold text-slate-900" id="m3-progress-text">0 of 15 Answered</span>
+              <div class="w-full bg-slate-200 rounded-full h-1.5 mt-1.5 overflow-hidden">
+                <div id="m3-progress-bar" class="bg-blue-600 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+            <div>
+              <span class="text-xs text-slate-500 block">Overall Readiness Score</span>
+              <span class="text-2xl font-black text-slate-900" id="m3-score">Assessment Pending</span>
+            </div>
+            <div>
+              <span class="text-xs text-slate-500 block">Classification</span>
+              <span id="m3-classification" class="inline-block mt-1 px-2.5 py-0.5 text-xs font-semibold rounded-full badge-pending">Assessment Pending</span>
+            </div>
+            <div>
+              <span class="text-xs text-slate-500 block">Status Description</span>
+              <p class="text-[11px] text-slate-600 mt-1 leading-snug" id="m3-desc">Evaluating answers...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Questions Container -->
+        <div id="m3-questions-container" class="space-y-4 mb-6"></div>
+
+        <div class="flex justify-between">
+          <button onclick="switchInputSubmodule('cost-leakage')" class="px-4 py-2 border rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+            ← Back to Module 2
+          </button>
+          <button onclick="switchInputSubmodule('ai-comparator')" class="px-5 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 shadow transition">
+            Next: Module 4 (AI Comparator) →
+          </button>
+        </div>
+      </div>
+
+      <!-- SUBMODULE 4: AI COMPARATOR -->
+      <div id="submodule-ai-comparator" class="submodule-pane hidden">
+        <div class="card-enterprise p-6 mb-6">
+          <h3 class="text-base font-bold text-slate-900 mb-1">Module 4: Enterprise AI Investment Comparator</h3>
+          <p class="text-xs text-slate-500 mb-4">Compare verified vendor pricing (Microsoft 365 Copilot, Copilot Studio, Claude Enterprise, and Custom LLM API).</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Target User Licenses (Seats)</label>
+              <input type="number" id="in-m4-users" class="w-full text-xs">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">One-Time Implementation Capex</label>
+              <input type="number" id="in-m4-capex" class="w-full text-xs">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">One-Time Integration Capex</label>
+              <input type="number" id="in-m4-integ" class="w-full text-xs">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Annual Maintenance & Support</label>
+              <input type="number" id="in-m4-support" class="w-full text-xs">
+            </div>
+          </div>
+          <div class="mt-3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-600">
+            <span class="font-semibold text-slate-800">Illustrative Enterprise Assumptions:</span> One-time implementation capex ($25,000 default), integration capex ($15,000 default), and annual support & maintenance ($8,000/yr default) are illustrative industry baseline estimates applied across all architectures. You can configure and edit these values at any time to reflect your specific vendor SOW or internal IT cost model.
+          </div>
+        </div>
+
+        <div class="card-enterprise overflow-hidden mb-6">
+          <div class="p-3.5 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+            <h4 class="font-bold text-xs text-slate-800 uppercase tracking-wider">Enterprise Pricing Comparison</h4>
+            <span class="text-xs text-slate-500">Official Reference Price &bull; Quote-Based Price &bull; Custom Price Entered by User</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-100 text-slate-600 uppercase font-semibold border-b">
+                <tr>
+                  <th class="p-3">Platform & Tier</th>
+                  <th class="p-3 text-right">Year 1 Subscriptions</th>
+                  <th class="p-3 text-right">Year 1 Usage / Tokens</th>
+                  <th class="p-3 text-right">Annual Support & Maint.</th>
+                  <th class="p-3 text-right">Implementation Capex</th>
+                  <th class="p-3 text-right">Total Year 1 Investment</th>
+                  <th class="p-3 text-right">3-Year Contract Cost</th>
+                  <th class="p-3 text-center">Active Selection</th>
+                </tr>
+              </thead>
+              <tbody id="m4-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="flex justify-between">
+          <button onclick="switchInputSubmodule('ai-readiness')" class="px-4 py-2 border rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+            ← Back to Module 3
+          </button>
+          <button onclick="goToStage(4)" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 shadow transition flex items-center space-x-1.5">
+            <span>Continue to Step 4: Analyze Results</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- STAGE 4: ANALYZE RESULTS (CONSOLIDATED DASHBOARD)       -->
+    <!-- ======================================================= -->
+    <section id="stage-4" class="stage-container hidden">
+      <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Step 4 of 5</span>
+          <h2 class="text-2xl font-extrabold text-slate-900">Consolidated Business Case Results</h2>
+          <p class="text-xs text-slate-500 mt-1">Here is what your inputs reveal about process costs, leakage, and potential AI returns.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="goToStage(3)" class="px-3.5 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+            ← Edit Inputs
+          </button>
+          <button onclick="goToStage(5)" class="px-5 py-1.5 bg-blue-600 rounded-lg text-xs font-bold text-white hover:bg-blue-700 shadow transition">
+            Download Report →
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI CARDS WITH EXPLAINER DETAILS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Labor Card -->
+        <div class="card-enterprise p-5 kpi-card">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Annual Manual Labor</div>
+          <div class="text-2xl font-black text-slate-900 mt-1" id="dash-labor-cost">$0</div>
+          <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-600 leading-snug">
+            <strong class="text-slate-800">What this means:</strong> Total annual employee wages dedicated to running this workflow manually.
+          </div>
+        </div>
+
+        <!-- Leakage Card -->
+        <div class="card-enterprise p-5 kpi-card crimson">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Annual Cost Leakage</div>
+          <div class="text-2xl font-black text-rose-600 mt-1" id="dash-leakage-cost">$0</div>
+          <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-600 leading-snug">
+            <strong class="text-slate-800">What this means:</strong> Money lost to defects, rework, delays, missed discounts, and penalties.
+          </div>
+        </div>
+
+        <!-- AI Readiness Card -->
+        <div class="card-enterprise p-5 kpi-card amber">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">AI Readiness Score</div>
+          <div class="text-2xl font-black text-amber-600 mt-1" id="dash-readiness-score">0/100</div>
+          <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-600 leading-snug">
+            <strong class="text-slate-800">What this means:</strong> Diagnostic maturity rating across data quality, standardization, and governance.
+          </div>
+        </div>
+
+        <!-- Net Financial Return Card -->
+        <div class="card-enterprise p-5 kpi-card emerald">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Net Annual Benefit</div>
+          <div class="text-2xl font-black text-emerald-600 mt-1" id="dash-net-benefit">$0</div>
+          <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-600 leading-snug flex justify-between">
+            <span>ROI: <strong class="text-slate-800" id="dash-roi">0%</strong></span>
+            <span>Payback: <strong class="text-slate-800" id="dash-payback">0 mo</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STRATEGIC RECOMMENDATION BANNER -->
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-blue-600 text-white">Recommended Strategy</span>
+            <h3 class="text-base font-bold text-slate-900" id="dash-approach-title">Evaluation in progress...</h3>
+          </div>
+          <p class="text-xs text-slate-600 mt-1.5 max-w-4xl" id="dash-approach-desc">Analyzing readiness matrix and cost drivers...</p>
+        </div>
+        <button onclick="goToStage(5)" class="shrink-0 text-xs font-bold text-blue-700 hover:text-blue-900 underline">
+          Download Executive PDF →
+        </button>
+      </div>
+
+      <!-- SCENARIOS COMPARISON -->
+      <div class="mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+          <h3 class="text-lg font-bold text-slate-900">Three Transformation Scenarios</h3>
+          <span class="text-xs px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-600 rounded-full font-medium">Reconciled Financial Architecture</span>
+        </div>
+        <p class="text-xs text-slate-500 mb-4">Compare status-quo operations against automation-first and full AI transformation across 7 independent financial dimensions.</p>
+
+        <!-- Scenario Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6" id="dash-scenarios-container"></div>
+
+        <!-- Executive Scenario Reconciliation Table -->
+        <div class="card-enterprise p-5 mb-6 overflow-hidden">
+          <h4 class="font-bold text-sm text-slate-900 mb-1">Executive Scenario Reconciliation Table</h4>
+          <p class="text-xs text-slate-500 mb-3">Side-by-side reconciliation of gross operating savings, technology expenses, net benefits, ROI, and payback.</p>
+          <div class="overflow-x-auto" id="dash-scenarios-table-container"></div>
+        </div>
+
+        <!-- Financial Model Definitions & Methodology -->
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 space-y-3">
+          <div class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+            <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Financial Benefit Classification & Value Realization Framework</span>
+          </div>
+
+          <!-- 4 Financial Categories -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+              <span class="font-bold text-emerald-700 block mb-1">1. Actual Cash Savings</span>
+              <span class="text-[11px] text-slate-600 leading-relaxed">Direct outlays eliminated from accounts (e.g. avoided duplicate vendor payments, zeroed regulatory/SLA penalties, and early-payment settlement discounts captured).</span>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+              <span class="font-bold text-rose-700 block mb-1">2. Avoided Process Leakage</span>
+              <span class="text-[11px] text-slate-600 leading-relaxed">Eliminated defect waste, transaction exception triaging, and delayed queue friction across internal operations.</span>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+              <span class="font-bold text-blue-700 block mb-1">3. Recoverable Capacity Value</span>
+              <span class="text-[11px] text-slate-600 leading-relaxed">Employee hours liberated from repetitive tasks, valued at loaded wage rates. Liberated for customer service, analysis, and strategic execution.</span>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+              <span class="font-bold text-purple-700 block mb-1">4. Total Economic Benefit</span>
+              <span class="text-[11px] text-slate-600 leading-relaxed">Comprehensive gross operating savings combining actual cash savings, avoided leakage, and employee capacity value released.</span>
+            </div>
+          </div>
+
+          <!-- Financial Model Metrics & Formulas -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+              <span class="font-bold text-slate-800 block mb-1">Gross Annual Operating Savings</span>
+              <span class="text-[11px] text-slate-500">Actual Cash Savings + Avoided Leakage + Capacity Value. Total operational value generated before technology expenses.</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+              <span class="font-bold text-slate-800 block mb-1">Annual Technology Opex</span>
+              <span class="text-[11px] text-slate-500">Ongoing software licenses, cloud capacity, overage fees, and vendor maintenance/support.</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+              <span class="font-bold text-slate-800 block mb-1">Net Annual Recurring Benefit</span>
+              <span class="text-[11px] text-slate-500">Gross Operating Savings minus Annual Technology Operating Costs. Ongoing annual surplus.</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+              <span class="font-bold text-slate-800 block mb-1">One-Time Capex</span>
+              <span class="text-[11px] text-slate-500">Upfront implementation, systems integration, workflow automation, and staff training outlay.</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+              <span class="font-bold text-slate-800 block mb-1">First-Year Net Benefit</span>
+              <span class="text-[11px] text-slate-500">Net Annual Recurring Benefit minus One-Time Implementation Capex. Net value delivered in Year 1.</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
+              <span class="font-bold text-slate-800 block mb-1">ROI Metrics (Recurring vs 1st-Year)</span>
+              <span class="text-[11px] text-slate-500"><strong>Recurring Annual ROI:</strong> (Net Recurring Benefit / Capex) &times; 100%.<br><strong>1st-Year Net ROI:</strong> (1st-Year Net Benefit / Capex) &times; 100%.</span>
+            </div>
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm sm:col-span-2 lg:col-span-3">
+              <span class="font-bold text-slate-800 block mb-1">Payback Period (Months)</span>
+              <span class="text-[11px] text-slate-500">One-Time Capex / (Net Annual Recurring Benefit / 12). Indicates elapsed months to recoup upfront outlay. <em>(Scenario A Baseline shows N/A – Baseline Scenario)</em>.</span>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-200 text-slate-500 text-[11px] leading-relaxed space-y-1">
+            <p><strong>Capacity Recovery Distinction:</strong> Recovered employee capacity reflects productive bandwidth liberated for high-value execution. It does not constitute guaranteed cash payroll reduction unless staffing or overtime is formally restructured.</p>
+            <p><strong>Anti-Double-Counting Safeguards:</strong> Overlap between transaction error remediation and manual rework hours has been deduplicated. Delayed transactions and SLA penalties are reconciled to prevent double-counting.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD CHART -->
+      <div class="card-enterprise p-6 mb-8">
+        <h4 class="font-bold text-sm text-slate-800 mb-2">Cost & Benefit Distribution Across Scenarios</h4>
+        <div class="h-64 sm:h-80 w-full">
+          <canvas id="dashChart"></canvas>
+        </div>
+      </div>
+
+      <!-- ABOUT PROCESSIQ OVERVIEW CARD -->
+      <div class="card-enterprise p-6 mb-8 bg-gradient-to-r from-slate-50 to-white">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-3">
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-sm text-slate-900">About ProcessIQ</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-medium">Executive Cockpit</span>
+          </div>
+          <div class="text-xs text-slate-500">
+            Created by <span class="font-semibold text-slate-800">Yuvraj Malpure</span>
+          </div>
+        </div>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          ProcessIQ is an objective business transformation platform designed to quantify manual process expenditure, detect cost leakages, evaluate organizational AI readiness, and compare enterprise AI vendor investments before committing transformation budgets.
+        </p>
+      </div>
+
+      <div class="flex justify-between pt-4 border-t border-slate-200">
+        <button onclick="goToStage(3)" class="px-5 py-2.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+          ← Back to Edit Inputs
+        </button>
+        <button onclick="goToStage(5)" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 shadow transition flex items-center space-x-1.5">
+          <span>Continue to Step 5: Download Report</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- STAGE 5: DOWNLOAD BUSINESS CASE REPORT                  -->
+    <!-- ======================================================= -->
+    <section id="stage-5" class="stage-container hidden">
+      <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Step 5 of 5</span>
+          <h2 class="text-2xl font-extrabold text-slate-900">Your Business Case is Ready</h2>
+          <p class="text-xs text-slate-500 mt-1">Download your multi-page consulting PDF report, export data to Excel, or save your progress.</p>
+        </div>
+        <button onclick="goToStage(4)" class="px-3.5 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+          ← Back to Results
+        </button>
+      </div>
+
+      <!-- ACTION CARDS -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- PDF Download -->
+        <div class="card-enterprise p-6 flex flex-col justify-between border-2 border-blue-600 shadow-md">
+          <div>
+            <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 mb-1">Download PDF Report</h3>
+            <p class="text-xs text-slate-500 mb-4">A 14-section consulting report including cover page, executive summary, ROI analysis, and 30-day roadmap.</p>
+          </div>
+          <button onclick="downloadPDF()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow transition flex items-center justify-center space-x-2">
+            <span>DOWNLOAD REPORT – PDF</span>
+          </button>
+        </div>
+
+        <!-- CSV Export -->
+        <div class="card-enterprise p-6 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 mb-1">Export Data to Excel</h3>
+            <p class="text-xs text-slate-500 mb-4">Export all baseline parameters, defect counts, vendor costs, and scenario tables in clean CSV format.</p>
+          </div>
+          <button onclick="downloadCSV()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-bold shadow transition">
+            EXPORT TO EXCEL (CSV)
+          </button>
+        </div>
+
+        <!-- Print View -->
+        <div class="card-enterprise p-6 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 mb-1">Executive Print Report</h3>
+            <p class="text-xs text-slate-500 mb-4">Generate a 2-page print-ready executive summary for executive presentations, reviews, or saving as browser PDF.</p>
+          </div>
+          <button id="btn-print-executive-report" onclick="printExecutiveReport()" class="w-full py-3 border border-slate-300 hover:bg-slate-50 text-slate-800 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            <span>PRINT EXECUTIVE REPORT</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- FINAL SUMMARY CALLOUT -->
+      <div class="card-enterprise p-6 mb-8">
+        <h4 class="font-bold text-sm text-slate-900 mb-3">Assessment Summary Snapshot</h4>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
+          <div class="p-3 bg-slate-50 rounded-lg">
+            <span class="text-slate-500 block text-[10px]">Process Name</span>
+            <span class="font-bold text-slate-900 text-sm" id="stage5-summary-process">Accounts Payable</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-lg">
+            <span class="text-slate-500 block text-[10px]">Annual Labor Cost</span>
+            <span class="font-bold text-slate-900 text-sm" id="stage5-summary-labor">$0</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-lg">
+            <span class="text-slate-500 block text-[10px]">Process Cost Leakage</span>
+            <span class="font-bold text-rose-600 text-sm" id="stage5-summary-leakage">$0</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-lg">
+            <span class="text-slate-500 block text-[10px]">Net Annual Benefit</span>
+            <span class="font-bold text-emerald-600 text-sm" id="stage5-summary-benefit">$0</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-lg">
+            <span class="text-slate-500 block text-[10px]">Projected ROI</span>
+            <span class="font-bold text-blue-600 text-sm" id="stage5-summary-roi">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSION CONTROLS -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
+        <div class="flex items-center space-x-3">
+          <button onclick="saveProgress()" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+            Save Progress in Browser
+          </button>
+          <button onclick="confirmStartAgain()" class="px-4 py-2 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-semibold transition">
+            Start Again with New Assessment
+          </button>
+        </div>
+        <button onclick="goToStage(1)" class="text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
+          Return to Welcome Screen
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- ABOUT & METHODOLOGY SECTION                             -->
+    <!-- ======================================================= -->
+    <section id="tab-methodology" class="stage-container hidden">
+      <div class="max-w-4xl mx-auto space-y-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-600">About & Governance</span>
+            <h2 class="text-2xl font-extrabold text-slate-900">About ProcessIQ & Methodology</h2>
+            <p class="text-sm text-slate-600 mt-1">An objective enterprise transformation framework to evaluate manual workflow economics before capital allocation.</p>
+          </div>
+          <button onclick="goToStage(ProcessIQ.currentStage)" class="px-3.5 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+            ← Return to Assessment
+          </button>
+        </div>
+
+        <!-- About ProcessIQ Card -->
+        <div class="card-enterprise p-6 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-bold text-slate-900">About ProcessIQ</h3>
+            <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md">Enterprise SaaS Architecture</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            ProcessIQ was designed to solve a critical enterprise problem: organizations rushing into generative AI licenses without first understanding whether their workflows are standardized, repeatable, or financially suited for automation. By unifying manual labor costs, operational defect leakage, 15-dimensional AI readiness scoring, and transparent vendor total cost of ownership (TCO) models, ProcessIQ equips executives with defensible business cases.
+          </p>
+          <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-slate-500 gap-2">
+            <span>Client-side analytical cockpit &bull; Zero server storage &bull; Pure browser execution</span>
+            <span class="text-slate-700 font-medium">Created by <strong class="text-slate-900 font-semibold">Yuvraj Malpure</strong></span>
+          </div>
+        </div>
+
+        <div class="card-enterprise p-6 space-y-4">
+          <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            <span>Client-Side Privacy Guarantee (Zero Database)</span>
+          </h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            ProcessIQ operates exclusively in client memory. All calculations, chart projections, CSV compilations, and PDF renderings are computed locally in your browser. 
+            No financial inputs, process parameters, employee counts, or wage data are ever stored in a database, sent across external APIs, or shared with third-party tracking platforms.
+          </p>
+        </div>
+
+        <div class="card-enterprise p-6 space-y-4">
+          <h3 class="text-base font-bold text-slate-900">Official Vendor Pricing Documentation</h3>
+          <ul class="text-xs text-slate-600 space-y-2">
+            <li>• <strong>Microsoft 365 Copilot:</strong> $30/user/month (annual commitment). Verified from <a href="https://www.microsoft.com/en-us/microsoft-365/enterprise/copilot-for-microsoft-365" target="_blank" class="text-blue-600 underline">Microsoft Official Enterprise Portal</a>.</li>
+            <li>• <strong>Microsoft Copilot Studio:</strong> $200/tenant/month includes 25,000 messages. Verified from <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/billing-licensing" target="_blank" class="text-blue-600 underline">Microsoft Learn Documentation</a>.</li>
+            <li>• <strong>Claude Enterprise:</strong> Quotation-based enterprise agreement. Representative benchmark estimate: $45/user/month. Verified from <a href="https://www.anthropic.com/pricing#enterprise" target="_blank" class="text-blue-600 underline">Anthropic Enterprise Pricing</a>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- EDITABLE SUBSCRIPTION PRICING MODAL (MODULE 4)         -->
+    <!-- ======================================================= -->
+    <div id="edit-pricing-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden transform transition-all">
+        <!-- Modal Header -->
+        <div class="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+          <div>
+            <h3 id="modal-vendor-title" class="font-bold text-slate-900 text-sm">Edit Subscription Pricing</h3>
+            <p id="modal-vendor-subtitle" class="text-xs text-slate-500 mt-0.5">Customize pricing parameters for bespoke enterprise agreements.</p>
+          </div>
+          <button type="button" onclick="closeEditPriceModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/60 transition" aria-label="Close modal">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-5 space-y-4">
+          <!-- Reference Price Badge / Notice -->
+          <div class="p-3 rounded-lg bg-blue-50/70 border border-blue-200/70 text-xs text-blue-900">
+            <div class="font-semibold flex items-center gap-1.5 mb-1 text-blue-800">
+              <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span id="modal-ref-label">Official Reference Price</span>
+            </div>
+            <p id="modal-ref-text" class="text-slate-600 leading-relaxed"></p>
+          </div>
+
+          <!-- Inputs Form -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" id="modal-price-label">Subscription Price</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs font-bold" id="modal-currency-symbol">$</span>
+                <input type="number" id="modal-input-price" step="any" min="0" oninput="updateModalPreview()" onchange="updateModalPreview()" class="w-full text-xs pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Billing Frequency</label>
+              <select id="modal-input-billing" onchange="updateModalPreview()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                <option value="monthly">Monthly ($/month)</option>
+                <option value="annually">Annually ($/year)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Number of Users / Seats</label>
+              <input type="number" id="modal-input-users" min="1" oninput="updateModalPreview()" onchange="updateModalPreview()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Monthly Additional Usage ($/mo)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs font-bold" id="modal-currency-symbol-2">$</span>
+                <input type="number" id="modal-input-usage" step="any" min="0" oninput="updateModalPreview()" onchange="updateModalPreview()" class="w-full text-xs pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Calculation Impact Preview -->
+          <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-xs space-y-1.5">
+            <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Live Calculation Preview</div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Monthly Licensing:</span>
+              <span class="font-semibold text-slate-800" id="modal-preview-monthly">$0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Year 1 Licensing (Annual):</span>
+              <span class="font-bold text-blue-700" id="modal-preview-annual">$0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Year 1 Usage / Consumption:</span>
+              <span class="font-semibold text-slate-800" id="modal-preview-usage">$0</span>
+            </div>
+            <div class="flex justify-between border-t border-slate-200 pt-1 font-medium">
+              <span class="text-slate-700 font-semibold">Total Year 1 Investment (inc. Capex):</span>
+              <span class="font-bold text-slate-900" id="modal-preview-total-year1">$0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-700 font-semibold">3-Year Contract Estimated Cost:</span>
+              <span class="font-bold text-blue-600" id="modal-preview-3yr">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
+          <button type="button" onclick="resetCurrentVendorPrice()" class="px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg font-medium transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span>Reset to Default</span>
+          </button>
+
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="closeEditPriceModal()" class="px-3.5 py-1.5 text-xs border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg font-medium transition">
+              Cancel
+            </button>
+            <button type="button" onclick="saveCustomPrice()" class="px-4 py-1.5 text-xs bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-sm transition">
+              Save Custom Price
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- DEDICATED 2-PAGE EXECUTIVE PRINT REPORT CONTAINER (Rendered only on print / PDF generation) -->
+  <div id="print-executive-report" class="print-report-container" aria-hidden="true"></div>
+
+  <!-- ENTERPRISE FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="font-bold text-slate-200 text-sm">ProcessIQ</span>
+          <span class="text-slate-600">&bull;</span>
+          <span class="text-slate-400">Created by <span class="text-slate-200 font-medium">Yuvraj Malpure</span></span>
+        </div>
+        <div class="text-[11px] text-slate-400 mt-1">Know your process cost before you invest in AI.</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">Client-side analytics engine &bull; Zero database retention &bull; Compliant with enterprise security standards</div>
+      </div>
+      <div class="flex space-x-6 text-slate-400">
+        <button onclick="switchTab('methodology')" class="hover:text-white transition">About & Methodology</button>
+        <button onclick="downloadCSV()" class="hover:text-white transition">Export CSV</button>
+        <button onclick="printExecutiveReport()" class="hover:text-white transition">Print View</button>
+        <button onclick="downloadPDF()" class="hover:text-white transition">PDF Report</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>

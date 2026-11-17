@@ -1,0 +1,462 @@
+/* ==========================================================================
+   ProcessIQ: Enterprise Consulting SaaS Stylesheet
+   Designed for Trust, Financial Intelligence, and Clarity
+   ========================================================================== */
+
+:root {
+  --primary-navy: #0f172a;
+  --secondary-navy: #1e293b;
+  --accent-blue: #2563eb;
+  --accent-hover: #1d4ed8;
+  --emerald-green: #059669;
+  --amber-gold: #d97706;
+  --crimson-red: #dc2626;
+  --slate-bg: #f8fafc;
+  --border-color: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-main);
+  background-color: var(--slate-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Consulting Header & Gradients */
+.consulting-nav {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-gradient {
+  background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 100%);
+}
+
+.card-enterprise {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.card-enterprise:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  border-color: #cbd5e1;
+}
+
+.kpi-card {
+  border-left: 4px solid var(--accent-blue);
+}
+
+.kpi-card.emerald {
+  border-left-color: var(--emerald-green);
+}
+
+.kpi-card.amber {
+  border-left-color: var(--amber-gold);
+}
+
+.kpi-card.crimson {
+  border-left-color: var(--crimson-red);
+}
+
+/* Tab active state */
+.module-tab.active {
+  color: #2563eb;
+  border-bottom: 2px solid #2563eb;
+  background-color: #eff6ff;
+  font-weight: 600;
+}
+
+/* Stepper Bar */
+.stepper-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.stepper-item.active .stepper-circle {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.stepper-item.completed .stepper-circle {
+  background-color: #059669;
+  color: #ffffff;
+  border-color: #059669;
+}
+
+.stepper-circle {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  border: 2px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+/* Process Selection Template Cards */
+.process-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.875rem;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.process-card:hover {
+  border-color: #2563eb;
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.process-card.selected {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* Plain Language Explainer Box */
+.guidance-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #2563eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.explainer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+/* Custom form inputs */
+input[type="range"] {
+  accent-color: #2563eb;
+}
+
+input[type="number"], input[type="text"], select {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input[type="number"]:focus, input[type="text"]:focus, select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Status Badges */
+.badge-strong {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-candidate {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.badge-foundation {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.badge-not-ready {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.badge-pending {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+/* Demo Sample Data Banner */
+.demo-banner {
+  background: linear-gradient(90deg, #fffbeb 0%, #fef3c7 100%);
+  border-bottom: 1px solid #fcd34d;
+  color: #92400e;
+}
+
+/* Scenario comparison cards */
+.scenario-card.recommended {
+  border: 2px solid #2563eb;
+  position: relative;
+}
+
+.scenario-card.recommended::before {
+  content: 'RECOMMENDED';
+  position: absolute;
+  top: -12px;
+  right: 16px;
+  background-color: #2563eb;
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  letter-spacing: 0.05em;
+}
+
+/* =============================================================
+   EXECUTIVE DASHBOARD PRINT REPORT STYLES
+   ============================================================= */
+
+/* Screen View: Hide dedicated executive print container completely */
+@media screen {
+  #print-executive-report {
+    display: none !important;
+  }
+}
+
+/* Print Structural Utilities (Scoped to print components) */
+.print-header {
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 7px;
+  margin-bottom: 11px;
+}
+
+.print-kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 10px !important;
+  margin-bottom: 12px !important;
+}
+
+.print-kpi-card {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  padding: 9px 12px !important;
+  background-color: #f8fafc !important;
+  box-sizing: border-box !important;
+}
+
+.print-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-bottom: 10px !important;
+  font-size: 8pt !important;
+  line-height: 1.35 !important;
+}
+
+.print-table th, .print-table td {
+  border: 1px solid #cbd5e1 !important;
+  padding: 4.5px 7.5px !important;
+  text-align: left !important;
+  vertical-align: middle !important;
+}
+
+.print-table th {
+  background-color: #f1f5f9 !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  font-size: 8pt !important;
+}
+
+.print-table tr:nth-child(even) td {
+  background-color: #f8fafc !important;
+}
+
+.print-table tr.highlight-row td {
+  background-color: #eff6ff !important;
+  font-weight: 700 !important;
+  color: #1e3a8a !important;
+}
+
+.print-table tr.bold-row td {
+  font-weight: 700 !important;
+}
+
+.print-two-col {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  margin-bottom: 9px !important;
+}
+
+.print-card-box {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  padding: 8px 11px !important;
+  background-color: #f8fafc !important;
+  box-sizing: border-box !important;
+}
+
+.print-callout {
+  border-left: 3px solid #2563eb !important;
+  background-color: #f8fafc !important;
+  border-top: 1px solid #e2e8f0 !important;
+  border-right: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-radius: 0 4px 4px 0 !important;
+  padding: 6.5px 11px !important;
+  margin-bottom: 9px !important;
+  font-size: 7.75pt !important;
+  line-height: 1.4 !important;
+}
+
+.print-footer {
+  border-top: 1px solid #cbd5e1 !important;
+  padding-top: 5px !important;
+  margin-top: 5px !important;
+  font-size: 7.5pt !important;
+  color: #64748b !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.print-badge-demo {
+  display: inline-block !important;
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border: 1px solid #f59e0b !important;
+  font-size: 6.5pt !important;
+  font-weight: 700 !important;
+  padding: 1px 5px !important;
+  border-radius: 3px !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+.print-badge-recommended {
+  display: inline-block !important;
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  font-size: 6pt !important;
+  font-weight: 700 !important;
+  padding: 1px 4px !important;
+  border-radius: 3px !important;
+  text-transform: uppercase !important;
+  margin-left: 4px !important;
+}
+
+.print-progress-bar {
+  height: 6.5px !important;
+  background-color: #e2e8f0 !important;
+  border-radius: 9999px !important;
+  overflow: hidden !important;
+  margin-top: 3px !important;
+}
+
+.print-progress-fill {
+  height: 100% !important;
+  background-color: #2563eb !important;
+}
+
+/* Print View: Strict 2-Page Executive Dashboard Layout (A4 Portrait) */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 12mm 8mm 12mm;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    min-height: auto !important;
+    height: auto !important;
+    position: static !important;
+    font-size: 8.5pt !important;
+    line-height: 1.35 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide entire interactive web application UI and all other body children */
+  body > *:not(#print-executive-report),
+  header,
+  main,
+  footer,
+  nav,
+  #demo-data-banner,
+  .demo-banner,
+  .no-print,
+  #edit-pricing-modal,
+  button,
+  input,
+  select,
+  textarea,
+  .stepper-nav {
+    display: none !important;
+  }
+
+  /* Display executive print report exclusively */
+  #print-executive-report {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print-page {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 274mm !important;
+    max-height: 274mm !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+  }
+
+  .print-page-1 {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  .print-page-2 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .print-page-break {
+    display: none !important;
+  }
+}

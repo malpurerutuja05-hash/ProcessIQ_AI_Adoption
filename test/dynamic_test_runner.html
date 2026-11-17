@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+  <div id="print-executive-report"></div>
+  <script src="../app.js"></script>
+  <div id="results"></div>
+  <script>
+    const log = [];
+    function check(cond, msg) {
+      if (cond) log.push("[PASS] " + msg);
+      else log.push("[FAIL] " + msg);
+    }
+
+    try {
+      // 1. Initial State: AP Sample Data (USD)
+      loadSampleData();
+      preparePrintReport();
+      let html = document.getElementById('print-executive-report').innerHTML;
+      check(html.includes('$617,652'), 'Initial: AP baseline labor is $617,652');
+      check(html.includes('$340,200'), 'Initial: AP baseline leakage is $340,200');
+      check(html.includes('Currency:</strong> USD'), 'Initial: Currency is USD');
+      check(html.includes('Accounts Payable'), 'Initial: Process name is Accounts Payable');
+
+      // 2. Dynamic Test 1: Process Inputs Change
+      ProcessIQ.manualCost.employeeCount = 20;
+      ProcessIQ.manualCost.hourlyRate = 50.0;
+      ProcessIQ.manualCost.hoursPerDay = 5.0;
+      ProcessIQ.manualCost.workingDays = 22;
+      ProcessIQ.manualCost.includeOvertime = false;
+      preparePrintReport();
+      html = document.getElementById('print-executive-report').innerHTML;
+      const m1 = runManualCostCalculations();
+      check(html.includes(formatCurrency(m1.totalAnnualLaborCost)), 'Dynamic 1: Labor cost updated to ' + formatCurrency(m1.totalAnnualLaborCost));
+      check(!html.includes('$617,652'), 'Dynamic 1: Old baseline labor $617,652 is no longer present');
+
+      // 3. Dynamic Test 2: Currency Change (USD -> EUR)
+      ProcessIQ.currency = 'EUR';
+      preparePrintReport();
+      html = document.getElementById('print-executive-report').innerHTML;
+      check(html.includes('Currency:</strong> EUR'), 'Dynamic 2: Header displays Currency: EUR');
+      check(html.includes('€'), 'Dynamic 2: KPI and table values format with € euro symbol');
+      check(!html.includes('$'), 'Dynamic 2: Dollar symbols replaced by Euro symbols');
+
+      // Currency Change (EUR -> GBP)
+      ProcessIQ.currency = 'GBP';
+      preparePrintReport();
+      html = document.getElementById('print-executive-report').innerHTML;
+      check(html.includes('Currency:</strong> GBP'), 'Dynamic 2: Header displays Currency: GBP');
+      check(html.includes('£'), 'Dynamic 2: KPI and table values format with £ pound symbol');
+
+      // 4. Dynamic Test 3: Custom Subscription Pricing Change
+      ProcessIQ.currency = 'USD';
+      loadSampleData(); // Restore baseline AP
+      ProcessIQ.aiComparator.customPricing = {
+        'm365-copilot': {
+          vendorId: 'm365-copilot',
+          unitPrice: 22.0,
+          billingFrequency: 'monthly',
+          userCount: 15,
+          isCustom: true
+        }
+      };
+      preparePrintReport();
+      html = document.getElementById('print-executive-report').innerHTML;
+      check(html.includes('Custom Pricing'), 'Dynamic 3: Header displays Custom Pricing badge');
+      const calc3 = runConsolidatedCalculations();
+      check(html.includes(formatCurrency(calc3.scenarios[2].aiCost)), 'Dynamic 3: Scenario C Tech Opex updated to ' + formatCurrency(calc3.scenarios[2].aiCost));
+      check(html.includes(formatCurrency(calc3.scenarios[2].netBenefit)), 'Dynamic 3: Scenario C Net Benefit updated to ' + formatCurrency(calc3.scenarios[2].netBenefit));
+
+      // 5. Dynamic Test 4: Different Process Template Selected (Procurement)
+      delete ProcessIQ.aiComparator.customPricing['m365-copilot'];
+      // Simulate selecting Procurement template
+      ProcessIQ.selectedTemplateKey = 'procurement';
+      ProcessIQ.manualCost.processName = 'Procurement & Sourcing';
+      ProcessIQ.manualCost.department = 'Supply Chain Management';
+      ProcessIQ.manualCost.employeeCount = 8;
+      ProcessIQ.manualCost.hourlyRate = 55.0;
+      ProcessIQ.manualCost.hoursPerDay = 6.0;
+      ProcessIQ.manualCost.workingDays = 21;
+      preparePrintReport();
+      html = document.getElementById('print-executive-report').innerHTML;
+      check(html.includes('Procurement &amp; Sourcing') || html.includes('Procurement & Sourcing'), 'Dynamic 4: Process name updated to Procurement & Sourcing');
+      check(html.includes('Supply Chain Management'), 'Dynamic 4: Department updated to Supply Chain Management');
+      const m1_proc = runManualCostCalculations();
+      check(html.includes(formatCurrency(m1_proc.totalAnnualLaborCost)), 'Dynamic 4: KPI labor cost updated to ' + formatCurrency(m1_proc.totalAnnualLaborCost));
+
+      // Reset to standard AP sample
+      loadSampleData();
+      preparePrintReport();
+
+    } catch (e) {
+      log.push("[ERROR] " + e.message);
+    }
+
+    document.getElementById('results').innerText = log.join('\n');
+  </script>
+</body>
+</html>

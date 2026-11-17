@@ -1,0 +1,520 @@
+======================================================================
+PROCESSIQ v1.0 — FINAL COMPREHENSIVE AUTOMATED TEST AUDIT LOG
+Generated: 2026-11-17 15:05:07
+Workspace: ProcessIQ Enterprise Project Root
+======================================================================
+
+>>> Executing: test_runner.py (Core Mathematical Engine Tests (M1, M2, M3, M4, Consolidator))
+======================================================================
+PROCESSIQ COMPREHENSIVE AUTOMATED TEST EXECUTION
+======================================================================
+
+>>> Testing Module 1: Hidden Cost of Manual Work...
+  [PASS] M1.1: Nominal Monthly Hours (10 emp * 4 hrs * 22 days) (880.0 ~= 880.0)
+  [PASS] M1.2: Nominal Monthly Labor Cost ($45/hr) (39600.0 ~= 39600.0)
+  [PASS] M1.3: Nominal Annual Labor Cost (475200.0 ~= 475200.0)
+  [PASS] M1.4: Nominal Recoverable Monthly Hours (30%) (264.0 ~= 264.0)
+  [PASS] M1.5: Nominal Annual Recoverable Value (142560.0 ~= 142560.0)
+  [PASS] M1.6: Overtime calculation ($67.50 * 20h) (1350.0 ~= 1350.0)
+  [PASS] M1.7: Total monthly including overtime (40950.0 ~= 40950.0)
+  [PASS] M1.8: Year 2 salary escalated projection (+5%) (515970.0 ~= 515970.0)
+  [PASS] M1.9: Edge case - Zero employees results in zero cost (0 ~= 0.0)
+  [PASS] M1.10: Edge case - Negative inputs safely clamped to zero (0.0 ~= 0.0)
+  [PASS] M1.11: Edge case - Enterprise scale ($316.8M / 2500 emp) (316800000 ~= 316800000.0)
+
+>>> Testing Module 2: Cost Leakage & Anti-Double Counting...
+  [PASS] M2.1: Transaction Error Cost ($5,000/mo) (5000.0 ~= 5000.0)
+  [PASS] M2.2: Duplicate Payment Cost ($3,000/mo) (3000.0 ~= 3000.0)
+  [PASS] M2.3: Total Monthly Leakage ($25,500/mo) (25500.0 ~= 25500.0)
+  [PASS] M2.4: Total Annual Leakage ($306,000/yr) (306000.0 ~= 306000.0)
+  [PASS] M2.5: Top cost driver is Delays ($6,000)
+  [PASS] M2.6: Second cost driver is Errors ($5,000)
+  [PASS] M2.7: Third cost driver is Discounts ($4,500)
+  [PASS] M2.8: Anti-double counting detects dual overlaps
+  [PASS] M2.9: No false positive warnings when isolated
+
+>>> Testing Module 3: AI Readiness Engine & Scoring...
+  [PASS] M3.1: Quick Tier - Not Ready classification (15%)
+  [PASS] M3.2: Quick Tier - Foundation Required (50%)
+  [PASS] M3.3: Quick Tier - Automation/AI Candidate (68%)
+  [PASS] M3.4: Quick Tier - Strong Readiness (95%)
+  [PASS] M3.5: Pro Tier (15 Qs) calculation
+  [PASS] M3.6: Advanced Tier (25 Qs) maximum score
+
+>>> Testing Module 4: AI Investment Comparator...
+  [PASS] M4.1: Microsoft 365 Copilot annual sub (50 seats) (18000.0 ~= 18000.0)
+  [PASS] M4.2: Copilot Studio message overage consumption ($3,600/yr) (3600.0 ~= 3600.0)
+  [PASS] M4.3: Claude Enterprise benchmark calculation (27000.0 ~= 27000.0)
+  [PASS] M4.4: Custom LLM Token usage math ($60/mo) (60.0 ~= 60.0)
+
+>>> Testing Consolidated Engine & Scenarios (A, B, C)...
+  [PASS] CONS.1: Total Annual Economic Benefit (377060.0 ~= 377060.0)
+  [PASS] CONS.2: Net Annual Economic Benefit (352060.0 ~= 352060.0)
+  [PASS] CONS.3: Scenario C ROI (880%) (880.1500000000001 ~= 880.15)
+  [PASS] CONS.4: Scenario C Payback Period (1.4 months) (1.3634039652331988 ~= 1.36)
+  [PASS] CONS.5: Score 25 triggers Standardization First
+  [PASS] CONS.6: Score 55 triggers Automation First
+  [PASS] CONS.7: Score 72 triggers Copilot Pilot
+  [PASS] CONS.8: Score 88 triggers Full AI Agentic
+
+>>> Testing Partial Assessment Handling...
+  [PASS] PARTIAL.1: Graceful fallback when only M1 completed
+  [PASS] PARTIAL.2: Graceful fallback when only M3 completed
+
+======================================================================
+TEST EXECUTION SUMMARY: 40 PASSED, 0 FAILED (TOTAL 40)
+======================================================================
+Return Code: 0
+
+>>> Executing: scenario_audit_test.py (Scenario Modeling & Mathematical Reconciliation (A vs B vs C))
+======================================================================
+PROCESSIQ FINANCIAL MODEL & SCENARIO MATHEMATICAL AUDIT
+======================================================================
+
+>>> 1. Auditing Accounts Payable Base Case (Scenarios A, B, C)...
+  [PASS] Scenario A: Baseline labor cost is $617,652 (actual: 617652)
+  [PASS] Scenario A: Baseline leakage cost is $340,200 (actual: 340200)
+  [PASS] Scenario A: Total baseline operating run-rate is $957,852 (actual: 957852)
+  [PASS] Scenario B: Remaining labor is $494,122 (actual: 494122)
+  [PASS] Scenario B: Remaining leakage is $170,100 (actual: 170100)
+  [PASS] Scenario B: 1. Gross annual operating savings is $293,630 (actual: 293630)
+  [PASS] Scenario B: 2. Annual technology operating costs is $5,000 (actual: 5000.0)
+  [PASS] Scenario B: 3. Net annual recurring benefit is $288,630 (actual: 288630.0)
+  [PASS] Scenario B: 4. One-time implementation Capex is $15,000 (actual: 15000.0)
+  [PASS] Scenario B: 5. First-year net benefit is $273,630 (actual: 273630.0)
+  [PASS] Scenario B: 6. ROI is 1,924% (actual: 1924%)
+  [PASS] Scenario B: 7. Payback period is 0.6 months (actual: 0.6)
+  [PASS] Scenario C: Remaining labor is $401,474 (actual: 401474)
+  [PASS] Scenario C: Remaining leakage is $79,158 (actual: 79158)
+  [PASS] Scenario C: 1. Gross annual operating savings is $477,220 (actual: 477220)
+  [PASS] Scenario C: 2. Annual technology operating costs is $13,400 (actual: 13400.0)
+  [PASS] Scenario C: 3. Net annual recurring benefit is $463,820 (actual: 463820.0)
+  [PASS] Scenario C: 4. One-time implementation Capex is $40,000 (actual: 40000.0)
+  [PASS] Scenario C: 5. First-year net benefit is $423,820 (actual: 423820.0)
+  [PASS] Scenario C: 6. ROI is 1,160% (actual: 1160%)
+  [PASS] Scenario C: 7. Payback period is 1.0 months (actual: 1.0)
+
+>>> 2. Auditing Edge Cases...
+  [PASS] Edge Case 1: Zero tech cost produces net=100k, 1stYr=80k, ROI=500%, Payback=2.4mo (got 100000.0, 80000.0, 500%, 2.4mo)
+  [PASS] Edge Case 2: Zero Capex produces net=90k, 1stYr=90k, ROI=0% (safe), Payback=0.0mo (got 90000.0, 90000.0, 0%, 0.0mo)
+  [PASS] Edge Case 3: Zero savings produces net=-15k, 1stYr=-45k, ROI=-50%, Payback=0.0mo (got -15000.0, -45000.0, -50%, 0.0mo)
+  [PASS] Edge Case 4: Negative benefit safely handled: net=-30k, 1stYr=-55k, ROI=-120%, Payback=0.0 (never pays back)
+  [PASS] Edge Case 5: All 7 currencies (USD, EUR, GBP, CAD, AUD, INR, JPY) format correctly with standard thousands separators
+  [PASS] Edge Case 6: Enterprise scale ($343M labor, $45M leakage) calculates without integer overflow: Gross=$112.8M, ROI=4,482%, Payback=0.3mo
+
+>>> 3. Auditing Codebase Consistency (app.js, consolidator.ts, index.html)...
+  [PASS] Reconciliation: Scenario B gross savings formula unified across JS and TS
+  [PASS] Consistency: All 7 financial metrics present in PDF and CSV generation
+  [PASS] Baseline Payback: Scenario A explicitly displays 'N/A – Baseline Scenario' (not 0.0 mo)
+  [PASS] Benefit Classification: 4 distinct categories separated across UI and calculation engine
+  [PASS] Editable Pricing: Edit Price modal, handlers, and 'Custom Price Entered by User' tags verified
+  [PASS] Pricing Transparency: Dual-layer pricing maintains immutable reference rates alongside user overrides
+  [PASS] PDF Layout: Dynamic wrapped disclaimers, warnings, and risk conditionals verified
+  [PASS] Vendor Pricing: Official URLs and quote-based contract transparency verified
+  [PASS] Attribution: 'Created by Yuvraj Malpure' preserved in HTML and PDF logic
+  [PASS] Executive Print Report: Dedicated 2-page print container, engine functions, and strict A4 print styles verified
+
+======================================================================
+SCENARIO AUDIT TEST SUMMARY: 37 PASSED, 0 FAILED (TOTAL 37)
+======================================================================
+Return Code: 0
+
+>>> Executing: dynamic_data_validation.py (Dynamic Print Report & Currency Re-Rendering Validation)
+======================================================================
+PROCESSIQ PRINT REPORT DYNAMIC DATA VALIDATION
+======================================================================
+
+  [PASS] Initial: AP baseline labor is $617,652
+  [PASS] Initial: AP baseline leakage is $340,200
+  [PASS] Initial: Currency is USD
+  [PASS] Initial: Process name is Accounts Payable
+  [PASS] Dynamic 1: Labor cost updated to $1,320,000
+  [PASS] Dynamic 1: Old baseline labor $617,652 is no longer present
+  [PASS] Dynamic 2: Header displays Currency: EUR
+  [PASS] Dynamic 2: KPI and table values format with € euro symbol
+  [PASS] Dynamic 2: Dollar symbols replaced by Euro symbols
+  [PASS] Dynamic 2: Header displays Currency: GBP
+  [PASS] Dynamic 2: KPI and table values format with £ pound symbol
+  [PASS] Dynamic 3: Header displays Custom Pricing badge
+  [PASS] Dynamic 3: Scenario C Tech Opex updated to $11,960
+  [PASS] Dynamic 3: Scenario C Net Benefit updated to $465,260
+  [PASS] Dynamic 4: Process name updated to Procurement &amp; Sourcing
+  [PASS] Dynamic 4: Department updated to Supply Chain Management
+  [PASS] Dynamic 4: KPI labor cost updated to $684,180
+
+======================================================================
+DYNAMIC DATA AUDIT: 17 PASSED, 0 FAILED
+======================================================================
+Return Code: 0
+
+>>> Executing: m3_readiness_comprehensive_test.py (Module 3 AI Readiness Browser State & Interaction Audit)
+======================================================================
+PROCESSIQ MODULE 3 AI READINESS COMPREHENSIVE BROWSER AUDIT
+======================================================================
+  [PASS] 1. Sample data active initially
+  [PASS] 2. Professional tier has 15 questions
+  [PASS] 3. Sample data has all 15 questions answered
+  [PASS] 4. Sample data assessment is marked completed
+  [PASS] 5. Sample AP readiness score is 60/100 (got 60)
+  [PASS] 6. Classification is Automation/AI Candidate
+  [PASS] 7. Question cards rendered in DOM
+  [PASS] 8. Question card has 5 option buttons
+  [PASS] 9. Option 2 is highlighted active for q1
+  [PASS] 10. Option 0 is inactive for q1
+  [PASS] 11. clearData sets isSampleData to false
+  [PASS] 12. readiness.answers is completely empty
+  [PASS] 13. Answered count is 0
+  [PASS] 14. isCompleted is false after clearData
+  [PASS] 15. Overall score is 0 (no synthetic score generated)
+  [PASS] 16. Classification is Assessment Pending
+  [PASS] 17. Badge class is badge-pending
+  [PASS] 18. Progress text displays 0 of 15 Answered (0%) (got '0 of 15 Answered (0%)')
+  [PASS] 19. Progress bar width is 0% (got '0%')
+  [PASS] 20. m3-score displays Assessment Pending (got 'Assessment Pending')
+  [PASS] 21. Dashboard KPI displays Assessment Pending (got 'Assessment Pending')
+  [PASS] 22. Dashboard approach recommendation displays Assessment Pending (got 'Assessment Pending')
+  [PASS] 23. All 5 option buttons for q1 are completely unselected
+  [PASS] 24. State updated: answers.q1 === 3
+  [PASS] 25. Clicked button (3/4) has active blue styling
+  [PASS] 26. Sibling button (0/4) is inactive
+  [PASS] 27. Sibling button (1/4) is inactive
+  [PASS] 28. Sibling button (2/4) is inactive
+  [PASS] 29. Sibling button (4/4) is inactive
+  [PASS] 30. Progress updated to 1 of 15 Answered (7%) (got '1 of 15 Answered (7%)')
+  [PASS] 31. Score remains Assessment Pending with 1 answer
+  [PASS] 32. State updated to answers.q1 === 1
+  [PASS] 33. Button 1/4 is now active
+  [PASS] 34. Button 3/4 reverted to inactive
+  [PASS] 35. State updated to answers.q1 === 4
+  [PASS] 36. Button 4/4 is now active
+  [PASS] 37. Button 1/4 reverted to inactive
+  [PASS] 38. State updated to answers.q1 === 0
+  [PASS] 39. Button 0/4 is active
+  [PASS] 40. Button 4/4 reverted to inactive
+  [PASS] 41.0. Option 0 sets state correctly
+  [PASS] 42.0. Option 0 button shows active styling
+  [PASS] 41.1. Option 1 sets state correctly
+  [PASS] 42.1. Option 1 button shows active styling
+  [PASS] 41.2. Option 2 sets state correctly
+  [PASS] 42.2. Option 2 button shows active styling
+  [PASS] 41.3. Option 3 sets state correctly
+  [PASS] 42.3. Option 3 button shows active styling
+  [PASS] 41.4. Option 4 sets state correctly
+  [PASS] 42.4. Option 4 button shows active styling
+  [PASS] 43. 8 questions answered (got 8)
+  [PASS] 44. isCompleted remains false
+  [PASS] 45. No synthetic score generated for unanswered questions (score is 0)
+  [PASS] 46. Classification is Assessment Pending
+  [PASS] 47. Progress text is 8 of 15 Answered (53%) (got '8 of 15 Answered (53%)')
+  [PASS] 48. Progress bar width is 53%
+  [PASS] 49. Module 3 score shows Assessment Pending
+  [PASS] 50. Dashboard KPI shows Assessment Pending
+  [PASS] 51. Print report KPI card shows Pending status
+  [PASS] 52. All 15 questions answered
+  [PASS] 53. Assessment is completed
+  [PASS] 54. Live verified score is 73/100 (got 73)
+  [PASS] 55. Classification is Automation/AI Candidate (got 'Automation/AI Candidate')
+  [PASS] 56. Strengths dynamically populated from user answers &gt;= 3
+  [PASS] 57. Weaknesses dynamically populated from user answers &lt;= 1
+  [PASS] 58. Progress text displays 15 of 15 Answered (100%) (got '15 of 15 Answered (100%)')
+  [PASS] 59. Progress bar is 100%
+  [PASS] 60. Module 3 score displays 73/100 (got '73/100')
+  [PASS] 61. Dashboard KPI displays 73/100 (got '73/100')
+  [PASS] 62. Approach recommendation reflects 73/100 tier
+  [PASS] 63. Print report displays 73 / 100
+  [PASS] 64. Print report displays user classification
+  [PASS] 65. Tier switched to quick
+  [PASS] 66. Quick tier displays 10 question cards (got 10)
+  [PASS] 67. Quick tier has 10 applicable questions
+  [PASS] 68. All 10 quick questions have preserved answers
+  [PASS] 69. Quick tier assessment is completed
+  [PASS] 70. Tier switched to advanced
+  [PASS] 71. Advanced tier displays 25 question cards (got 25)
+  [PASS] 72. Advanced tier has 25 applicable questions
+  [PASS] 73. Advanced tier preserves 15 previously answered questions
+  [PASS] 74. Advanced tier is incomplete (needs remaining 10 questions)
+  [PASS] 75. Score reverts to Assessment Pending in Advanced tier
+  [PASS] 76. Progress displays 15 of 25 Answered (60%)
+  [PASS] 77. loadSampleData restores isSampleData = true
+  [PASS] 78. Sample data resets to professional tier
+  [PASS] 79. Sample data restores 15 answers
+  [PASS] 80. Sample data score is restored to 60/100 (got 60)
+  [PASS] 81. q1 answer restored to sample demo default of 2
+  [PASS] 82. clearData clears sample data again
+  [PASS] 83. answers empty again
+  [PASS] 84. isCompleted is false again
+======================================================================
+MODULE 3 AUDIT SUMMARY: 92 PASSED, 0 FAILED
+======================================================================
+Return Code: 0
+
+>>> Executing: run_chrome_tests.py (Headless Chrome Browser Integration & Custom Pricing Audit)
+======================================================================
+PROCESSIQ BROWSER INTEGRATION AUDIT (HEADLESS CHROME)
+======================================================================
+  [PASS] 1. goToStage is defined
+  [PASS] 2. openEditPriceModal is defined
+  [PASS] 3. saveCustomPrice is defined
+  [PASS] 4. resetVendorPrice is defined
+  [PASS] 5. downloadPDF is defined
+  [PASS] 6. downloadCSV is defined
+  [PASS] 7. AP Baseline Labor is $617,652 (got 617652)
+  [PASS] 8. AP Baseline Leakage is $340,200 (got 340200)
+  [PASS] 9. AP Baseline Operating Run-Rate is $957,852 (got 957852)
+  [PASS] 10. Scenario A Gross Savings is $0
+  [PASS] 11. Scenario A Tech Opex is $0
+  [PASS] 12. Scenario A Net Recurring Benefit is $0
+  [PASS] 13. Scenario A ROI is 'N/A – Baseline' (got 'N/A – Baseline')
+  [PASS] 14. Scenario A Payback is 'N/A – Baseline Scenario' (got 'N/A – Baseline Scenario')
+  [PASS] 15. Scenario B Remaining Labor is $494,122 (got 494122)
+  [PASS] 16. Scenario B Remaining Leakage is $170,100 (got 170100)
+  [PASS] 17. Scenario B Actual Cash Savings is $58,920 (got 58920)
+  [PASS] 18. Scenario B Avoided Leakage is $170,100 (got 170100)
+  [PASS] 19. Scenario B Capacity Value is $123,530 (got 123530)
+  [PASS] 20. Scenario B Reconciled Gross Savings is $293,630 (got 293630)
+  [PASS] 21. Scenario B Tech Opex is $5,000 (got 5000)
+  [PASS] 22. Scenario B Net Recurring Benefit is $288,630 (got 288630)
+  [PASS] 23. Scenario B One-Time Capex is $15,000 (got 15000)
+  [PASS] 24. Scenario B First-Year Net Benefit is $273,630 (got 273630)
+  [PASS] 25. Scenario B Recurring ROI is 1,924% (got 1924%)
+  [PASS] 26. Scenario B First-Year Net ROI is 1,824% (got 1824%)
+  [PASS] 27. Scenario B Payback is 0.6 mo (got 0.6)
+  [PASS] 28. Scenario C Remaining Labor is $401,474 (got 401474)
+  [PASS] 29. Scenario C Remaining Leakage is $79,158 (got 79158)
+  [PASS] 30. Scenario C Actual Cash Savings is $94,272 (got 94272)
+  [PASS] 31. Scenario C Avoided Leakage is $261,042 (got 261042)
+  [PASS] 32. Scenario C Capacity Value is $216,178 (got 216178)
+  [PASS] 33. Scenario C Gross Savings is $477,220 (got 477220)
+  [PASS] 34. Scenario C Default Tech Opex is $13,400 (got 13400)
+  [PASS] 35. Scenario C Default Net Recurring is $463,820 (got 463820)
+  [PASS] 36. Scenario C One-Time Capex is $40,000 (got 40000)
+  [PASS] 37. Scenario C First-Year Net Benefit is $423,820 (got 423820)
+  [PASS] 38. Scenario C Recurring ROI is 1,160% (got 1160%)
+  [PASS] 39. Scenario C First-Year Net ROI is 1,060% (got 1060%)
+  [PASS] 40. Scenario C Payback is 1.0 mo (got 1)
+  [PASS] 41. AI Comparator evaluates all 4 vendors (got 4)
+  [PASS] 42. M365 Copilot default Year 1 Sub is $5,400 (got 5400)
+  [PASS] 43. M365 Copilot default Total Year 1 is $53,400 (got 53400)
+  [PASS] 44. M365 Copilot default 3-Yr Total is $80,200 (got 80200)
+  [PASS] 45. Edit Price modal opens and is visible
+  [PASS] 46. Modal pre-populates official reference price $30.00
+  [PASS] 47. Live preview calculates $4,500 annual licensing
+  [PASS] 48. Live preview calculates $52,500 Year 1 total
+  [PASS] 49. Live preview calculates $77,500 3-Year total
+  [PASS] 50. Modal closes after saving
+  [PASS] 51. Custom pricing active in ProcessIQ state
+  [PASS] 52. Table row displays Custom Price Entered by User badge
+  [PASS] 53. Table row displays updated custom subscription cost $4,500
+  [PASS] 54. Table row displays updated Year 1 total $52,500
+  [PASS] 55. Scenario C Tech Opex updated to $12,500 (got 12500)
+  [PASS] 56. Scenario C Net Benefit increased by $900 to $464,720 (got 464720)
+  [PASS] 57. Scenario C 1st-Year Net Benefit is $424,720 (got 424720)
+  [PASS] 58. Scenario C Recurring ROI updated to 1,162% (got 1162%)
+  [PASS] 59. Scenario C Payback is 1.0 mo (got 1)
+  [PASS] 60. Custom pricing deleted from state
+  [PASS] 61. Scenario C Tech Opex restored to $13,400 (got 13400)
+  [PASS] 62. Scenario C Net Benefit restored to $463,820 (got 463820)
+  [PASS] 63. Scenario C ROI restored to 1,160% (got 1160%)
+  [PASS] 64. preparePrintReport function is defined
+  [PASS] 65. printExecutiveReport function is defined
+  [PASS] 66. Print Report contains ProcessIQ branding
+  [PASS] 67. Print Report contains mandatory tagline
+  [PASS] 68. Print Report contains author attribution Created by Yuvraj Malpure
+  [PASS] 69. Print Report displays DEMONSTRATION SAMPLE badge when sample data active
+  [PASS] 70. Print Report includes evaluated process name
+  [PASS] 71. KPI Card 1 displays baseline labor $617,652
+  [PASS] 72. KPI Card 2 displays leakage $340,200
+  [PASS] 73. KPI Card 3 displays readiness score 72
+  [PASS] 74. KPI Card 4 displays net benefit $463,820
+  [PASS] 75. Scenario table contains Scenarios A, B, and C
+  [PASS] 76. Scenario A payback displays N/A – Baseline Scenario
+  [PASS] 77. Scenario A ROI displays N/A – Baseline
+  [PASS] 78. Scenario B gross savings displays $293,630
+  [PASS] 79. Scenario B net recurring benefit displays $288,630
+  [PASS] 80. Scenario C gross savings displays $477,220
+  [PASS] 81. Financial governance note distinguishes capacity value from cash savings
+  [PASS] 82. Page 1 contains explicit Page 1 of 2 indicator
+  [PASS] 83. Contains print-page-break between Page 1 and Page 2
+  [PASS] 84. Page 2 includes Process Maturity dimension
+  [PASS] 85. Page 2 includes Data Quality dimension
+  [PASS] 86. Page 2 includes Key Operational Strengths
+  [PASS] 87. Page 2 includes Critical Improvement Gaps
+  [PASS] 88. Page 2 includes strategic recommendation
+  [PASS] 89. Page 2 includes 3-phase tactical roadmap
+  [PASS] 90. Page 2 includes client-side confidentiality notice
+  [PASS] 91. Page 2 includes executive sign-off signature blocks
+  [PASS] 92. Page 2 contains explicit Page 2 of 2 indicator
+  [PASS] 93. DEMONSTRATION SAMPLE badge omitted when sample data inactive
+======================================================================
+CHROME AUDIT SUMMARY: 93 PASSED, 0 FAILED
+======================================================================
+Return Code: 0
+
+>>> Executing: master_e2e_release_test.py (Master End-to-End User Journey (All 15 Steps))
+======================================================================
+PROCESSIQ MASTER END-TO-END RELEASE AUDIT (ALL 15 WORKFLOW STEPS)
+======================================================================
+  [PASS] S1.1: Application boots with isSampleData === true
+  [PASS] S1.2: Current stage is 1 (Welcome)
+  [PASS] S1.3: Default process is Accounts Payable
+  [PASS] S1.4: Default readiness tier is professional (15 Qs)
+  [PASS] S1.5: Sample data includes 15 AP answers
+  [PASS] S1.6: Sample AP readiness score is 60/100
+  [PASS] S2.1: isSampleData set to false after clearData
+  [PASS] S2.2: readiness.answers completely empty
+  [PASS] S2.3: isCompleted is false
+  [PASS] S2.4: Overall score is 0 with no answers
+  [PASS] S2.5: Classification is Assessment Pending
+  [PASS] S2.6: Module 3 UI score is Assessment Pending
+  [PASS] S2.7: Dashboard KPI is Assessment Pending
+  [PASS] S3.1: Procurement template loaded
+  [PASS] S3.2: FTE count is 9
+  [PASS] S3.3: Hourly rate is $46.00
+  [PASS] S3.4: Negative inputs safely clamped to 0
+  [PASS] S5.1: Monthly hours is 1,000 (got 1000)
+  [PASS] S5.2: Total monthly labor is $47,025 (got 47025)
+  [PASS] S5.3: Total annual labor is $564,300 (got 564300)
+  [PASS] S5.4: Recoverable capacity value is $169,290 (got 169290)
+  [PASS] S6.1: Monthly leakage is $16,000 (got 16000)
+  [PASS] S6.2: Annual leakage is $192,000 (got 192000)
+  [PASS] S6.3: Anti-double counting warnings detected (2 warnings)
+  [PASS] S7.1: Zero answers initially in fresh assessment
+  [PASS] S7.2: q1 selected as 1
+  [PASS] S7.3: q1 updated to 3
+  [PASS] S7.4: Incomplete count is 7 (got 7)
+  [PASS] S7.5: isCompleted is false for 7/15
+  [PASS] S7.6: No synthetic score for incomplete assessment
+  [PASS] S7.7: Status is Assessment Pending
+  [PASS] S7.8: All 15 questions answered
+  [PASS] S7.9: Assessment marked completed
+  [PASS] S7.10: Live calculated score is 65/100 (got 65)
+  [PASS] S7.11: Classification is Automation/AI Candidate
+  [PASS] S7.12: Strengths populated
+  [PASS] S7.13: Operational gaps/risks populated from &lt;= 2 answers
+  [PASS] S8.1: Evaluates all 4 AI platforms
+  [PASS] S8.2: M365 Copilot Year 1 Sub is $3,600 (got 3600)
+  [PASS] S8.3: Capex is $30,000 (got 30000)
+  [PASS] S8.4: Annual Support is $6,000 (got 6000)
+  [PASS] S8.5: M365 Copilot Year 1 Total is $39,600 (got 39600)
+  [PASS] S8.6: M365 Copilot 3-Yr Total is $58,800 (got 58800)
+  [PASS] S8.7: Custom pricing marked active
+  [PASS] S8.8: Custom Year 1 Sub is $3,000 (got 3000)
+  [PASS] S8.9: Custom Year 1 Total is $39,000 (got 39000)
+  [PASS] S8.10: Custom price deleted on reset
+  [PASS] S9.1: Scenario A operating cost equals baseline labor + leakage
+  [PASS] S9.2: Scenario A ROI formatted as N/A – Baseline
+  [PASS] S9.3: Scenario A Payback formatted as N/A – Baseline Scenario
+  [PASS] S9.4: Scenario B capacity released is $112,860 (got 112860)
+  [PASS] S9.5: Scenario B avoided leakage is $96,000 (got 96000)
+  [PASS] S9.6: Scenario B actual cash savings is $33,000 (got 33000)
+  [PASS] S9.7: Scenario B gross savings is $208,860 (got 208860)
+  [PASS] S9.8: Anti-double-counting validated: Capacity + Avoided Leakage === Gross Savings
+  [PASS] S9.9: Scenario C capacity released is $169,290 (got 169290)
+  [PASS] S9.10: Scenario C avoided leakage is $147,300 (got 147300)
+  [PASS] S9.11: Scenario C actual cash savings is $52,800 (got 52800)
+  [PASS] S9.12: Scenario C gross savings is $316,590 (got 316590)
+  [PASS] S9.13: Anti-double-counting validated for Scenario C
+  [PASS] S10.1: Print report contains ProcessIQ branding
+  [PASS] S10.2: Process name dynamically populated
+  [PASS] S10.3: Department dynamically populated
+  [PASS] S10.4: Verified readiness score 65/100 rendered in KPI card
+  [PASS] S10.5: Verified classification rendered
+  [PASS] S10.6: 2-Page structure verified
+  [PASS] S10.7: DEMONSTRATION SAMPLE omitted in user mode
+  [PASS] S11.1: Currency changed to EUR
+  [PASS] S11.2: Print report reflects Euro symbol and header
+  [PASS] S11.3: Currency changed to GBP
+  [PASS] S11.4: Print report reflects Pound symbol
+  [PASS] S12.1: Switched to quick tier
+  [PASS] S12.2: Quick tier has 10 questions
+  [PASS] S12.3: Quick tier is completed (10/10 preserved)
+  [PASS] S12.4: Switched to advanced tier
+  [PASS] S12.5: Advanced tier has 25 questions
+  [PASS] S12.6: Preserved 15 previously answered questions
+  [PASS] S12.7: Advanced tier is incomplete
+  [PASS] S12.8: UI reverts to Assessment Pending in Advanced tier
+  [PASS] S13.1: Detailed Business Case PDF compiled (108563 chars datauri)
+  [PASS] S13.2: PDF data URI header verified
+  [PASS] S15.1: isSampleData restored to true
+  [PASS] S15.2: AP sample process restored
+  [PASS] S15.3: AP baseline 12 FTE restored
+  [PASS] S15.4: AP sample score 60/100 restored
+  [PASS] S15.5: DEMONSTRATION SAMPLE badge displayed in sample mode
+  [PASS] S15.6: Clean slate after clearData
+  [PASS] S15.7: All readiness answers cleared
+======================================================================
+MASTER E2E AUDIT SUMMARY: 88 PASSED, 0 FAILED
+======================================================================
+Return Code: 0
+
+>>> Executing: generate_and_audit_detailed_pdf.py (Detailed 10-Page Business Case PDF Generation & Binary Audit)
+======================================================================
+PROCESSIQ DETAILED BUSINESS CASE PDF GENERATION & AUDIT
+======================================================================
+[PASS] Successfully generated: ProcessIQ_Detailed_Business_Case_Demo.pdf
+       File Size: 81379 bytes (79.5 KB)
+       Report Filename: ProcessIQ_Accounts_Payable_Report.pdf
+[PASS] Page Count: 10 pages (Expected: 10)
+  [PASS] ProcessIQ Platform Branding: Found 'PROCESSIQ'
+  [PASS] Mandatory Tagline: Found 'Know your process cost before you invest in AI.'
+  [PASS] Creator Attribution: Found 'Created by Yuvraj Malpure'
+  [PASS] Sample Demonstration Mode Badge: Found 'DEMONSTRATION SAMPLE REPORT'
+  [PASS] Evaluated Target Process: Found 'Accounts Payable'
+  [PASS] Evaluated Department: Found 'Finance & Shared Services'
+  [PASS] Page 2 Executive Summary Header: Found 'Executive Summary'
+  [PASS] Page 3 Assumptions Header: Found 'Process Information & Key Assumptions'
+  [PASS] Page 4 Module 1 Header: Found 'Module 1: Hidden Cost of Manual Work'
+  [PASS] Module 1 Capacity Recovery Distinction: Found 'Important Capacity Recovery Distinction'
+  [PASS] Page 5 Module 2 Header: Found 'Module 2: Where Is My Process Losing Money?'
+  [PASS] Module 2 Anti-Double Counting Governance: Found 'Anti-Double Counting'
+  [PASS] Page 6 Module 3 Header: Found 'Module 3: Is My Process AI-Ready?'
+  [PASS] Module 3 Readiness Score (60/100): Found 'Overall AI Readiness Score: 60 / 100'
+  [PASS] Module 3 Maturity Classification: Found 'Automation/AI Candidate'
+  [PASS] Page 7 Module 4 Header: Found 'Module 4: Enterprise AI Investment Comparator'
+  [PASS] Module 4 Vendor 1 (M365 Copilot): Found 'Microsoft 365 Copilot'
+  [PASS] Module 4 Vendor 2 (Copilot Studio): Found 'Microsoft Copilot Studio'
+  [PASS] Module 4 Vendor 3 (Claude Enterprise): Found 'Claude Enterprise'
+  [PASS] Module 4 Vendor 4 (Custom AI Agent): Found 'Custom AI Agent'
+  [PASS] Page 8 Scenario Comparison Header: Found 'Consolidated Scenario Modeling \(A vs B vs C\)'
+  [PASS] Page 9 30-Day Roadmap Header: Found 'Recommended 30-Day Tactical Roadmap'
+  [PASS] Page 10 Methodology & Sources Header: Found 'Calculation Methodology, Sources & Disclaimers'
+  [PASS] Cover Page Privacy Notice: Found 'Zero Cloud Data Transmission'
+  [PASS] Methodology Privacy Disclaimer: Found 'All calculations, transformations, and document compilations were executed in-memory'
+  [PASS] Baseline Labor Cost ($617,652): Found '617,652'
+  [PASS] Baseline Leakage Cost ($340,200): Found '340,200'
+  [PASS] Total Baseline Run-Rate ($957,852): Found '957,852'
+  [PASS] Scenario B Gross Savings ($293,630): Found '293,630'
+  [PASS] Scenario B Net Annual Benefit ($288,630): Found '288,630'
+  [PASS] Scenario C Gross Savings ($477,220): Found '477,220'
+  [PASS] Scenario C Net Annual Benefit ($463,820): Found '463,820'
+  [PASS] Scenario C First-Year Net Benefit ($423,820): Found '423,820'
+  [PASS] Scenario C Recurring ROI (1,160%): Found '1160%'
+  [PASS] Scenario C Payback Period (1.0 mo): Found '1.0'
+----------------------------------------------------------------------
+PDF CONTENT AUDIT SUMMARY: 35 / 35 VERIFIED
+======================================================================
+Return Code: 0
+
+>>> Executing: security_scanner.py (Automated Static Security & Secret Analysis Scan)
+======================================================================
+PROCESSIQ AUTOMATED STATIC SECURITY SCANNER
+======================================================================
+
+Scanned 20 source and configuration files.
+
+  [PASS] Anti-MIME sniffing header (nosniff) present.
+
+Scan Results:
+  CRITICAL: 0
+  HIGH:     0
+  MEDIUM:   0
+  LOW:      0
+  Zero critical or high vulnerabilities identified in static scan.
+
+======================================================================
+Return Code: 0
+
+======================================================================
+ALL TEST SUITES SUMMARY: 8 PASSED, 0 FAILED
+FINAL STATUS: RELEASE READY (100% SUCCESS)
+======================================================================
