@@ -138,14 +138,17 @@ export function calculateConsolidatedBusinessCase(inputs: ConsolidatorInputs): C
   };
 
   // Scenario B: Process Improvement & Automation First
-  // Standard Lean / low-code RPA: 20% capacity recovered ($123,530), 50% leakage reduced ($170,100), $15,000 Capex, $5,000 Opex
+  // Standard Lean / low-code RPA: captures up to 20% of total labor ($123,530 in AP baseline).
+  // When recoverable capacity is below 20% (e.g. Treasury @ 10%), automation is bounded by process capacity (capturing 20/35 of available capacity).
   const bCapex = 15000;
   const bOpex = 5000;
-  const bLaborSavings = Math.round(annualLaborCost * 0.2);
+  const bLaborSavings = annualCapacityValue < Math.round(annualLaborCost * 0.2)
+    ? Math.round(annualCapacityValue * (20 / 35))
+    : Math.round(annualLaborCost * 0.2);
   const bLeakageSavings = Math.round(annualLeakage * 0.5);
-  const bGrossSavings = bLaborSavings + bLeakageSavings; // Reconciled gross savings: $293,630
-  const bNetBenefit = bGrossSavings - bOpex; // Reconciled net annual recurring benefit: $288,630
-  const bFirstYearNetBenefit = bNetBenefit - bCapex; // First-year net benefit: $273,630
+  const bGrossSavings = bLaborSavings + bLeakageSavings; // Reconciled gross savings: $293,630 in AP
+  const bNetBenefit = bGrossSavings - bOpex; // Reconciled net annual recurring benefit: $288,630 in AP
+  const bFirstYearNetBenefit = bNetBenefit - bCapex; // First-year net benefit: $273,630 in AP
   const bNetMonthly = bNetBenefit / 12;
   const bRoi = bCapex > 0 ? Math.round((bNetBenefit / bCapex) * 100) : 0;
   const bFirstYearRoi = bCapex > 0 ? Math.round((bFirstYearNetBenefit / bCapex) * 100) : 0;
@@ -155,9 +158,9 @@ export function calculateConsolidatedBusinessCase(inputs: ConsolidatorInputs): C
     id: 'automation_first',
     name: 'Scenario B: Process Optimization & Automation First',
     tagline: 'Lean Standardization + Traditional Rules-Based Workflow Automation',
-    annualLaborCost: Math.round(annualLaborCost * 0.8),
+    annualLaborCost: Math.round(annualLaborCost - bLaborSavings),
     annualLeakageCost: Math.round(annualLeakage * 0.5),
-    totalOperatingCost: Math.round(annualLaborCost * 0.8) + Math.round(annualLeakage * 0.5),
+    totalOperatingCost: Math.round(annualLaborCost - bLaborSavings) + Math.round(annualLeakage * 0.5),
     grossAnnualOperatingSavings: bGrossSavings,
     actualCashSavings: Math.round(directCashLeakage * 0.5),
     avoidedLeakage: bLeakageSavings,

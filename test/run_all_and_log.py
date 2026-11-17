@@ -16,6 +16,7 @@ suites = [
     ("run_chrome_tests.py", "Headless Chrome Browser Integration & Custom Pricing Audit"),
     ("master_e2e_release_test.py", "Master End-to-End User Journey (All 15 Steps)"),
     ("generate_and_audit_detailed_pdf.py", "Detailed 10-Page Business Case PDF Generation & Binary Audit"),
+    ("treasury_ar_reconciliation_test.py", "Treasury & AR Mathematical Reconciliation & 10-Page PDF Verification"),
     ("security_scanner.py", "Automated Static Security & Secret Analysis Scan")
 ]
 

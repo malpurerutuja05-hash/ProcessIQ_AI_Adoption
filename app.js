@@ -921,24 +921,29 @@ function runConsolidatedCalculations() {
   // Scenario B: Automation & Lean First
   const bCapex = 15000;
   const bOpex = 5000;
-  const bLaborSavings = Math.round(annualLabor * 0.2); // 20% labor capacity recovered ($123,530)
-  const bLeakageSavings = Math.round(annualLeakage * 0.5); // 50% defect leakage reduced ($170,100)
-  const bActualCashSavings = Math.round(directCashLeakage * 0.5); // 50% of direct cash leakage ($58,920)
-  const bGrossSavings = bLaborSavings + bLeakageSavings; // Reconciled gross savings ($293,630)
-  const bNetBenefit = bGrossSavings - bOpex; // Reconciled net annual recurring benefit ($288,630)
-  const bFirstYearNet = bNetBenefit - bCapex; // First-year net benefit ($273,630)
-  const bRoi = bCapex > 0 ? Math.round((bNetBenefit / bCapex) * 100) : 0; // 1,924% Recurring ROI
-  const bFirstYearRoi = bCapex > 0 ? Math.round((bFirstYearNet / bCapex) * 100) : 0; // 1,824% First-Year ROI
+  // Reconciled Scenario B labor savings:
+  // Traditional rules automation achieves up to 20% of annual labor ($123,530 in AP baseline).
+  // When recoverable capacity is below 20% (e.g. Treasury @ 10%), automation is bounded by process capacity (capturing 20/35 of available capacity).
+  const bLaborSavings = annualCapacityValue < Math.round(annualLabor * 0.2)
+    ? Math.round(annualCapacityValue * (20 / 35))
+    : Math.round(annualLabor * 0.2);
+  const bLeakageSavings = Math.round(annualLeakage * 0.5); // 50% defect leakage reduced ($170,100 in AP)
+  const bActualCashSavings = Math.round(directCashLeakage * 0.5); // 50% of direct cash leakage ($58,920 in AP)
+  const bGrossSavings = bLaborSavings + bLeakageSavings; // Reconciled gross savings ($293,630 in AP)
+  const bNetBenefit = bGrossSavings - bOpex; // Reconciled net annual recurring benefit ($288,630 in AP)
+  const bFirstYearNet = bNetBenefit - bCapex; // First-year net benefit ($273,630 in AP)
+  const bRoi = bCapex > 0 ? Math.round((bNetBenefit / bCapex) * 100) : 0; // 1,924% Recurring ROI in AP
+  const bFirstYearRoi = bCapex > 0 ? Math.round((bFirstYearNet / bCapex) * 100) : 0; // 1,824% First-Year ROI in AP
   const bNetMonthly = bNetBenefit / 12;
-  const bPayback = bCapex > 0 ? (bNetMonthly > 0 ? Math.round((bCapex / bNetMonthly) * 10) / 10 : 0) : 0; // 0.6 mo
+  const bPayback = bCapex > 0 ? (bNetMonthly > 0 ? Math.round((bCapex / bNetMonthly) * 10) / 10 : 0) : 0; // 0.6 mo in AP
 
   const scenarioB = {
     id: 'automation_first',
     name: 'Scenario B: Automation & Lean First',
     tagline: 'Standardization + Traditional Rules Automation',
-    laborCost: Math.round(annualLabor * 0.8), // Remaining labor ($494,122)
-    leakageCost: Math.round(annualLeakage * 0.5), // Remaining leakage ($170,100)
-    totalOperatingCost: Math.round(annualLabor * 0.8) + Math.round(annualLeakage * 0.5),
+    laborCost: Math.round(annualLabor - bLaborSavings), // Remaining labor ($494,122 in AP baseline)
+    leakageCost: Math.round(annualLeakage * 0.5), // Remaining leakage ($170,100 in AP)
+    totalOperatingCost: Math.round(annualLabor - bLaborSavings) + Math.round(annualLeakage * 0.5),
     grossSavings: bGrossSavings, // 1. Gross annual operating savings ($293,630)
     actualCashSavings: bActualCashSavings, // Actual cash savings ($58,920)
     avoidedLeakage: bLeakageSavings, // Avoided defect leakage ($170,100)
@@ -2194,7 +2199,7 @@ function downloadCSV() {
 }
 
 // -------------------------------------------------------------
-// MULTI-PAGE CONSULTING PDF REPORT GENERATOR (14 PAGES/SECTIONS)
+// MULTI-PAGE CONSULTING PDF REPORT GENERATOR (10 PAGES/SECTIONS)
 // -------------------------------------------------------------
 function downloadPDF() {
   const { jsPDF } = window.jspdf;
@@ -2214,21 +2219,34 @@ function downloadPDF() {
   const m3 = runAIReadinessCalculations();
   const data = runConsolidatedCalculations();
 
+  const isDemo = Boolean(ProcessIQ.isSampleData);
+  const processName = ProcessIQ.manualCost.processName || 'Enterprise Process';
+  const department = ProcessIQ.manualCost.department || 'Operations';
+  const cur = ProcessIQ.currency || 'USD';
+  const evalDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  // Safe PDF currency formatter that prevents Latin-1 encoding bugs (e.g. INR ₹ -> corrupted glyph)
+  function formatPdfCurrency(val) {
+    const sym = cur === 'INR' ? 'INR ' : (ProcessIQ.currencySymbols[cur] || '$');
+    const num = Math.round(Number(val) || 0);
+    return `${sym}${num.toLocaleString('en-US')}`;
+  }
+
   let currentPage = 1;
 
   function addHeaderFooter(title) {
     doc.setFontSize(8);
     doc.setTextColor(148, 163, 184); // slate-400
-    const demoPrefix = ProcessIQ.isSampleData ? '[DEMO SAMPLE] ' : '';
+    const demoPrefix = isDemo ? '[DEMO SAMPLE] ' : '';
     doc.text(`PROCESSIQ ENTERPRISE REPORT | ${demoPrefix}${title.toUpperCase()}`, margin, 30);
     doc.setDrawColor(226, 232, 240);
     doc.setLineWidth(0.5);
     doc.line(margin, 35, pageWidth - margin, 35);
 
     doc.line(margin, pageHeight - 35, pageWidth - margin, pageHeight - 35);
-    const demoNote = ProcessIQ.isSampleData ? 'Demonstration Sample Case Study | ' : '';
-    doc.text(`Confidential - ${demoNote}Created by Yuvraj Malpure`, margin, pageHeight - 22);
-    doc.text(`Page ${currentPage}`, pageWidth - margin - 40, pageHeight - 22);
+    const modeLabel = isDemo ? 'Demonstration Sample Case Study' : 'Enterprise Valuation Diagnostic';
+    doc.text(`Confidential — ${modeLabel} | Created by Yuvraj Malpure`, margin, pageHeight - 22);
+    doc.text(`Page ${currentPage} of 10`, pageWidth - margin - 55, pageHeight - 22);
   }
 
   function newPage(title) {
@@ -2238,78 +2256,215 @@ function downloadPDF() {
   }
 
   // -----------------------------------------------------------
-  // PAGE 1: COVER PAGE
+  // PAGE 1: COVER PAGE (EXECUTIVE CONSULTING DESIGN)
   // -----------------------------------------------------------
+  // Dark Navy Canvas
   doc.setFillColor(15, 23, 42); // Navy #0f172a
   doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-  // Accent band
+  // Accent vertical bands (Cobalt Blue + Emerald/Teal)
   doc.setFillColor(37, 99, 235); // Blue #2563eb
-  doc.rect(margin, 120, 6, 90, 'F');
+  doc.rect(margin, 105, 5, 80, 'F');
+  doc.setFillColor(13, 148, 136); // Teal #0d9488
+  doc.rect(margin + 5, 105, 3, 80, 'F');
 
-  doc.setFontSize(32);
+  doc.setFontSize(30);
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.text('PROCESSIQ', margin + 20, 155);
+  doc.text('PROCESSIQ', margin + 20, 135);
 
-  doc.setFontSize(14);
-  doc.setTextColor(147, 197, 253); // blue-300
+  doc.setFontSize(9);
+  doc.setTextColor(45, 212, 191); // teal-400
+  doc.setFont('helvetica', 'bold');
+  doc.text('ENTERPRISE VALUATION & AI TRANSFORMATION PLATFORM', margin + 20, 155);
+
+  doc.setFontSize(12);
+  doc.setTextColor(191, 219, 254); // blue-200
   doc.setFont('helvetica', 'normal');
-  doc.text('Know your process cost before you invest in AI.', margin + 20, 185);
+  doc.text('Know your process cost before you invest in AI.', margin + 20, 175);
 
-  // Sample data banner if active
-  if (ProcessIQ.isSampleData) {
-    doc.setFillColor(217, 119, 6); // amber-600
-    doc.roundedRect(margin, 240, contentWidth, 26, 4, 4, 'F');
-    doc.setFontSize(9);
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.text('DEMONSTRATION SAMPLE REPORT - Fictional Accounts Payable Case Study', margin + 15, 257);
-  }
+  // Dynamic Process Mode Banner (Explicitly identifies Demo vs User-Configured)
+  const bannerBadgeText = isDemo
+    ? `DEMONSTRATION SAMPLE REPORT — ${processName.toUpperCase()}`
+    : `USER-CONFIGURED ENTERPRISE ASSESSMENT — ${processName.toUpperCase()}`;
 
+  doc.setFillColor(isDemo ? 180 : 15, isDemo ? 83 : 118, isDemo ? 9 : 110); // amber-700 or teal-700
+  doc.roundedRect(margin, 210, contentWidth, 26, 4, 4, 'F');
+  doc.setFontSize(9);
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.text(bannerBadgeText, margin + 14, 226);
+
+  // Report Title
   doc.setFontSize(22);
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.text('Business Transformation & AI Readiness Case', margin, 300);
+  doc.text('Business Transformation & AI Readiness Case', margin, 270);
 
-  doc.setFontSize(14);
+  // Metadata Card
+  doc.setFillColor(30, 41, 59); // slate-800
+  doc.roundedRect(margin, 290, contentWidth, 80, 5, 5, 'F');
+  doc.setDrawColor(51, 65, 85);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, 290, contentWidth, 80, 5, 5, 'S');
+
+  doc.setFontSize(9.5);
   doc.setTextColor(203, 213, 225); // slate-300
   doc.setFont('helvetica', 'normal');
-  doc.text(`Target Process: ${ProcessIQ.manualCost.processName || 'Target Process'}`, margin, 335);
-  doc.text(`Department: ${ProcessIQ.manualCost.department || 'Enterprise Operations'}`, margin, 360);
-  doc.text(`Evaluation Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, margin, 385);
-
-  // Summary box
-  doc.setFillColor(30, 41, 59); // slate-800
-  doc.roundedRect(margin, 460, contentWidth, 140, 6, 6, 'F');
-
-  doc.setFontSize(11);
-  doc.setTextColor(255, 255, 255);
+  doc.text(`Target Process:`, margin + 16, 312);
   doc.setFont('helvetica', 'bold');
-  doc.text('KEY EXECUTIVE FINDINGS AT A GLANCE', margin + 20, 490);
+  doc.setTextColor(255, 255, 255);
+  doc.text(processName, margin + 120, 312);
 
-  doc.setFontSize(10);
-  doc.setTextColor(203, 213, 225);
   doc.setFont('helvetica', 'normal');
-  doc.text(`* Total Baseline Manual Labor Cost: ${formatCurrency(m1.totalAnnualLaborCost)} / year`, margin + 20, 515);
-  doc.text(`* Quantified Process Leakage: ${formatCurrency(m2.totalAnnual)} / year`, margin + 20, 535);
-  const readinessCoverStr = m3.isCompleted 
-    ? `${m3.overallScore}/100 (${m3.classification})` 
-    : `Assessment Pending (${m3.answeredCount}/${m3.questionCount} answered)`;
-  doc.text(`* Evaluated AI Readiness Score: ${readinessCoverStr}`, margin + 20, 555);
-  doc.text(`* Net Projected Economic Benefit: ${formatCurrency(data.netAnnualEconomicBenefit)} / year (ROI: ${data.roiPct}%)`, margin + 20, 575);
+  doc.setTextColor(203, 213, 225);
+  doc.text(`Department / Unit:`, margin + 16, 330);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text(department, margin + 120, 330);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(203, 213, 225);
+  doc.text(`Evaluation Date:`, margin + 16, 348);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text(evalDate, margin + 120, 348);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(203, 213, 225);
+  doc.text(`Reporting Currency:`, margin + 300, 312);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text(cur, margin + 410, 312);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(203, 213, 225);
+  doc.text(`Evaluation Mode:`, margin + 300, 330);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(isDemo ? 251 : 52, isDemo ? 191 : 211, isDemo ? 36 : 153);
+  doc.text(isDemo ? 'Demonstration Benchmark' : 'Production Diagnostic', margin + 410, 330);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(203, 213, 225);
+  doc.text(`Recommended Path:`, margin + 300, 348);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(147, 197, 253);
+  doc.text(data.approachTitle.length > 22 ? data.approachTitle.substring(0, 20) + '...' : data.approachTitle, margin + 410, 348);
+
+  // Executive KPI Grid on Cover (2x2 Cards)
+  const cardW = (contentWidth - 12) / 2;
+  const cardH = 68;
+  const gridY = 390;
+
+  // Card 1: Annual Labor Cost
+  doc.setFillColor(30, 41, 59);
+  doc.roundedRect(margin, gridY, cardW, cardH, 5, 5, 'F');
+  doc.roundedRect(margin, gridY, cardW, cardH, 5, 5, 'S');
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(148, 163, 184);
+  doc.text('ANNUAL BASELINE LABOR COST', margin + 14, gridY + 18);
+  doc.setFontSize(15);
+  doc.setTextColor(248, 250, 252);
+  doc.text(formatPdfCurrency(m1.totalAnnualLaborCost), margin + 14, gridY + 40);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(148, 163, 184);
+  doc.text(`Baseline commitment across ${ProcessIQ.manualCost.employeeCount} FTEs`, margin + 14, gridY + 56);
+
+  // Card 2: Process Cost Leakage
+  doc.setFillColor(30, 41, 59);
+  doc.roundedRect(margin + cardW + 12, gridY, cardW, cardH, 5, 5, 'F');
+  doc.roundedRect(margin + cardW + 12, gridY, cardW, cardH, 5, 5, 'S');
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(148, 163, 184);
+  doc.text('ANNUAL PROCESS COST LEAKAGE', margin + cardW + 26, gridY + 18);
+  doc.setFontSize(15);
+  doc.setTextColor(248, 113, 113); // red-400
+  doc.text(formatPdfCurrency(m2.totalAnnual), margin + cardW + 26, gridY + 40);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(148, 163, 184);
+  doc.text('Quantified operational defects, rework & delays', margin + cardW + 26, gridY + 56);
+
+  // Card 3: AI Readiness Score
+  const gridY2 = gridY + cardH + 12;
+  doc.setFillColor(30, 41, 59);
+  doc.roundedRect(margin, gridY2, cardW, cardH, 5, 5, 'F');
+  doc.roundedRect(margin, gridY2, cardW, cardH, 5, 5, 'S');
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(148, 163, 184);
+  doc.text('AI READINESS DIAGNOSTIC', margin + 14, gridY2 + 18);
+  if (m3.isCompleted) {
+    doc.setFontSize(15);
+    doc.setTextColor(56, 189, 248); // sky-400
+    doc.text(`${m3.overallScore} / 100`, margin + 14, gridY2 + 40);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(125, 211, 252);
+    doc.text(m3.classification, margin + 14, gridY2 + 56);
+  } else {
+    doc.setFontSize(13);
+    doc.setTextColor(251, 191, 36); // amber-400
+    doc.text('Assessment Pending', margin + 14, gridY2 + 40);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(252, 211, 77);
+    doc.text(`Diagnostic Incomplete (${m3.answeredCount}/${m3.questionCount} Answered)`, margin + 14, gridY2 + 56);
+  }
+
+  // Card 4: Net Projected Economic Benefit
+  doc.setFillColor(30, 41, 59);
+  doc.roundedRect(margin + cardW + 12, gridY2, cardW, cardH, 5, 5, 'F');
+  doc.roundedRect(margin + cardW + 12, gridY2, cardW, cardH, 5, 5, 'S');
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(148, 163, 184);
+  doc.text('NET RECURRING BENEFIT (SCENARIO C)', margin + cardW + 26, gridY2 + 18);
+  doc.setFontSize(15);
+  doc.setTextColor(52, 211, 153); // emerald-400
+  doc.text(formatPdfCurrency(data.netAnnualEconomicBenefit), margin + cardW + 26, gridY2 + 40);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(110, 231, 183);
+  doc.text(`Recurring ROI: ${data.roiPct}% | Payback: ${data.paybackMonths} mo`, margin + cardW + 26, gridY2 + 56);
+
+  // Cover Page Executive Callout Box
+  const calloutY = gridY2 + cardH + 18;
+  doc.setFillColor(23, 37, 84); // dark blue-950
+  doc.roundedRect(margin, calloutY, contentWidth, 75, 5, 5, 'F');
+  doc.setDrawColor(37, 99, 235);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(margin, calloutY, contentWidth, 75, 5, 5, 'S');
 
   doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(147, 197, 253);
+  doc.text('EXECUTIVE TRANSFORMATION DIRECTIVE', margin + 14, calloutY + 20);
+
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(226, 232, 240);
+  const coverDirective = 
+    `This formal valuation establishes the financial baseline, operational defect leakage, and organizational readiness for ${processName}. ` +
+    `Traditional workflow automation recovers deterministic rules capacity, while Enterprise AI unlocks unstructured cognitive processing. ` +
+    `Strategic recommendations are fully reconciled against commercial AI total cost of ownership to ensure maximum capital efficiency.`;
+  doc.text(doc.splitTextToSize(coverDirective, contentWidth - 28), margin + 14, calloutY + 36);
+
+  // Cover Page Bottom Footer & Attributions
+  doc.setFontSize(8.5);
   doc.setTextColor(148, 163, 184);
   doc.setFont('helvetica', 'normal');
-  doc.text('Created by Yuvraj Malpure', margin, pageHeight - 55);
+  doc.text('Created by Yuvraj Malpure | Enterprise Solutions Architecture', margin, pageHeight - 55);
 
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(100, 116, 139);
-  doc.text('Generated via ProcessIQ Client-Side Evaluation Engine | Zero Cloud Data Transmission', margin, pageHeight - 40);
+  doc.text('Generated via ProcessIQ Client-Side Evaluation Engine | Local In-Memory Execution | Zero Cloud Data Transmission', margin, pageHeight - 40);
 
   // -----------------------------------------------------------
-  // PAGE 2: EXECUTIVE SUMMARY
+  // PAGE 2: EXECUTIVE SUMMARY & STRATEGIC SYNTHESIS
   // -----------------------------------------------------------
   newPage('Executive Summary');
 
@@ -2318,36 +2473,57 @@ function downloadPDF() {
   doc.setFont('helvetica', 'bold');
   doc.text('Executive Summary', margin, 70);
 
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setTextColor(51, 65, 85);
   doc.setFont('helvetica', 'normal');
   const execSummaryText = 
-    `This report establishes the baseline economics, cost leakage, and strategic AI readiness for ${ProcessIQ.manualCost.processName || 'the target workflow'}. ` +
+    `This report establishes the baseline economics, cost leakage, and strategic AI readiness for ${processName}. ` +
     `Modern enterprises frequently rush into generative AI licensing without first calculating whether their manual processes are structured, ` +
     `governed, and financially suited for automation. ` +
     `Our objective evaluation combines four rigorous dimensions: labor intensity, systemic defect leakage, multi-tier organizational readiness, ` +
     `and commercial AI vendor total cost of ownership.`;
-  doc.text(doc.splitTextToSize(execSummaryText, contentWidth), margin, 95);
+  doc.text(doc.splitTextToSize(execSummaryText, contentWidth), margin, 92);
 
   // Summary Table
   doc.autoTable({
-    startY: 160,
-    head: [['Strategic Dimension', 'Current Baseline Metric', 'Strategic Assessment']],
+    startY: 155,
+    head: [['Strategic Dimension', 'Current Baseline Metric', 'Strategic Assessment & Governance Scope']],
     body: [
-      ['Annual Labor Exposure', formatCurrency(m1.totalAnnualLaborCost), `${formatNumber(m1.annualHours)} labor hours committed annually across ${ProcessIQ.manualCost.employeeCount} operators.`],
-      ['Recoverable Capacity', `${formatCurrency(m1.recoverableAnnualValue)} (${ProcessIQ.manualCost.recoverableCapacityPct}%)`, `${formatNumber(m1.recoverableAnnualHours)} hours potentially liberated for higher-value activities.`],
-      ['Process Cost Leakage', formatCurrency(m2.totalAnnual), `Operational defects, rework, and penalties contribute ${formatCurrency(m2.totalMonthly)}/month in leakage.`],
+      ['Annual Labor Exposure', formatPdfCurrency(m1.totalAnnualLaborCost), `${formatNumber(m1.annualHours)} labor hours committed annually across ${ProcessIQ.manualCost.employeeCount} dedicated operators.`],
+      ['Recoverable Capacity', `${formatPdfCurrency(m1.recoverableAnnualValue)} (${ProcessIQ.manualCost.recoverableCapacityPct}%)`, `${formatNumber(m1.recoverableAnnualHours)} productive hours reclaimable for high-value strategic execution.`],
+      ['Process Cost Leakage', formatPdfCurrency(m2.totalAnnual), `Operational defects, rework, and compliance penalties generate ${formatPdfCurrency(m2.totalMonthly)} in monthly leakage.`],
       ['AI Readiness Score', m3.isCompleted ? `${m3.overallScore}/100` : 'Assessment Pending', `${m3.classification}. ${m3.description}`],
       ['Recommended Strategy', data.approachTitle, data.approachRationale],
-      ['Financial Returns (AI)', `ROI: ${data.roiPct}% | Payback: ${data.paybackMonths} mo`, `Net annual economic value of ${formatCurrency(data.netAnnualEconomicBenefit)} projected under Scenario C.`]
+      ['Financial Returns (AI)', `ROI: ${data.roiPct}% | Payback: ${data.paybackMonths} mo`, `Net annual economic value of ${formatPdfCurrency(data.netAnnualEconomicBenefit)} projected under Scenario C.`]
     ],
     theme: 'grid',
-    headStyles: { fillColor: [15, 23, 42], textColor: 255, fontSize: 9, fontStyle: 'bold' },
+    headStyles: { fillColor: [15, 23, 42], textColor: 255, fontSize: 8.5, fontStyle: 'bold' },
     styles: { fontSize: 8, cellPadding: 6 }
   });
 
+  const finalY2 = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : 360;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(margin, finalY2, contentWidth, 80, 5, 5, 'F');
+  doc.setDrawColor(203, 213, 225);
+  doc.roundedRect(margin, finalY2, contentWidth, 80, 5, 5, 'S');
+
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 64, 175); // blue-800
+  doc.text('Key Strategic Takeaway for Executive Leadership:', margin + 14, finalY2 + 20);
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(51, 65, 85);
+  const execTakeaway = 
+    `Automating an unstructured process simply accelerates chaos. By evaluating labor exposure (${formatPdfCurrency(m1.totalAnnualLaborCost)}) ` +
+    `and systemic defect leakage (${formatPdfCurrency(m2.totalAnnual)}) against organizational maturity (${m3.isCompleted ? m3.overallScore + '/100' : 'Assessment Pending'}), ` +
+    `leadership can determine whether to deploy low-code rules automation (Scenario B) to eliminate basic workflow debt or implement cognitive AI copilots ` +
+    `(Scenario C) to achieve scalable operational throughput.`;
+  doc.text(doc.splitTextToSize(execTakeaway, contentWidth - 28), margin + 14, finalY2 + 36);
+
   // -----------------------------------------------------------
-  // PAGE 3: PROCESS INFORMATION & ASSUMPTIONS
+  // PAGE 3: PROCESS INFORMATION & BASELINE PARAMETERS
   // -----------------------------------------------------------
   newPage('Process Information & Baseline Parameters');
 
@@ -2358,25 +2534,25 @@ function downloadPDF() {
 
   doc.autoTable({
     startY: 95,
-    head: [['Input Parameter', 'Value', 'Methodology & Source Assumption']],
+    head: [['Input Parameter', 'Configured Value', 'Methodology & Source Assumption']],
     body: [
-      ['Process Name', ProcessIQ.manualCost.processName || 'Target Process', 'Target business workflow selected by user.'],
-      ['Department / Unit', ProcessIQ.manualCost.department || 'Operations', 'Designated organizational department.'],
-      ['Reporting Currency', ProcessIQ.currency, 'Base currency for financial calculations.'],
+      ['Process Name', processName, 'Target business workflow evaluated.'],
+      ['Department / Unit', department, 'Designated organizational department.'],
+      ['Reporting Currency', cur, 'Base currency for all financial calculations.'],
       ['Dedicated Headcount', `${ProcessIQ.manualCost.employeeCount} FTEs`, 'Full-time employees engaged in the daily workflow.'],
-      ['Average Hours/Day', `${ProcessIQ.manualCost.hoursPerDay} hrs`, 'Estimated time per employee dedicated to this specific task.'],
-      ['Working Days/Month', `${ProcessIQ.manualCost.workingDays} days`, 'Standard corporate working days.'],
-      ['Fully-Loaded Hourly Rate', formatCurrency(ProcessIQ.manualCost.hourlyRate), 'Includes salary, payroll taxes, benefits, and standard overhead.'],
-      ['Overtime Consideration', ProcessIQ.manualCost.includeOvertime ? `${ProcessIQ.manualCost.overtimeHours} hrs/mo @ ${formatCurrency(ProcessIQ.manualCost.overtimeRate)}/hr` : 'None', 'Recurring monthly overtime spend.'],
+      ['Average Hours/Day', `${ProcessIQ.manualCost.hoursPerDay} hrs/day`, 'Estimated time per employee dedicated to this specific task.'],
+      ['Working Days/Month', `${ProcessIQ.manualCost.workingDays} days/mo`, 'Standard corporate working days per operational month.'],
+      ['Fully-Loaded Hourly Rate', formatPdfCurrency(ProcessIQ.manualCost.hourlyRate), 'Includes salary, payroll taxes, benefits, and corporate overhead.'],
+      ['Overtime Consideration', ProcessIQ.manualCost.includeOvertime ? `${ProcessIQ.manualCost.overtimeHours} hrs/mo @ ${formatPdfCurrency(ProcessIQ.manualCost.overtimeRate)}/hr` : 'None Configured', 'Recurring monthly overtime commitments.'],
       ['Salary Escalation Rate', `${ProcessIQ.manualCost.annualSalaryIncreasePct}% per annum`, 'Baseline wage inflation assumption used for multi-year projections.'],
       ['Estimated Recovery Target', `${ProcessIQ.manualCost.recoverableCapacityPct}% of labor hours`, 'Targeted proportion of repetitive work reclaimable via transformation.']
     ],
     theme: 'striped',
-    headStyles: { fillColor: [30, 41, 59], textColor: 255, fontSize: 9 }
+    headStyles: { fillColor: [30, 41, 59], textColor: 255, fontSize: 8.5 }
   });
 
   // -----------------------------------------------------------
-  // PAGE 4: MANUAL WORK COST ANALYSIS
+  // PAGE 4: MANUAL WORK COST ANALYSIS (MODULE 1)
   // -----------------------------------------------------------
   newPage('Manual Work Cost Analysis');
 
@@ -2390,24 +2566,32 @@ function downloadPDF() {
     head: [['Metric', 'Monthly Figure', 'Annualized Figure (Year 1)', 'Year 2 Projected', 'Year 3 Projected']],
     body: [
       ['Base Labor Hours', `${formatNumber(m1.monthlyHours)} hrs`, `${formatNumber(m1.annualHours)} hrs`, `${formatNumber(m1.annualHours)} hrs`, `${formatNumber(m1.annualHours)} hrs`],
-      ['Base Labor Cost', formatCurrency(m1.baseMonthlyLaborCost), formatCurrency(m1.baseAnnualLaborCost), formatCurrency(m1.baseAnnualLaborCost * 1.04), formatCurrency(m1.baseAnnualLaborCost * 1.0816)],
-      ['Overtime Spend', formatCurrency(m1.monthlyOvertimeCost), formatCurrency(m1.monthlyOvertimeCost * 12), formatCurrency(m1.monthlyOvertimeCost * 12 * 1.04), formatCurrency(m1.monthlyOvertimeCost * 12 * 1.0816)],
-      ['Total Labor Commitment', formatCurrency(m1.totalMonthlyLaborCost), formatCurrency(m1.totalAnnualLaborCost), formatCurrency(m1.projectedYear2LaborCost), formatCurrency(m1.projectedYear3LaborCost)],
-      ['Recoverable Capacity Value', formatCurrency(m1.recoverableMonthlyValue), formatCurrency(m1.recoverableAnnualValue), formatCurrency(m1.recoverableAnnualValue * 1.04), formatCurrency(m1.recoverableAnnualValue * 1.0816)]
+      ['Base Labor Cost', formatPdfCurrency(m1.baseMonthlyLaborCost), formatPdfCurrency(m1.baseAnnualLaborCost), formatPdfCurrency(m1.baseAnnualLaborCost * (1 + (ProcessIQ.manualCost.annualSalaryIncreasePct/100))), formatPdfCurrency(m1.baseAnnualLaborCost * Math.pow(1 + (ProcessIQ.manualCost.annualSalaryIncreasePct/100), 2))],
+      ['Overtime Spend', formatPdfCurrency(m1.monthlyOvertimeCost), formatPdfCurrency(m1.monthlyOvertimeCost * 12), formatPdfCurrency(m1.monthlyOvertimeCost * 12 * (1 + (ProcessIQ.manualCost.annualSalaryIncreasePct/100))), formatPdfCurrency(m1.monthlyOvertimeCost * 12 * Math.pow(1 + (ProcessIQ.manualCost.annualSalaryIncreasePct/100), 2))],
+      ['Total Labor Commitment', formatPdfCurrency(m1.totalMonthlyLaborCost), formatPdfCurrency(m1.totalAnnualLaborCost), formatPdfCurrency(m1.projectedYear2LaborCost), formatPdfCurrency(m1.projectedYear3LaborCost)],
+      ['Recoverable Capacity Value', formatPdfCurrency(m1.recoverableMonthlyValue), formatPdfCurrency(m1.recoverableAnnualValue), formatPdfCurrency(m1.recoverableAnnualValue * (1 + (ProcessIQ.manualCost.annualSalaryIncreasePct/100))), formatPdfCurrency(m1.recoverableAnnualValue * Math.pow(1 + (ProcessIQ.manualCost.annualSalaryIncreasePct/100), 2))]
     ],
     theme: 'grid',
     headStyles: { fillColor: [37, 99, 235], textColor: 255, fontSize: 8 }
   });
 
   const finalY4 = doc.lastAutoTable ? doc.lastAutoTable.finalY + 18 : 250;
+  doc.setFillColor(254, 243, 199); // light amber-100
+  doc.roundedRect(margin, finalY4, contentWidth, 55, 4, 4, 'F');
+  doc.setDrawColor(245, 158, 11);
+  doc.roundedRect(margin, finalY4, contentWidth, 55, 4, 4, 'S');
+
   doc.setFontSize(8.5);
-  doc.setTextColor(180, 83, 9); // amber-700
-  doc.setFont('helvetica', 'italic');
-  const disclaimerP4 = 'Important Capacity Recovery Distinction: Recovered employee capacity reflects productive hours reclaimed for high-value strategic execution. It does not constitute immediate cash savings or guaranteed payroll reduction unless headcount, overtime, or contractor spend is formally restructured.';
-  doc.text(doc.splitTextToSize(disclaimerP4, contentWidth), margin, finalY4);
+  doc.setTextColor(146, 64, 14); // amber-800
+  doc.setFont('helvetica', 'bold');
+  doc.text('Important Capacity Recovery Distinction:', margin + 12, finalY4 + 18);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  const disclaimerP4 = 'Recovered employee capacity reflects productive hours reclaimed for high-value strategic execution. It does not constitute immediate cash savings or guaranteed payroll reduction unless headcount, overtime, or contractor spend is formally restructured.';
+  doc.text(doc.splitTextToSize(disclaimerP4, contentWidth - 24), margin + 12, finalY4 + 32);
 
   // -----------------------------------------------------------
-  // PAGE 5: PROCESS COST LEAKAGE ANALYSIS
+  // PAGE 5: PROCESS COST LEAKAGE ANALYSIS (MODULE 2)
   // -----------------------------------------------------------
   newPage('Process Cost Leakage Analysis');
 
@@ -2421,8 +2605,8 @@ function downloadPDF() {
     head: [['Leakage Category', 'Monthly Loss', 'Annual Loss', '% Contribution', 'Recommended Targeted Intervention']],
     body: m2.items.map(i => [
       i.name,
-      formatCurrency(i.monthly),
-      formatCurrency(i.annual),
+      formatPdfCurrency(i.monthly),
+      formatPdfCurrency(i.annual),
       `${Math.round(i.pct)}%`,
       i.intervention
     ]),
@@ -2431,29 +2615,32 @@ function downloadPDF() {
   });
 
   let yPos5 = doc.lastAutoTable ? doc.lastAutoTable.finalY + 18 : 320;
+  doc.setFillColor(241, 245, 249);
+  doc.roundedRect(margin, yPos5, contentWidth, 68, 4, 4, 'F');
+  doc.setDrawColor(203, 213, 225);
+  doc.roundedRect(margin, yPos5, contentWidth, 68, 4, 4, 'S');
+
+  doc.setFontSize(8.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 41, 59);
+  doc.text('Anti-Double Counting Controls & Operational Warnings:', margin + 12, yPos5 + 16);
+  yPos5 += 28;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(71, 85, 105);
   if (m2.warnings.length > 0) {
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(180, 83, 9);
-    doc.text('Anti-Double Counting Controls & Operational Warnings:', margin, yPos5);
-    yPos5 += 14;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
     m2.warnings.forEach(w => {
-      const lines = doc.splitTextToSize(`* ${w}`, contentWidth - 10);
-      doc.text(lines, margin + 5, yPos5);
-      yPos5 += (lines.length * 11) + 4;
+      const lines = doc.splitTextToSize(`* ${w}`, contentWidth - 24);
+      doc.text(lines, margin + 12, yPos5);
+      yPos5 += (lines.length * 9) + 2;
     });
   } else {
-    doc.setFontSize(8.5);
-    doc.setFont('helvetica', 'italic');
-    doc.setTextColor(100, 116, 139);
-    doc.text('Anti-Double Counting Validation: Zero cross-category leakage overlaps identified.', margin, yPos5);
+    doc.text('Anti-Double Counting Validation: Zero cross-category leakage overlaps identified.', margin + 12, yPos5);
   }
 
   // -----------------------------------------------------------
-  // PAGE 6: AI READINESS ASSESSMENT
+  // PAGE 6: AI READINESS ASSESSMENT (MODULE 3)
   // -----------------------------------------------------------
   newPage('AI Readiness Assessment');
 
@@ -2496,7 +2683,7 @@ function downloadPDF() {
     m3.strengths.forEach(s => {
       const lines = doc.splitTextToSize(`+ ${s}`, contentWidth - 10);
       doc.text(lines, margin + 5, yPos6);
-      yPos6 += (lines.length * 11) + 3;
+      yPos6 += (lines.length * 10) + 3;
     });
   } else {
     doc.setFont('helvetica', 'italic');
@@ -2506,7 +2693,7 @@ function downloadPDF() {
   }
 
   yPos6 += 10;
-  // Vulnerabilities and Operational Risks (Priority 3 Check)
+  // Vulnerabilities and Operational Risks
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.setTextColor(15, 23, 42);
@@ -2524,7 +2711,7 @@ function downloadPDF() {
     m3.weaknesses.forEach(w => {
       const lines = doc.splitTextToSize(`- ${w}`, contentWidth - 10);
       doc.text(lines, margin + 5, yPos6);
-      yPos6 += (lines.length * 11) + 3;
+      yPos6 += (lines.length * 10) + 3;
     });
   } else {
     doc.setFont('helvetica', 'italic');
@@ -2533,7 +2720,7 @@ function downloadPDF() {
   }
 
   // -----------------------------------------------------------
-  // PAGE 7: AI INVESTMENT COMPARISON
+  // PAGE 7: AI INVESTMENT COMPARISON (MODULE 4)
   // -----------------------------------------------------------
   newPage('AI Investment Comparison');
 
@@ -2544,7 +2731,7 @@ function downloadPDF() {
 
   doc.autoTable({
     startY: 95,
-    head: [['AI Platform', 'Pricing Model', 'Pricing Status', 'Year 1 Licenses', 'Annual Support', 'Year 1 Capex', 'Total Year 1', '3-Year Total']],
+    head: [['AI Platform', 'Pricing Model', 'Pricing Status', 'Year 1 Licenses', 'Year 1 Usage', 'Annual Support', 'Year 1 Capex', 'Total Year 1', '3-Year Total']],
     body: data.m4.results.map(r => {
       const statusLabel = r.isCustom 
         ? 'Custom Price Entered by User' 
@@ -2553,16 +2740,28 @@ function downloadPDF() {
         r.vendor.name,
         r.vendor.pricingModel || r.vendor.tier,
         statusLabel,
-        formatCurrency(r.year1Sub),
-        formatCurrency(r.annualSupport || 8000),
-        formatCurrency(r.year1Capex),
-        formatCurrency(r.totalYear1),
-        formatCurrency(r.contractTotal)
+        formatPdfCurrency(r.year1Sub),
+        formatPdfCurrency(r.year1Usage || 0),
+        formatPdfCurrency(r.annualSupport || 8000),
+        formatPdfCurrency(r.year1Capex),
+        formatPdfCurrency(r.totalYear1),
+        formatPdfCurrency(r.contractTotal)
       ];
     }),
+    columnStyles: {
+      0: { cellWidth: 75 },
+      1: { cellWidth: 55 },
+      2: { cellWidth: 65 },
+      3: { cellWidth: 50 },
+      4: { cellWidth: 45 },
+      5: { cellWidth: 45 },
+      6: { cellWidth: 45 },
+      7: { cellWidth: 65 },
+      8: { cellWidth: 70 }
+    },
     theme: 'grid',
-    headStyles: { fillColor: [30, 41, 59], textColor: 255, fontSize: 8 },
-    styles: { fontSize: 7, cellPadding: 4 }
+    headStyles: { fillColor: [30, 41, 59], textColor: 255, fontSize: 7.5 },
+    styles: { fontSize: 6.5, cellPadding: 3.5 }
   });
 
   const finalY7 = doc.lastAutoTable ? doc.lastAutoTable.finalY + 16 : 280;
@@ -2588,20 +2787,33 @@ function downloadPDF() {
     head: [['Scenario', 'Cash Savings', 'Avoided Leakage', 'Capacity Value', 'Gross Benefits', 'Tech Opex', 'Net Recurring', 'Capex', '1st-Yr Net', 'Recurring ROI', 'Payback']],
     body: data.scenarios.map(s => [
       s.name,
-      formatCurrency(s.actualCashSavings),
-      formatCurrency(s.avoidedLeakage),
-      formatCurrency(s.capacityValueReleased),
-      formatCurrency(s.grossSavings),
-      formatCurrency(s.aiCost),
-      formatCurrency(s.netBenefit),
-      formatCurrency(s.capex),
-      formatCurrency(s.firstYearNetBenefit),
+      formatPdfCurrency(s.actualCashSavings),
+      formatPdfCurrency(s.avoidedLeakage),
+      formatPdfCurrency(s.capacityValueReleased),
+      formatPdfCurrency(s.grossSavings),
+      formatPdfCurrency(s.aiCost),
+      formatPdfCurrency(s.netBenefit),
+      formatPdfCurrency(s.capex),
+      formatPdfCurrency(s.firstYearNetBenefit),
       s.roiFormatted,
       s.paybackFormatted
     ]),
+    columnStyles: {
+      0: { cellWidth: 75 },
+      1: { cellWidth: 45 },
+      2: { cellWidth: 48 },
+      3: { cellWidth: 48 },
+      4: { cellWidth: 48 },
+      5: { cellWidth: 42 },
+      6: { cellWidth: 45 },
+      7: { cellWidth: 42 },
+      8: { cellWidth: 45 },
+      9: { cellWidth: 40 },
+      10: { cellWidth: 37 }
+    },
     theme: 'grid',
-    headStyles: { fillColor: [15, 23, 42], textColor: 255, fontSize: 7.5 },
-    styles: { fontSize: 6.5, cellPadding: 4 }
+    headStyles: { fillColor: [15, 23, 42], textColor: 255, fontSize: 7 },
+    styles: { fontSize: 6.5, cellPadding: 3.5 }
   });
 
   // Table 2: Operating Run-Rate Breakdown
@@ -2619,10 +2831,10 @@ function downloadPDF() {
       const redPct = baselineTotal > 0 ? Math.round(((baselineTotal - s.totalOperatingCost) / baselineTotal) * 1000) / 10 : 0;
       return [
         s.name,
-        formatCurrency(s.laborCost),
-        formatCurrency(s.leakageCost),
-        formatCurrency(s.totalOperatingCost),
-        `${redPct}% (${formatCurrency(s.grossSavings)} saved)`
+        formatPdfCurrency(s.laborCost),
+        formatPdfCurrency(s.leakageCost),
+        formatPdfCurrency(s.totalOperatingCost),
+        `${redPct}% (${formatPdfCurrency(s.grossSavings)} saved)`
       ];
     }),
     theme: 'striped',
@@ -2641,19 +2853,25 @@ function downloadPDF() {
   doc.text(doc.splitTextToSize(data.approachRationale, contentWidth), margin, pathwayY + 14);
 
   // -----------------------------------------------------------
-  // PAGE 9: 30-DAY IMPROVEMENT ROADMAP
+  // PAGE 9: 30-DAY TACTICAL ROADMAP & EXECUTIVE SIGN-OFF
   // -----------------------------------------------------------
-  newPage('30-Day Tactical Roadmap');
+  newPage('30-Day Tactical Roadmap & Sign-Off');
 
   doc.setFontSize(18);
   doc.setTextColor(15, 23, 42);
   doc.setFont('helvetica', 'bold');
   doc.text('Recommended 30-Day Tactical Roadmap', margin, 70);
 
+  const roadmapData = (m3.roadmap && m3.roadmap.length > 0) ? m3.roadmap : [
+    { days: 'Days 1–10', phase: 'Process Hygiene & Baseline Mapping', task: 'Workflow Mapping & SOP Standardization', deliverable: 'Step-level flowchart with exception matrix', owner: 'Process Owner & Ops Lead' },
+    { days: 'Days 11–20', phase: 'Data Architecture & Privacy Guardrails', task: 'Data Accessibility Audit & Sanitization', deliverable: '50-item clean golden evaluation dataset with ground truth', owner: 'Data Engineer & Security Lead' },
+    { days: 'Days 21–30', phase: 'Supervised Pilot & Change Enablement', task: 'Constrained Pilot (20% volume) with HITL Sign-offs', deliverable: 'Pilot Performance Scorecard measuring cycle-time and adoption', owner: 'Transformation Lead & Power Users' }
+  ];
+
   doc.autoTable({
-    startY: 95,
+    startY: 90,
     head: [['Time Horizon', 'Strategic Phase', 'Tactical Actions', 'Key Deliverable', 'Accountable Owner']],
-    body: m3.roadmap.map(r => [
+    body: roadmapData.map(r => [
       r.days,
       r.phase,
       r.task,
@@ -2661,7 +2879,28 @@ function downloadPDF() {
       r.owner
     ]),
     theme: 'grid',
-    headStyles: { fillColor: [5, 150, 105], textColor: 255, fontSize: 8 }
+    headStyles: { fillColor: [5, 150, 105], textColor: 255, fontSize: 8 },
+    styles: { fontSize: 7.5, cellPadding: 5 }
+  });
+
+  // Enterprise Governance Sign-Off Block
+  const finalY9 = doc.lastAutoTable ? doc.lastAutoTable.finalY + 25 : 320;
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(15, 23, 42);
+  doc.text('Executive Transformation Sign-Off & Governance Approval', margin, finalY9);
+
+  doc.autoTable({
+    startY: finalY9 + 10,
+    head: [['Executive Stakeholder Role', 'Designated Leader', 'Governance Decision', 'Formal Signature', 'Date Signed']],
+    body: [
+      ['Business Executive Sponsor', `${department} VP`, '[  ] Approved    [  ] Conditional    [  ] Deferred', '_______________________', '____ / ____ / 2026'],
+      ['Finance & Commercial Controller', 'Corporate Finance', '[  ] Approved    [  ] Conditional    [  ] Deferred', '_______________________', '____ / ____ / 2026'],
+      ['Technology & AI Practice Lead', 'Enterprise Architecture', '[  ] Approved    [  ] Conditional    [  ] Deferred', '_______________________', '____ / ____ / 2026']
+    ],
+    theme: 'grid',
+    headStyles: { fillColor: [15, 23, 42], textColor: 255, fontSize: 8, fontStyle: 'bold' },
+    styles: { fontSize: 7.5, cellPadding: 8 }
   });
 
   // -----------------------------------------------------------
@@ -2704,7 +2943,7 @@ function downloadPDF() {
     '2. Anti-Double Counting Safeguards: Overlap between transaction error remediation and manual rework labor has been deduplicated to prevent artificial inflation of financial benefits.',
     '3. Vendor Pricing Verification: Microsoft pricing is verified from commercial documentation. Claude Enterprise is an indicative benchmark requiring direct Anthropic quotation. Custom LLM pricing uses developer API token consumption rates without synthetic credit conversion. Implementation capex ($40,000 baseline) and annual support ($8,000/yr baseline) are illustrative enterprise assumptions that users may configure directly in Module 4.',
     '4. AI Readiness Diagnostic: Diagnostic scores reflect organizational responses and do not constitute an audited legal, compliance, or cybersecurity warranty.',
-    '5. Client-Side Privacy: All calculations, transformations, and document compilations were executed in-memory within the local browser sandbox. Zero business data was stored or transmitted across any network. External network activity is strictly limited to retrieving public static code libraries (Tailwind, Chart.js, jsPDF) on initial page load.',
+    '5. Client-Side Privacy, Local Storage & External Dependencies: All calculations, transformations, and document compilations were executed in-memory within the local browser sandbox. Zero business data was stored or transmitted across any network. The application utilizes browser localStorage strictly to preserve assessment progress between sessions. External network activity is strictly limited to retrieving public static code libraries (Tailwind CSS, Chart.js, jsPDF, Google Fonts) on initial page load.',
     '6. Pricing Transparency & Auditability: ProcessIQ maintains dual-layer pricing governance. Official vendor reference rates remain permanent benchmarks, while custom contract prices entered by users are explicitly flagged across all executive dashboards, CSV exports, and formal reports.'
   ];
   disclaimers.forEach(d => {

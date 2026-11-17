@@ -1,6 +1,6 @@
 ======================================================================
 PROCESSIQ v1.0 — FINAL COMPREHENSIVE AUTOMATED TEST AUDIT LOG
-Generated: 2026-11-17 15:05:07
+Generated: 2026-11-17 19:28:09
 Workspace: ProcessIQ Enterprise Project Root
 ======================================================================
 
@@ -433,7 +433,7 @@ PROCESSIQ MASTER END-TO-END RELEASE AUDIT (ALL 15 WORKFLOW STEPS)
   [PASS] S12.6: Preserved 15 previously answered questions
   [PASS] S12.7: Advanced tier is incomplete
   [PASS] S12.8: UI reverts to Assessment Pending in Advanced tier
-  [PASS] S13.1: Detailed Business Case PDF compiled (108563 chars datauri)
+  [PASS] S13.1: Detailed Business Case PDF compiled (130435 chars datauri)
   [PASS] S13.2: PDF data URI header verified
   [PASS] S15.1: isSampleData restored to true
   [PASS] S15.2: AP sample process restored
@@ -452,7 +452,7 @@ Return Code: 0
 PROCESSIQ DETAILED BUSINESS CASE PDF GENERATION & AUDIT
 ======================================================================
 [PASS] Successfully generated: ProcessIQ_Detailed_Business_Case_Demo.pdf
-       File Size: 81379 bytes (79.5 KB)
+       File Size: 97781 bytes (95.5 KB)
        Report Filename: ProcessIQ_Accounts_Payable_Report.pdf
 [PASS] Page Count: 10 pages (Expected: 10)
   [PASS] ProcessIQ Platform Branding: Found 'PROCESSIQ'
@@ -495,6 +495,92 @@ PDF CONTENT AUDIT SUMMARY: 35 / 35 VERIFIED
 ======================================================================
 Return Code: 0
 
+>>> Executing: treasury_ar_reconciliation_test.py (Treasury & AR Mathematical Reconciliation & 10-Page PDF Verification)
+======================================================================
+TREASURY & ACCOUNTS RECEIVABLE RECONCILIATION & PDF AUDIT SUITE
+======================================================================
+
+--- 1. Treasury Scenario B Mathematical Engine Reconciliation ---
+  [PASS] Treasury recoverable capacity value is INR 106,920 (got 106920)
+  [PASS] Scenario B labor savings is INR 61,097 (NOT 213,840; got 61097)
+  [PASS] Scenario B remaining labor is INR 1,008,103 (NOT 855,360; got 1008103)
+  [PASS] Scenario C labor savings is INR 106,920 (got 106920)
+  [PASS] Scenario C remaining labor is INR 962,280 (got 962280)
+  [PASS] Scenario B labor savings (61097) < Scenario C labor savings (106920)
+  [PASS] Scenario B remaining labor (1008103) > Scenario C remaining labor (962280)
+  [PASS] Treasury total annual leakage is INR 29,424 (got 29424)
+  [PASS] Scenario B gross savings is INR 75,809 (got 75809)
+  [PASS] Scenario B net recurring benefit is INR 70,809 (got 70809)
+  [PASS] Scenario B recurring ROI is 472% (got 472%)
+  [PASS] Scenario B payback is 2.5 mo (got 2.5 mo)
+  [PASS] Scenario C gross savings is INR 128,988 (got 128988)
+  [PASS] Scenario C net recurring benefit is INR 115,588 (got 115588)
+  [PASS] Scenario C recurring ROI is 289% (got 289%)
+  [PASS] Scenario C payback is 4.2 mo (got 4.2 mo)
+
+--- 2. Accounts Receivable Mathematical Engine Audit ---
+  [PASS] Accounts Receivable baseline labor is $337,920 (got 337920)
+  [PASS] Accounts Receivable recoverable capacity value is $101,376 (got 101376)
+  [PASS] AR Scenario B labor savings is $67,584 (20% cap; got 67584)
+  [PASS] AR Scenario B remaining labor is $270,336 (got 270336)
+  [PASS] AR total annual leakage is $84,024 (got 84024)
+  [PASS] AR Scenario B gross savings is $109,596 (got 109596)
+  [PASS] AR Scenario B net recurring benefit is $104,596 (got 104596)
+  [PASS] AR Scenario B recurring ROI is 697% (got 697%)
+  [PASS] AR Scenario B payback is 1.7 mo (got 1.7 mo)
+
+--- 3. Custom AI Agent / LLM API Stack Pricing Reconciliation ---
+  [PASS] Custom AI Agent Year 1 Licenses is 2,700 (got 2700)
+  [PASS] Custom AI Agent Year 1 Usage is 450 (got 450)
+  [PASS] Custom AI Agent Annual Support is 8,000 (got 8000)
+  [PASS] Custom AI Agent Year 1 Capex is 40,000 (got 40000)
+  [PASS] Custom AI Agent Total Year 1 is 51,150 (got 51150)
+  [PASS] Custom AI Agent 3-Year Contract Total is 73,450 (got 73450)
+  [PASS] Horizontal Year 1 formula reconciles: 2,700 + 450 + 8,000 + 40,000 = 51150
+  [PASS] Horizontal 3-Year formula reconciles: 40,000 + (11,150 * 3) = 73450
+
+--- 4. PDF Physical Artifact & Layout Verification ---
+  [PASS] Treasury PDF exists (ProcessIQ_Treasury_Operations_Report.pdf)
+  [PASS] Accounts Receivable PDF exists (ProcessIQ_Accounts_Receivable_Report.pdf)
+  [PASS] Treasury PDF page count is 10 (got 10)
+  [PASS] Treasury Cover explicitly declares DEMONSTRATION SAMPLE REPORT — TREASURY OPERATIONS
+  [PASS] Treasury report contains zero references to 'Accounts Payable'
+  [PASS] Treasury report contains 'INR 1,069,200'
+  [PASS] Treasury report contains 'INR 106,920'
+  [PASS] Treasury report contains reconciled Scenario B capacity value 'INR 61,097'
+  [PASS] Treasury report contains reconciled Scenario B remaining labor 'INR 1,008,103'
+  [PASS] Treasury report renders 'Assessment Pending' for incomplete Module 3
+  [PASS] Treasury report contains formal Executive Sign-Off Block
+  [PASS] Treasury report contains Privacy, localStorage & CDN disclosures
+  [PASS] Treasury report contains 'Custom AI Agent / LLM API Stack'
+  [PASS] Treasury report Module 4 table contains 'Year 1 Usage' column
+  [PASS] Treasury report contains Custom AI Agent Year 1 Licenses 'INR 2,700'
+  [PASS] Treasury report contains Custom AI Agent Year 1 Usage 'INR 450'
+  [PASS] Treasury report contains Custom AI Agent Annual Support 'INR 8,000'
+  [PASS] Treasury report contains Custom AI Agent Year 1 Capex 'INR 40,000'
+  [PASS] Treasury report contains Custom AI Agent Total Year 1 'INR 51,150'
+  [PASS] Treasury report contains Custom AI Agent 3-Year Total 'INR 73,450'
+  [PASS] Accounts Receivable PDF page count is 10 (got 10)
+  [PASS] AR Cover explicitly declares DEMONSTRATION SAMPLE REPORT — ACCOUNTS RECEIVABLE
+  [PASS] AR report contains '$337,920'
+  [PASS] AR report contains '$101,376'
+  [PASS] AR report contains reconciled Scenario B capacity value '$67,584'
+  [PASS] AR report contains reconciled Scenario B remaining labor '$270,336'
+  [PASS] AR report contains formal Executive Sign-Off Block
+  [PASS] AR report contains 'Custom AI Agent / LLM API Stack'
+  [PASS] AR report Module 4 table contains 'Year 1 Usage' column
+  [PASS] AR report contains Custom AI Agent Year 1 Licenses '$2,700'
+  [PASS] AR report contains Custom AI Agent Year 1 Usage '$450'
+  [PASS] AR report contains Custom AI Agent Annual Support '$8,000'
+  [PASS] AR report contains Custom AI Agent Year 1 Capex '$40,000'
+  [PASS] AR report contains Custom AI Agent Total Year 1 '$51,150'
+  [PASS] AR report contains Custom AI Agent 3-Year Total '$73,450'
+
+======================================================================
+RECONCILIATION SUITE SUMMARY: 68 PASSED, 0 FAILED (TOTAL 68)
+======================================================================
+Return Code: 0
+
 >>> Executing: security_scanner.py (Automated Static Security & Secret Analysis Scan)
 ======================================================================
 PROCESSIQ AUTOMATED STATIC SECURITY SCANNER
@@ -515,6 +601,6 @@ Scan Results:
 Return Code: 0
 
 ======================================================================
-ALL TEST SUITES SUMMARY: 8 PASSED, 0 FAILED
+ALL TEST SUITES SUMMARY: 9 PASSED, 0 FAILED
 FINAL STATUS: RELEASE READY (100% SUCCESS)
 ======================================================================
