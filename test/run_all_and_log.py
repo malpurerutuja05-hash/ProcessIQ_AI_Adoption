@@ -17,7 +17,12 @@ suites = [
     ("master_e2e_release_test.py", "Master End-to-End User Journey (All 15 Steps)"),
     ("generate_and_audit_detailed_pdf.py", "Detailed 10-Page Business Case PDF Generation & Binary Audit"),
     ("treasury_ar_reconciliation_test.py", "Treasury & AR Mathematical Reconciliation & 10-Page PDF Verification"),
-    ("security_scanner.py", "Automated Static Security & Secret Analysis Scan")
+    ("security_scanner.py", "Automated Static Security & Secret Analysis Scan"),
+    ("business_analyst_qa_test.py", "Business Analyst Review, Currency Consistency & Module 4 Pricing Audit"),
+    ("financial_governance_validation_test.py", "Independent Financial Governance, Anti-Double-Counting & ROI Audit"),
+    ("global_currency_conversion_test.py", "Global Currency Conversion 5-Step Cycle & 10 Rules Validation"),
+    ("cross_template_validation_engine.py", "12-Template Cross-Industry Financial Calculation & Currency Invariance Validation"),
+    ("production_readiness_comprehensive_test.py", "Production Readiness, Deployment Caching, Persistence & Edge Cases")
 ]
 
 log_lines = []
@@ -58,3 +63,9 @@ with open(out_log, "w", encoding="utf-8") as f:
 
 print(f"Test log successfully written to: {out_log}")
 print(f"Suites passed: {total_passed} / {len(suites)}")
+if not all_success:
+    print(f"FAILED: {total_failed} test suite(s) failed!")
+    sys.exit(1)
+else:
+    print(f"SUCCESS: All {total_passed} test suites passed with exit code 0.")
+    sys.exit(0)

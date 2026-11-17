@@ -205,7 +205,7 @@
 
         assert(printHtml.includes('ProcessIQ'), '66. Print Report contains ProcessIQ branding');
         assert(printHtml.includes('Know your process cost before you invest in AI.'), '67. Print Report contains mandatory tagline');
-        assert(printHtml.includes('Created by') && printHtml.includes('Yuvraj Malpure'), '68. Print Report contains author attribution Created by Yuvraj Malpure');
+        assert(!printHtml.includes('Yuvraj Malpure'), '68. Print Report omits creator attribution (creator reflects on Home page only)');
         assert(printHtml.includes('DEMONSTRATION SAMPLE'), '69. Print Report displays DEMONSTRATION SAMPLE badge when sample data active');
         assert(printHtml.includes('Accounts Payable'), '70. Print Report includes evaluated process name');
 

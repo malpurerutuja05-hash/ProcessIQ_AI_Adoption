@@ -22,7 +22,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <!-- Custom Enterprise Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=1.0.0">
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
 
@@ -50,7 +50,8 @@
 
       <!-- Global Actions -->
       <div class="flex items-center space-x-2.5">
-        <!-- Currency Select -->
+        <!-- Currency Select & FX Reference Indicator -->
+        <span id="currency-fx-badge" class="hidden xl:inline-flex items-center text-[10px] text-slate-300 bg-slate-800/90 px-2 py-1 rounded border border-slate-700/80 font-mono" title="Reference exchange rate basis">Evaluation: USD ($) &bull; Base</span>
         <select id="currency-select" onchange="updateCurrency(this.value)" class="bg-slate-800 text-white text-xs border border-slate-700 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-400">
           <option value="USD" selected>USD ($)</option>
           <option value="EUR">EUR (€)</option>
@@ -164,6 +165,9 @@
           <p class="mt-3 text-base sm:text-lg text-slate-300 leading-relaxed font-light">
             Understand your process costs. Discover improvement opportunities. Make smarter AI investment decisions.
           </p>
+          <div class="mt-2.5 text-xs text-blue-200/90 font-medium flex items-center space-x-1.5">
+            <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-200 border border-blue-400/20">Creator: <strong class="text-white font-semibold">Yuvraj Malpure</strong></span>
+          </div>
 
           <div class="mt-4 p-3.5 bg-slate-800/80 border border-slate-700 rounded-lg text-xs text-slate-300 leading-relaxed max-w-2xl">
             <strong class="text-white">No technical or AI expertise required:</strong> 
@@ -258,37 +262,37 @@
           <div onclick="selectProcessTemplate('ap')" data-key="ap" class="process-card selected">
             <div class="font-bold text-sm text-slate-900">Accounts Payable</div>
             <div class="text-[11px] text-slate-500 mt-1">Vendor invoices, 3-way matching & batch payments.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 12 FTEs | $42/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="ap">Benchmark: 12 FTEs | $42/hr</div>
           </div>
           <div onclick="selectProcessTemplate('ar')" data-key="ar" class="process-card">
             <div class="font-bold text-sm text-slate-900">Accounts Receivable</div>
             <div class="text-[11px] text-slate-500 mt-1">Customer billing, cash allocation & collections.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 8 FTEs | $40/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="ar">Benchmark: 8 FTEs | $40/hr</div>
           </div>
           <div onclick="selectProcessTemplate('bank_rec')" data-key="bank_rec" class="process-card">
             <div class="font-bold text-sm text-slate-900">Bank Reconciliation</div>
             <div class="text-[11px] text-slate-500 mt-1">Statement matching, ledger feeds & exceptions.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 4 FTEs | $44/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="bank_rec">Benchmark: 4 FTEs | $44/hr</div>
           </div>
           <div onclick="selectProcessTemplate('gl')" data-key="gl" class="process-card">
             <div class="font-bold text-sm text-slate-900">General Ledger Closing</div>
             <div class="text-[11px] text-slate-500 mt-1">Month-end balances, roll-forwards & closing entries.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 6 FTEs | $52/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="gl">Benchmark: 6 FTEs | $52/hr</div>
           </div>
           <div onclick="selectProcessTemplate('journal')" data-key="journal" class="process-card">
             <div class="font-bold text-sm text-slate-900">Journal Processing</div>
             <div class="text-[11px] text-slate-500 mt-1">Manual journal entries & supporting doc review.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 5 FTEs | $45/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="journal">Benchmark: 5 FTEs | $45/hr</div>
           </div>
           <div onclick="selectProcessTemplate('treasury')" data-key="treasury" class="process-card">
             <div class="font-bold text-sm text-slate-900">Treasury Operations</div>
             <div class="text-[11px] text-slate-500 mt-1">Cash positioning, wire approvals & FX liquidity.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 3 FTEs | $58/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="treasury">Benchmark: 3 FTEs | $58/hr</div>
           </div>
           <div onclick="selectProcessTemplate('fin_rep')" data-key="fin_rep" class="process-card">
             <div class="font-bold text-sm text-slate-900">Financial Reporting</div>
             <div class="text-[11px] text-slate-500 mt-1">Variance commentary, board packs & KPI reports.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 5 FTEs | $55/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="fin_rep">Benchmark: 5 FTEs | $55/hr</div>
           </div>
         </div>
       </div>
@@ -303,27 +307,27 @@
           <div onclick="selectProcessTemplate('procurement')" data-key="procurement" class="process-card">
             <div class="font-bold text-sm text-slate-900">Procurement</div>
             <div class="text-[11px] text-slate-500 mt-1">Purchase requisitions, vendor RFQs & PO dispatch.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 9 FTEs | $46/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="procurement">Benchmark: 9 FTEs | $46/hr</div>
           </div>
           <div onclick="selectProcessTemplate('order_proc')" data-key="order_proc" class="process-card">
             <div class="font-bold text-sm text-slate-900">Order Processing</div>
             <div class="text-[11px] text-slate-500 mt-1">Sales order validation, ERP entry & fulfillment.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 14 FTEs | $38/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="order_proc">Benchmark: 14 FTEs | $38/hr</div>
           </div>
           <div onclick="selectProcessTemplate('cust_service')" data-key="cust_service" class="process-card">
             <div class="font-bold text-sm text-slate-900">Customer Service</div>
             <div class="text-[11px] text-slate-500 mt-1">Inbound client ticketing, status checks & triage.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 16 FTEs | $32/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="cust_service">Benchmark: 16 FTEs | $32/hr</div>
           </div>
           <div onclick="selectProcessTemplate('inventory')" data-key="inventory" class="process-card">
             <div class="font-bold text-sm text-slate-900">Inventory Management</div>
             <div class="text-[11px] text-slate-500 mt-1">Cycle count logs, warehouse transfers & scrap.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 7 FTEs | $36/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="inventory">Benchmark: 7 FTEs | $36/hr</div>
           </div>
           <div onclick="selectProcessTemplate('hr_ops')" data-key="hr_ops" class="process-card">
             <div class="font-bold text-sm text-slate-900">HR Operations</div>
             <div class="text-[11px] text-slate-500 mt-1">Employee onboarding paperwork & leave tracking.</div>
-            <div class="mt-2 text-[10px] font-semibold text-blue-600">Benchmark: 5 FTEs | $42/hr</div>
+            <div class="mt-2 text-[10px] font-semibold text-blue-600 template-benchmark-badge" data-key="hr_ops">Benchmark: 5 FTEs | $42/hr</div>
           </div>
         </div>
       </div>
@@ -396,8 +400,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="card-enterprise p-6 lg:col-span-2 space-y-5">
             <div class="guidance-box text-xs text-slate-700 space-y-1">
-              <strong class="text-blue-900 font-bold block">Module 1 Guidance:</strong>
-              Tell us how many employees work on this task, how much time they dedicate, and their estimated hourly cost.
+              <strong class="text-blue-900 font-bold block text-sm">Module 1: Annual Labor Cost</strong>
+              <div class="text-slate-800 font-medium">"What does this process cost your organization in employee time every year?"</div>
+              <p class="text-[11px] text-slate-600 mt-0.5">Enter how many employees work on this workflow, their dedicated hours, and loaded hourly pay to calculate your baseline annual payroll cost.</p>
             </div>
 
             <!-- Process Name -->
@@ -446,8 +451,8 @@
             <!-- Hourly Rate -->
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label class="text-xs font-bold text-slate-900">Average fully-loaded hourly employee cost</label>
-                <span class="explainer-pill">Currency / Hour</span>
+                <label class="text-xs font-bold text-slate-900">Average fully-loaded hourly employee cost <span class="currency-tag text-blue-600 font-normal">($/hr)</span></label>
+                <span class="explainer-pill currency-unit-pill">$/hr</span>
               </div>
               <input type="number" id="in-m1-rate" min="0" step="1" class="w-full text-xs">
               <p class="text-[11px] text-slate-500 mt-1">
@@ -517,8 +522,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="card-enterprise p-6 lg:col-span-2 space-y-4">
             <div class="guidance-box text-xs text-slate-700 space-y-1">
-              <strong class="text-rose-900 font-bold block">Module 2 Guidance: Where does this process lose money?</strong>
-              Every manual process experiences defects. Enter estimates for transaction errors, rework hours, delays, and penalties.
+              <strong class="text-rose-900 font-bold block text-sm">Module 2: Process Cost Leakage</strong>
+              <div class="text-slate-800 font-medium">"How much money or productive time is lost because of errors, rework, delays and process inefficiencies?"</div>
+              <p class="text-[11px] text-slate-600 mt-0.5">Quantify operational waste across clerical mistakes, staff triage rework, late transaction delays, and penalty payments.</p>
             </div>
 
             <!-- Error Leakage -->
@@ -538,8 +544,8 @@
                   <input type="number" id="in-m2-err-rate" class="w-full text-xs" value="2.8" step="0.1" oninput="ProcessIQ.costLeakage.errors.errorRatePct=this.value;renderAll()">
                 </div>
                 <div>
-                  <span class="text-[10px] text-slate-500">Cost Per Error</span>
-                  <input type="number" id="in-m2-err-cost" class="w-full text-xs" value="35" oninput="ProcessIQ.costLeakage.errors.avgCostPerError=this.value;renderAll()">
+                  <span class="text-[10px] text-slate-500">Cost Per Error <span class="currency-tag text-rose-600 font-semibold">($)</span></span>
+                  <input type="number" id="in-m2-err-cost" class="w-full text-xs" value="35" oninput="ProcessIQ.costLeakage.errors.avgCostPerError=Number(this.value)||0;captureCanonicalBase();renderAll()">
                 </div>
               </div>
             </div>
@@ -557,9 +563,22 @@
                   <input type="number" id="in-m2-rework-hrs" class="w-full text-xs" value="75" oninput="ProcessIQ.costLeakage.rework.monthlyHours=this.value;renderAll()">
                 </div>
                 <div>
-                  <span class="text-[10px] text-slate-500">Rework Hourly Rate</span>
-                  <input type="number" id="in-m2-rework-rate" class="w-full text-xs" value="48" oninput="ProcessIQ.costLeakage.rework.hourlyRate=this.value;renderAll()">
+                  <span class="text-[10px] text-slate-500">Rework Hourly Rate <span class="currency-tag text-rose-600 font-semibold">($/hr)</span></span>
+                  <input type="number" id="in-m2-rework-rate" class="w-full text-xs" value="48" oninput="ProcessIQ.costLeakage.rework.hourlyRate=Number(this.value)||0;captureCanonicalBase();renderAll()">
                 </div>
+              </div>
+              <!-- Rework Staffing Allocation Assumption -->
+              <div class="mt-2.5 pt-2 border-t border-slate-200">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[10px] font-semibold text-slate-700">Rework Staffing Allocation</span>
+                  <span id="rework-staffing-badge" class="text-[9px] px-1.5 py-0.5 rounded font-semibold bg-blue-100 text-blue-800">Frontline Staff</span>
+                </div>
+                <select id="in-m2-rework-staffing" class="w-full text-xs p-1.5 border border-slate-200 rounded bg-white text-slate-800 focus:ring-1 focus:ring-blue-500" onchange="ProcessIQ.costLeakage.rework.staffingAllocation=this.value;renderAll()">
+                  <option value="frontline">A. Frontline Staff (Work performed by Module 1 baseline FTEs – Prevents double-counting)</option>
+                  <option value="separate">B. Separate Team / Specialists (Dedicated escalation team outside Module 1 baseline)</option>
+                  <option value="unconfirmed">C. Staffing Allocation Unconfirmed (Apply conservative anti-double-counting estimate)</option>
+                </select>
+                <div id="m2-rework-overlap-note" class="mt-1 text-[10px] text-slate-500 leading-tight"></div>
               </div>
             </div>
 
@@ -567,19 +586,19 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div class="p-3 border rounded-lg bg-slate-50/50">
                 <label class="font-bold text-xs text-slate-900 block mb-1">3. Transaction Delays</label>
-                <span class="text-[10px] text-slate-500 block mb-1">Delayed Volume × Cost/Delay</span>
+                <span class="text-[10px] text-slate-500 block mb-1">Delayed Volume × Cost/Delay <span class="currency-tag text-rose-600 font-semibold">($)</span></span>
                 <div class="grid grid-cols-2 gap-2">
                   <input type="number" id="in-m2-delays-vol" placeholder="Delayed / Mo" class="w-full text-xs" value="120" oninput="ProcessIQ.costLeakage.delays.monthlyDelayedVolume=this.value;renderAll()">
-                  <input type="number" id="in-m2-delays-cost" placeholder="Cost / Delay" class="w-full text-xs" value="45" oninput="ProcessIQ.costLeakage.delays.avgCostPerDelay=this.value;renderAll()">
+                  <input type="number" id="in-m2-delays-cost" placeholder="Cost / Delay" class="w-full text-xs" value="45" oninput="ProcessIQ.costLeakage.delays.avgCostPerDelay=Number(this.value)||0;captureCanonicalBase();renderAll()">
                 </div>
               </div>
 
               <div class="p-3 border rounded-lg bg-slate-50/50">
                 <label class="font-bold text-xs text-slate-900 block mb-1">4. Missed Discounts</label>
-                <span class="text-[10px] text-slate-500 block mb-1">Missed early payment discounts</span>
+                <span class="text-[10px] text-slate-500 block mb-1">Missed early payment discounts <span class="currency-tag text-rose-600 font-semibold">($)</span></span>
                 <div class="grid grid-cols-2 gap-2">
                   <input type="number" id="in-m2-disc-count" placeholder="Missed / Mo" class="w-full text-xs" value="15" oninput="ProcessIQ.costLeakage.missedDiscounts.monthlyMissedCount=this.value;renderAll()">
-                  <input type="number" id="in-m2-disc-val" placeholder="Avg Discount Value" class="w-full text-xs" value="380" oninput="ProcessIQ.costLeakage.missedDiscounts.avgDiscountValue=this.value;renderAll()">
+                  <input type="number" id="in-m2-disc-val" placeholder="Avg Discount Value" class="w-full text-xs" value="380" oninput="ProcessIQ.costLeakage.missedDiscounts.avgDiscountValue=Number(this.value)||0;captureCanonicalBase();renderAll()">
                 </div>
               </div>
             </div>
@@ -588,17 +607,17 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div class="p-3 border rounded-lg bg-slate-50/50">
                 <label class="font-bold text-xs text-slate-900 block mb-1">5. Duplicate Payments</label>
-                <span class="text-[10px] text-slate-500 block mb-1">Count × Avg Amount</span>
+                <span class="text-[10px] text-slate-500 block mb-1">Count × Avg Amount <span class="currency-tag text-rose-600 font-semibold">($)</span></span>
                 <div class="grid grid-cols-2 gap-2">
                   <input type="number" id="in-m2-dup-count" placeholder="Duplicates" class="w-full text-xs" value="4" oninput="ProcessIQ.costLeakage.duplicatePayments.monthlyDuplicateCount=this.value;renderAll()">
-                  <input type="number" id="in-m2-dup-amt" placeholder="Avg Amount" class="w-full text-xs" value="1450" oninput="ProcessIQ.costLeakage.duplicatePayments.avgDuplicateAmount=this.value;renderAll()">
+                  <input type="number" id="in-m2-dup-amt" placeholder="Avg Amount" class="w-full text-xs" value="1450" oninput="ProcessIQ.costLeakage.duplicatePayments.avgDuplicateAmount=Number(this.value)||0;captureCanonicalBase();renderAll()">
                 </div>
               </div>
 
               <div class="p-3 border rounded-lg bg-slate-50/50">
                 <label class="font-bold text-xs text-slate-900 block mb-1">6. Penalties & Fines</label>
-                <span class="text-[10px] text-slate-500 block mb-1">Monthly regulatory/SLA penalties</span>
-                <input type="number" id="in-m2-penalties" class="w-full text-xs" value="1800" oninput="ProcessIQ.costLeakage.penalties.monthlyAmount=this.value;renderAll()">
+                <span class="text-[10px] text-slate-500 block mb-1">Monthly regulatory/SLA penalties <span class="currency-tag text-rose-600 font-semibold">($/mo)</span></span>
+                <input type="number" id="in-m2-penalties" class="w-full text-xs" value="1800" oninput="ProcessIQ.costLeakage.penalties.monthlyAmount=Number(this.value)||0;captureCanonicalBase();renderAll()">
               </div>
             </div>
 
@@ -647,8 +666,9 @@
         <div class="card-enterprise p-6 mb-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
-              <h3 class="text-base font-bold text-slate-900">Module 3: Is My Process AI-Ready?</h3>
-              <p class="text-xs text-slate-500">Select an assessment depth below. Answer questions on how work is documented and governed.</p>
+              <h3 class="text-base font-bold text-slate-900">Module 3: AI Readiness Diagnostic</h3>
+              <div class="text-xs text-slate-700 font-medium mt-0.5">"Is your process sufficiently standardized and reliable to benefit from automation or AI?"</div>
+              <p class="text-[11px] text-slate-500 mt-1">Select an assessment depth below. Answer questions on how work is documented, integrated, and governed.</p>
             </div>
 
             <!-- Tier Selector -->
@@ -705,7 +725,8 @@
       <div id="submodule-ai-comparator" class="submodule-pane hidden">
         <div class="card-enterprise p-6 mb-6">
           <h3 class="text-base font-bold text-slate-900 mb-1">Module 4: Enterprise AI Investment Comparator</h3>
-          <p class="text-xs text-slate-500 mb-4">Compare verified vendor pricing (Microsoft 365 Copilot, Copilot Studio, Claude Enterprise, and Custom LLM API).</p>
+          <div class="text-xs text-slate-700 font-medium mb-1">"What could different technology options cost, and what business benefits could they deliver?"</div>
+          <p class="text-[11px] text-slate-500 mb-4">Compare verified vendor pricing (Microsoft 365 Copilot, Copilot Studio, Claude Enterprise, and Custom LLM API Stack) against one-time implementation investments and ongoing support costs.</p>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             <div>
@@ -713,20 +734,20 @@
               <input type="number" id="in-m4-users" class="w-full text-xs">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">One-Time Implementation Capex</label>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">One-Time Implementation Capex <span class="currency-tag text-blue-600 font-normal">($)</span></label>
               <input type="number" id="in-m4-capex" class="w-full text-xs">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">One-Time Integration Capex</label>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">One-Time Integration Capex <span class="currency-tag text-blue-600 font-normal">($)</span></label>
               <input type="number" id="in-m4-integ" class="w-full text-xs">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Annual Maintenance & Support</label>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Annual Maintenance & Support <span class="currency-tag text-blue-600 font-normal">($/yr)</span></label>
               <input type="number" id="in-m4-support" class="w-full text-xs">
             </div>
           </div>
-          <div class="mt-3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-600">
-            <span class="font-semibold text-slate-800">Illustrative Enterprise Assumptions:</span> One-time implementation capex ($25,000 default), integration capex ($15,000 default), and annual support & maintenance ($8,000/yr default) are illustrative industry baseline estimates applied across all architectures. You can configure and edit these values at any time to reflect your specific vendor SOW or internal IT cost model.
+          <div id="m4-assumptions-callout" class="mt-3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-600">
+            <!-- Dynamically populated in renderM4 -->
           </div>
         </div>
 
@@ -740,6 +761,7 @@
               <thead class="bg-slate-100 text-slate-600 uppercase font-semibold border-b">
                 <tr>
                   <th class="p-3">Platform & Tier</th>
+                  <th class="p-3 text-right">Monthly Sub</th>
                   <th class="p-3 text-right">Year 1 Subscriptions</th>
                   <th class="p-3 text-right">Year 1 Usage / Tokens</th>
                   <th class="p-3 text-right">Annual Support & Maint.</th>
@@ -817,11 +839,17 @@
 
         <!-- Net Financial Return Card -->
         <div class="card-enterprise p-5 kpi-card emerald">
-          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Net Annual Benefit</div>
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Net Annual Economic Benefit</div>
           <div class="text-2xl font-black text-emerald-600 mt-1" id="dash-net-benefit">$0</div>
-          <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-600 leading-snug flex justify-between">
-            <span>ROI: <strong class="text-slate-800" id="dash-roi">0%</strong></span>
-            <span>Payback: <strong class="text-slate-800" id="dash-payback">0 mo</strong></span>
+          <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-600 leading-snug space-y-1">
+            <div class="flex justify-between">
+              <span>Annual Economic ROI: <strong class="text-slate-800" id="dash-roi">0%</strong></span>
+              <span id="dash-payback-container"><span id="dash-payback-label">Breakeven:</span> <strong class="text-slate-800" id="dash-payback">0 mo</strong></span>
+            </div>
+            <div class="text-[10px] text-slate-400 flex justify-between pt-0.5" id="dash-cash-metrics-row">
+              <span id="dash-cash-roi-wrapper">Cash ROI: <strong class="text-slate-600" id="dash-cash-roi">N/A</strong></span>
+              <span id="dash-cash-payback-wrapper">Cash Payback: <strong class="text-slate-600" id="dash-cash-payback">N/A</strong></span>
+            </div>
           </div>
         </div>
       </div>
@@ -869,7 +897,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
             <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
               <span class="font-bold text-emerald-700 block mb-1">1. Actual Cash Savings</span>
-              <span class="text-[11px] text-slate-600 leading-relaxed">Direct outlays eliminated from accounts (e.g. avoided duplicate vendor payments, zeroed regulatory/SLA penalties, and early-payment settlement discounts captured).</span>
+              <span class="text-[11px] text-slate-600 leading-relaxed">Direct outlays eliminated from accounts (e.g. avoided duplicate vendor payments, zeroed penalties, captured discounts). For workflows with internal errors and rework, direct disbursements are 0.</span>
             </div>
             <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
               <span class="font-bold text-rose-700 block mb-1">2. Avoided Process Leakage</span>
@@ -881,7 +909,7 @@
             </div>
             <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
               <span class="font-bold text-purple-700 block mb-1">4. Total Economic Benefit</span>
-              <span class="text-[11px] text-slate-600 leading-relaxed">Comprehensive gross operating savings combining actual cash savings, avoided leakage, and employee capacity value released.</span>
+              <span class="text-[11px] text-slate-600 leading-relaxed">Comprehensive gross operating savings combining liberated capacity value and avoided leakage (with actual cash savings embedded, preventing double counting).</span>
             </div>
           </div>
 
@@ -889,7 +917,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
             <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
               <span class="font-bold text-slate-800 block mb-1">Gross Annual Operating Savings</span>
-              <span class="text-[11px] text-slate-500">Actual Cash Savings + Avoided Leakage + Capacity Value. Total operational value generated before technology expenses.</span>
+              <span class="text-[11px] text-slate-500">Capacity Value Released + Total Avoided Leakage. Total operational value generated before technology expenses.</span>
             </div>
             <div class="bg-white p-2.5 rounded-lg border border-slate-200 shadow-sm">
               <span class="font-bold text-slate-800 block mb-1">Annual Technology Opex</span>
@@ -1231,6 +1259,7 @@
       <div>
         <div class="flex items-center space-x-2">
           <span class="font-bold text-slate-200 text-sm">ProcessIQ</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-900/60 text-blue-300 font-mono font-semibold">v1.0.0</span>
           <span class="text-slate-600">&bull;</span>
           <span class="text-slate-400">Created by <span class="text-slate-200 font-medium">Yuvraj Malpure</span></span>
         </div>
@@ -1247,6 +1276,6 @@
   </footer>
 
   <!-- Core Application Script -->
-  <script src="app.js"></script>
+  <script src="app.js?v=1.0.0"></script>
 </body>
 </html>

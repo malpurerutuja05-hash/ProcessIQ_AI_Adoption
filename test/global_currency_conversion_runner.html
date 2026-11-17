@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ProcessIQ Global Currency Conversion Verification Suite</title>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="vendor/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Navbar & Currency Elements -->
+  <select id="currency-select" onchange="updateCurrency(this.value)">
+    <option value="USD">USD ($)</option>
+    <option value="EUR">EUR (€)</option>
+    <option value="GBP">GBP (£)</option>
+    <option value="CAD">CAD ($)</option>
+    <option value="AUD">AUD ($)</option>
+    <option value="INR">INR (₹)</option>
+    <option value="JPY">JPY (¥)</option>
+  </select>
+  <span id="currency-fx-badge">Base: USD (Benchmark Ref)</span>
+  <div id="demo-data-banner" class="hidden"></div>
+
+  <!-- Stage 2 Template Cards with Badges -->
+  <div class="template-benchmark-badge" data-key="ap">Benchmark Rate: $42/hr</div>
+  <div class="template-benchmark-badge" data-key="ar">Benchmark Rate: $40/hr</div>
+  <div class="template-benchmark-badge" data-key="treasury">Benchmark Rate: $58/hr</div>
+
+  <!-- Form Currency Tags & Pills -->
+  <span class="currency-tag">($/hr)</span>
+  <span class="currency-tag">($/mo)</span>
+  <span class="currency-tag">($/yr)</span>
+  <span class="currency-tag">($)</span>
+  <span class="currency-unit-pill">$/hr</span>
+  <span class="currency-unit-pill">$/yr</span>
+  <span class="currency-unit-pill">$</span>
+
+  <!-- Module 1 Inputs & Outputs -->
+  <input type="text" id="in-m1-name">
+  <input type="number" id="in-m1-emp">
+  <input type="number" id="in-m1-hours">
+  <input type="number" id="in-m1-days">
+  <input type="number" id="in-m1-rate">
+  <input type="checkbox" id="in-m1-overtime">
+  <input type="range" id="in-m1-recovery" value="35">
+  <span id="val-m1-recovery">35%</span>
+
+  <span id="m1-monthly-labor">$0</span>
+  <span id="m1-annual-labor">$0</span>
+  <span id="m1-annual-hours">0 hrs</span>
+  <span id="m1-recoverable-value">$0</span>
+  <span id="m1-recoverable-hours">0 hrs</span>
+  <canvas id="m1Chart"></canvas>
+
+  <!-- Module 2 Inputs & Outputs -->
+  <input type="number" id="in-m2-err-vol">
+  <input type="number" id="in-m2-err-rate">
+  <input type="number" id="in-m2-err-cost">
+  <input type="number" id="in-m2-rework-hrs">
+  <input type="number" id="in-m2-rework-rate">
+  <select id="in-m2-rework-staffing">
+    <option value="frontline">Frontline Staff</option>
+    <option value="separate">Separate Team</option>
+    <option value="unconfirmed">Unconfirmed</option>
+  </select>
+  <span id="rework-staffing-badge"></span>
+  <div id="m2-rework-overlap-note"></div>
+  <input type="number" id="in-m2-delays-vol">
+  <input type="number" id="in-m2-delays-cost">
+  <input type="number" id="in-m2-disc-count">
+  <input type="number" id="in-m2-disc-val">
+  <input type="number" id="in-m2-dup-count">
+  <input type="number" id="in-m2-dup-amt">
+  <input type="number" id="in-m2-penalties">
+
+  <span id="m2-monthly-leakage">$0</span>
+  <span id="m2-annual-leakage">$0</span>
+  <span id="m2-top-driver">None</span>
+  <div id="m2-warnings"></div>
+  <canvas id="m2Chart"></canvas>
+
+  <!-- Module 3 Elements -->
+  <span id="m3-score">Assessment Pending</span>
+  <span id="m3-classification">Assessment Pending</span>
+  <p id="m3-desc"></p>
+  <span id="m3-progress-text"></span>
+  <div id="m3-progress-bar"></div>
+  <div id="m3-questions-container"></div>
+  <canvas id="m3Chart"></canvas>
+
+  <!-- Module 4 Elements -->
+  <input type="number" id="in-m4-users">
+  <input type="number" id="in-m4-capex">
+  <input type="number" id="in-m4-integ">
+  <input type="number" id="in-m4-support">
+  <table id="vendor-table"><tbody id="vendor-table-body"></tbody></table>
+  <div id="m4-custom-alert"></div>
+  <div id="m4-active-vendor"></div>
+  <div id="m4-assumptions-callout"></div>
+
+  <!-- Pricing Modal Elements -->
+  <div id="edit-pricing-modal" class="hidden">
+    <span id="modal-currency-symbol">$</span>
+    <span id="modal-currency-symbol-2">$</span>
+    <span id="modal-price-label"></span>
+    <span id="modal-vendor-title"></span>
+    <span id="modal-vendor-subtitle"></span>
+    <span id="modal-ref-label"></span>
+    <span id="modal-ref-text"></span>
+    <input type="number" id="modal-input-price">
+    <select id="modal-input-billing">
+      <option value="monthly">Monthly</option>
+      <option value="annually">Annually</option>
+    </select>
+    <input type="number" id="modal-input-users">
+    <input type="number" id="modal-input-usage">
+    <span id="modal-preview-monthly"></span>
+    <span id="modal-preview-annual"></span>
+    <span id="modal-preview-usage"></span>
+    <span id="modal-preview-total-year1"></span>
+    <span id="modal-preview-3yr"></span>
+  </div>
+
+  <!-- Dashboard Elements -->
+  <div id="dash-labor-cost"></div>
+  <div id="dash-leakage-cost"></div>
+  <div id="dash-capacity-value"></div>
+  <div id="dash-readiness-score"></div>
+  <div id="dash-approach-title"></div>
+  <div id="dash-approach-desc"></div>
+  <div id="dash-net-benefit"></div>
+  <div id="dash-roi"></div>
+  <div id="dash-payback"></div>
+  <div id="dash-payback-label"></div>
+  <div id="dash-cash-roi"></div>
+  <div id="dash-cash-payback"></div>
+  <div id="dash-scenarios-container"></div>
+  <div id="dash-scenario-table-container"></div>
+  <canvas id="dashChart"></canvas>
+
+  <!-- Print Executive Report Container -->
+  <div id="print-executive-report"></div>
+
+  <!-- Test Output Result Marker -->
+  <div id="test-output">INITIALIZING_GLOBAL_CURRENCY_TEST</div>
+
+  <script src="../app.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const logs = [];
+      function assert(cond, msg) {
+        if (cond) logs.push(`[PASS] ${msg}`);
+        else logs.push(`[FAIL] ${msg}`);
+      }
+
+      try {
+        // =============================================================
+        // GLOBAL CURRENCY CONVERSION: 5-STEP AUDIT CYCLE
+        // Cycle: INR -> USD -> EUR -> GBP -> JPY -> INR
+        // =============================================================
+
+        // 1. Initial State: Load Accounts Payable Benchmark in INR
+        selectProcessTemplate('ap');
+        updateCurrency('INR');
+
+        assert(ProcessIQ.currency === 'INR', 'Init: Active currency is INR');
+        assert(document.getElementById('currency-select').value === 'INR', 'Init: Currency dropdown synced to INR');
+        assert(document.getElementById('currency-fx-badge').innerText.includes('84'), 'Init: FX badge shows 1 USD = ₹84 Reference');
+
+        // Check Initial INR baseline values
+        const inr_0_m1 = runManualCostCalculations();
+        const inr_0_m2 = runCostLeakageCalculations();
+        const inr_0_cons = runConsolidatedCalculations();
+
+        const inr_0_hourlyRate = ProcessIQ.manualCost.hourlyRate; // 42 * 84 = 3528
+        const inr_0_annualLabor = Math.round(inr_0_m1.totalAnnualLaborCost); // 51,882,768
+        const inr_0_annualLeakage = Math.round(inr_0_m2.totalAnnual); // 28,576,800
+        const inr_0_grossBenefit = Math.round(inr_0_cons.scenarios[2].grossSavings); // 40,086,497
+        const inr_0_capex = Math.round(inr_0_cons.scenarios[2].capex); // 3,360,000
+        const inr_0_netBenefit = Math.round(inr_0_cons.scenarios[2].netBenefit); // 38,960,897
+        const inr_0_roi = inr_0_cons.scenarios[2].roi; // 1160%
+        const inr_0_breakeven = inr_0_cons.scenarios[2].payback; // 1.0 mo
+
+        assert(inr_0_hourlyRate === 3528, `Init INR: Hourly rate is ₹3,528/hr (got ₹${inr_0_hourlyRate})`);
+        assert(inr_0_annualLabor === 51882768, `Init INR: Annual labor cost is ₹51,882,768 (got ₹${inr_0_annualLabor})`);
+        assert(inr_0_annualLeakage === 28576800, `Init INR: Annual leakage is ₹28,576,800 (got ₹${inr_0_annualLeakage})`);
+        assert(inr_0_roi === 1160, `Init INR: Scenario C ROI is 1160% (got ${inr_0_roi}%)`);
+        assert(inr_0_breakeven === 1.0, `Init INR: Scenario C Breakeven is 1.0 mo (got ${inr_0_breakeven} mo)`);
+
+        // =============================================================
+        // STEP 1: SWITCH INR -> USD (Rate 1.0)
+        // =============================================================
+        updateCurrency('USD');
+        const usd_m1 = runManualCostCalculations();
+        const usd_m2 = runCostLeakageCalculations();
+        const usd_cons = runConsolidatedCalculations();
+
+        assert(ProcessIQ.currency === 'USD', 'Step 1 USD: Currency updated to USD');
+        assert(document.getElementById('currency-select').value === 'USD', 'Step 1 USD: Dropdown shows USD');
+        assert(ProcessIQ.manualCost.hourlyRate === 42.0, `Step 1 USD: Hourly rate converted to $42.00 (got $${ProcessIQ.manualCost.hourlyRate})`);
+        assert(Math.round(usd_m1.totalAnnualLaborCost) === 617652, `Step 1 USD: Annual labor converted to $617,652 (got $${Math.round(usd_m1.totalAnnualLaborCost)})`);
+        assert(Math.round(usd_m2.totalAnnual) === 340200, `Step 1 USD: Annual leakage converted to $340,200 (got $${Math.round(usd_m2.totalAnnual)})`);
+        assert(usd_cons.scenarios[2].capex === 40000, `Step 1 USD: Scenario C Capex converted to $40,000 (got $${usd_cons.scenarios[2].capex})`);
+        assert(Math.round(usd_cons.scenarios[2].netBenefit) === 463820, `Step 1 USD: Scenario C Net Benefit is $463,820 (got $${Math.round(usd_cons.scenarios[2].netBenefit)})`);
+        assert(usd_cons.scenarios[2].roi === 1160, `Step 1 USD: ROI is INVARIANT at 1160% (got ${usd_cons.scenarios[2].roi}%)`);
+        assert(usd_cons.scenarios[2].payback === 1.0, `Step 1 USD: Breakeven is INVARIANT at 1.0 mo (got ${usd_cons.scenarios[2].payback} mo)`);
+        assert(usd_cons.readinessScore === 60, `Step 1 USD: Readiness Score strictly invariant at 60/100 (got ${usd_cons.readinessScore})`);
+
+        // Check print report rendering in USD
+        preparePrintReport();
+        let printHtml = document.getElementById('print-executive-report').innerHTML;
+        assert(printHtml.includes('$617,652'), 'Step 1 USD Print: Contains formatted $617,652');
+        assert(printHtml.includes('$340,200'), 'Step 1 USD Print: Contains formatted $340,200');
+        assert(printHtml.includes('Currency:</strong> USD'), 'Step 1 USD Print: Currency is USD');
+
+        // =============================================================
+        // STEP 2: SWITCH USD -> EUR (Rate 0.92)
+        // =============================================================
+        updateCurrency('EUR');
+        const eur_m1 = runManualCostCalculations();
+        const eur_m2 = runCostLeakageCalculations();
+        const eur_cons = runConsolidatedCalculations();
+
+        assert(ProcessIQ.currency === 'EUR', 'Step 2 EUR: Currency updated to EUR');
+        assert(document.getElementById('currency-select').value === 'EUR', 'Step 2 EUR: Dropdown shows EUR');
+        assert(ProcessIQ.manualCost.hourlyRate === 38.64, `Step 2 EUR: Hourly rate converted to €38.64 (got €${ProcessIQ.manualCost.hourlyRate})`);
+        assert(Math.round(eur_m1.totalAnnualLaborCost) === 568240, `Step 2 EUR: Annual labor converted to €568,240 (got €${Math.round(eur_m1.totalAnnualLaborCost)})`);
+        assert(Math.round(eur_m2.totalAnnual) === 312984, `Step 2 EUR: Annual leakage converted to €312,984 (got €${Math.round(eur_m2.totalAnnual)})`);
+        assert(eur_cons.scenarios[2].capex === 36800, `Step 2 EUR: Scenario C Capex converted to €36,800 (got €${eur_cons.scenarios[2].capex})`);
+        assert(Math.round(eur_cons.scenarios[2].netBenefit) === 426715, `Step 2 EUR: Scenario C Net Benefit is €426,715 (got €${Math.round(eur_cons.scenarios[2].netBenefit)})`);
+        assert(eur_cons.scenarios[2].roi === 1160, `Step 2 EUR: ROI is INVARIANT at 1160% (got ${eur_cons.scenarios[2].roi}%)`);
+        assert(eur_cons.scenarios[2].payback === 1.0, `Step 2 EUR: Breakeven is INVARIANT at 1.0 mo (got ${eur_cons.scenarios[2].payback} mo)`);
+
+        // Check print report rendering in EUR
+        preparePrintReport();
+        printHtml = document.getElementById('print-executive-report').innerHTML;
+        assert(printHtml.includes('€568,240'), 'Step 2 EUR Print: Contains formatted €568,240');
+        assert(printHtml.includes('€312,984'), 'Step 2 EUR Print: Contains formatted €312,984');
+        assert(printHtml.includes('Currency:</strong> EUR'), 'Step 2 EUR Print: Currency is EUR');
+
+        // =============================================================
+        // STEP 3: SWITCH EUR -> GBP (Rate 0.79)
+        // =============================================================
+        updateCurrency('GBP');
+        const gbp_m1 = runManualCostCalculations();
+        const gbp_m2 = runCostLeakageCalculations();
+        const gbp_cons = runConsolidatedCalculations();
+
+        assert(ProcessIQ.currency === 'GBP', 'Step 3 GBP: Currency updated to GBP');
+        assert(document.getElementById('currency-select').value === 'GBP', 'Step 3 GBP: Dropdown shows GBP');
+        assert(ProcessIQ.manualCost.hourlyRate === 33.18, `Step 3 GBP: Hourly rate converted to £33.18 (got £${ProcessIQ.manualCost.hourlyRate})`);
+        assert(Math.round(gbp_m1.totalAnnualLaborCost) === 487945, `Step 3 GBP: Annual labor converted to £487,945 (got £${Math.round(gbp_m1.totalAnnualLaborCost)})`);
+        assert(Math.round(gbp_m2.totalAnnual) === 268758, `Step 3 GBP: Annual leakage converted to £268,758 (got £${Math.round(gbp_m2.totalAnnual)})`);
+        assert(gbp_cons.scenarios[2].capex === 31600, `Step 3 GBP: Scenario C Capex converted to £31,600 (got £${gbp_cons.scenarios[2].capex})`);
+        assert(Math.round(gbp_cons.scenarios[2].netBenefit) === 366418, `Step 3 GBP: Scenario C Net Benefit is £366,418 (got £${Math.round(gbp_cons.scenarios[2].netBenefit)})`);
+        assert(gbp_cons.scenarios[2].roi === 1160, `Step 3 GBP: ROI is INVARIANT at 1160% (got ${gbp_cons.scenarios[2].roi}%)`);
+        assert(gbp_cons.scenarios[2].payback === 1.0, `Step 3 GBP: Breakeven is INVARIANT at 1.0 mo (got ${gbp_cons.scenarios[2].payback} mo)`);
+
+        // Check print report rendering in GBP
+        preparePrintReport();
+        printHtml = document.getElementById('print-executive-report').innerHTML;
+        assert(printHtml.includes('£487,945'), 'Step 3 GBP Print: Contains formatted £487,945');
+        assert(printHtml.includes('£268,758'), 'Step 3 GBP Print: Contains formatted £268,758');
+        assert(printHtml.includes('Currency:</strong> GBP'), 'Step 3 GBP Print: Currency is GBP');
+
+        // =============================================================
+        // STEP 4: SWITCH GBP -> JPY (Rate 152.0)
+        // =============================================================
+        updateCurrency('JPY');
+        const jpy_m1 = runManualCostCalculations();
+        const jpy_m2 = runCostLeakageCalculations();
+        const jpy_cons = runConsolidatedCalculations();
+
+        assert(ProcessIQ.currency === 'JPY', 'Step 4 JPY: Currency updated to JPY');
+        assert(document.getElementById('currency-select').value === 'JPY', 'Step 4 JPY: Dropdown shows JPY');
+        assert(ProcessIQ.manualCost.hourlyRate === 6384, `Step 4 JPY: Hourly rate converted to ¥6,384 (got ¥${ProcessIQ.manualCost.hourlyRate})`);
+        assert(Math.round(jpy_m1.totalAnnualLaborCost) === 93883104, `Step 4 JPY: Annual labor converted to ¥93,883,104 (got ¥${Math.round(jpy_m1.totalAnnualLaborCost)})`);
+        assert(Math.round(jpy_m2.totalAnnual) === 51710400, `Step 4 JPY: Annual leakage converted to ¥51,710,400 (got ¥${Math.round(jpy_m2.totalAnnual)})`);
+        assert(jpy_cons.scenarios[2].capex === 6080000, `Step 4 JPY: Scenario C Capex converted to ¥6,080,000 (got ¥${jpy_cons.scenarios[2].capex})`);
+        assert(Math.round(jpy_cons.scenarios[2].netBenefit) === 70500670, `Step 4 JPY: Scenario C Net Benefit is ¥70,500,670 (got ¥${Math.round(jpy_cons.scenarios[2].netBenefit)})`);
+        assert(jpy_cons.scenarios[2].roi === 1160, `Step 4 JPY: ROI is INVARIANT at 1160% (got ${jpy_cons.scenarios[2].roi}%)`);
+        assert(jpy_cons.scenarios[2].payback === 1.0, `Step 4 JPY: Breakeven is INVARIANT at 1.0 mo (got ${jpy_cons.scenarios[2].payback} mo)`);
+
+        // Check print report rendering in JPY
+        preparePrintReport();
+        printHtml = document.getElementById('print-executive-report').innerHTML;
+        assert(printHtml.includes('¥93,883,104'), 'Step 4 JPY Print: Contains formatted ¥93,883,104');
+        assert(printHtml.includes('¥51,710,400'), 'Step 4 JPY Print: Contains formatted ¥51,710,400');
+        assert(printHtml.includes('Currency:</strong> JPY'), 'Step 4 JPY Print: Currency is JPY');
+
+        // =============================================================
+        // STEP 5: SWITCH JPY -> INR (Back to Start - ZERO ROUNDING DRIFT)
+        // =============================================================
+        updateCurrency('INR');
+        const inr_final_m1 = runManualCostCalculations();
+        const inr_final_m2 = runCostLeakageCalculations();
+        const inr_final_cons = runConsolidatedCalculations();
+
+        assert(ProcessIQ.currency === 'INR', 'Step 5 INR: Currency restored to INR');
+        assert(document.getElementById('currency-select').value === 'INR', 'Step 5 INR: Dropdown shows INR');
+        
+        // Assert exact equality between Step 0 and Step 5 (0.0000% Rounding Drift)
+        const drift_hourlyRate = Math.abs(ProcessIQ.manualCost.hourlyRate - inr_0_hourlyRate);
+        const drift_annualLabor = Math.abs(Math.round(inr_final_m1.totalAnnualLaborCost) - inr_0_annualLabor);
+        const drift_annualLeakage = Math.abs(Math.round(inr_final_m2.totalAnnual) - inr_0_annualLeakage);
+        const drift_grossBenefit = Math.abs(Math.round(inr_final_cons.scenarios[2].grossSavings) - inr_0_grossBenefit);
+        const drift_capex = Math.abs(Math.round(inr_final_cons.scenarios[2].capex) - inr_0_capex);
+        const drift_netBenefit = Math.abs(Math.round(inr_final_cons.scenarios[2].netBenefit) - inr_0_netBenefit);
+
+        assert(drift_hourlyRate === 0, `Zero Drift Rule: Hourly rate drift is 0.0000% (initial=${inr_0_hourlyRate}, final=${ProcessIQ.manualCost.hourlyRate})`);
+        assert(drift_annualLabor === 0, `Zero Drift Rule: Annual labor drift is 0.0000% (initial=${inr_0_annualLabor}, final=${Math.round(inr_final_m1.totalAnnualLaborCost)})`);
+        assert(drift_annualLeakage === 0, `Zero Drift Rule: Annual leakage drift is 0.0000% (initial=${inr_0_annualLeakage}, final=${Math.round(inr_final_m2.totalAnnual)})`);
+        assert(drift_grossBenefit === 0, `Zero Drift Rule: Gross benefit drift is 0.0000% (initial=${inr_0_grossBenefit}, final=${Math.round(inr_final_cons.scenarios[2].grossSavings)})`);
+        assert(drift_capex === 0, `Zero Drift Rule: Capex drift is 0.0000% (initial=${inr_0_capex}, final=${Math.round(inr_final_cons.scenarios[2].capex)})`);
+        assert(drift_netBenefit === 0, `Zero Drift Rule: Net benefit drift is 0.0000% (initial=${inr_0_netBenefit}, final=${Math.round(inr_final_cons.scenarios[2].netBenefit)})`);
+        assert(inr_final_cons.scenarios[2].roi === inr_0_roi, `Zero Drift Rule: ROI is identical at ${inr_final_cons.scenarios[2].roi}%`);
+        assert(inr_final_cons.scenarios[2].payback === inr_0_breakeven, `Zero Drift Rule: Breakeven is identical at ${inr_final_cons.scenarios[2].payback} mo`);
+
+        // Check print report rendering in final INR
+        preparePrintReport();
+        printHtml = document.getElementById('print-executive-report').innerHTML;
+        assert(printHtml.includes('₹51,882,768'), 'Step 5 INR Print: Contains formatted ₹51,882,768');
+        assert(printHtml.includes('₹28,576,800'), 'Step 5 INR Print: Contains formatted ₹28,576,800');
+        assert(printHtml.includes('Currency:</strong> INR'), 'Step 5 INR Print: Currency is INR');
+
+        // =============================================================
+        // STEP 6: NON-MONETARY INPUTS INTEGRITY CHECK
+        // =============================================================
+        assert(ProcessIQ.manualCost.employeeCount === 12, 'Non-Monetary Rule: FTE Count is strictly 12 (unconverted)');
+        assert(ProcessIQ.manualCost.hoursPerDay === 4.5, 'Non-Monetary Rule: Hours Per Day is strictly 4.5 (unconverted)');
+        assert(ProcessIQ.manualCost.workingDays === 22, 'Non-Monetary Rule: Working Days is strictly 22 (unconverted)');
+        assert(ProcessIQ.manualCost.recoverableCapacityPct === 35.0, 'Non-Monetary Rule: Recoverable Capacity is strictly 35% (unconverted)');
+        assert(ProcessIQ.costLeakage.errors.monthlyVolume === 8500, 'Non-Monetary Rule: Monthly volume is strictly 8,500 (unconverted)');
+        assert(ProcessIQ.costLeakage.errors.errorRatePct === 2.8, 'Non-Monetary Rule: Error rate % is strictly 2.8% (unconverted)');
+        assert(ProcessIQ.costLeakage.rework.monthlyHours === 75, 'Non-Monetary Rule: Monthly rework hours is strictly 75 (unconverted)');
+
+        // =============================================================
+        // STEP 7: USER-ENTERED VALUES UPDATE CANONICAL BASE (RULE 4)
+        // =============================================================
+        // In INR, set employee hourly rate to ₹4,200
+        ProcessIQ.manualCost.hourlyRate = 4200.0;
+        captureCanonicalBase();
+        const base_usd_after_user_input = ProcessIQ.canonicalBase.manualCost.hourlyRate;
+        assert(Math.round(base_usd_after_user_input * 100) / 100 === 50.0, `Rule 4: User-entered ₹4,200 in INR updates canonical base to $50.00 USD (got $${base_usd_after_user_input})`);
+
+        // Switch to EUR (rate 0.92): EUR rate should be 50 * 0.92 = 46.00
+        updateCurrency('EUR');
+        assert(ProcessIQ.manualCost.hourlyRate === 46.0, `Rule 4: Converted from updated canonical base: EUR hourly rate is €46.00 (got €${ProcessIQ.manualCost.hourlyRate})`);
+
+        // Switch back to USD (rate 1.0): USD rate should be $50.00
+        updateCurrency('USD');
+        assert(ProcessIQ.manualCost.hourlyRate === 50.0, `Rule 4: Converted back to base: USD hourly rate is $50.00 (got $${ProcessIQ.manualCost.hourlyRate})`);
+
+        // Reset to default template
+        selectProcessTemplate('ap');
+
+      } catch (err) {
+        logs.push(`[ERROR] Test execution failed: ${err.message}\n${err.stack}`);
+      }
+
+      const outEl = document.getElementById('test-output');
+      if (outEl) {
+        outEl.innerHTML = logs.join('\n');
+      }
+    });
+  </script>
+</body>
+</html>

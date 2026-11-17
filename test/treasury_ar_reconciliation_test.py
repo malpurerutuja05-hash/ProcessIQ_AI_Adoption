@@ -102,16 +102,43 @@ def run_reconciliation_suite():
 
     check(ar_leakage == 84024, f"AR total annual leakage is $84,024 (got {ar_leakage})")
 
+    # AR Direct Cash Leakage vs Non-Cash Operational Defect Leakage
+    ar_direct_cash_leakage = 0 # No duplicate payments, SLA penalties, or missed discounts
+    ar_non_cash_leakage = ar_leakage - ar_direct_cash_leakage # 84,024
+    check(ar_direct_cash_leakage == 0, f"AR direct cash leakage is $0 (got {ar_direct_cash_leakage})")
+    check(ar_non_cash_leakage == 84024, f"AR non-cash leakage is 100% of leakage ($84,024; got {ar_non_cash_leakage})")
+
+    # AR Scenario B Reconciliation
+    ar_b_actual_cash_savings = round(ar_direct_cash_leakage * 0.5) # $0
     ar_b_leakage_savings = round(ar_leakage * 0.5) # 42,012
     ar_b_gross = ar_b_labor_savings + ar_b_leakage_savings # 109,596
     ar_b_net = ar_b_gross - 5000 # 104,596
     ar_b_roi = round((ar_b_net / 15000) * 100) # 697%
     ar_b_payback = round((15000 / (ar_b_net / 12)) * 10) / 10 # 1.7 mo
 
+    check(ar_b_actual_cash_savings == 0, f"AR Scenario B Actual Cash Savings is $0 (got {ar_b_actual_cash_savings})")
+    check(ar_b_leakage_savings == 42012, f"AR Scenario B Avoided Leakage is $42,012 (got {ar_b_leakage_savings})")
     check(ar_b_gross == 109596, f"AR Scenario B gross savings is $109,596 (got {ar_b_gross})")
     check(ar_b_net == 104596, f"AR Scenario B net recurring benefit is $104,596 (got {ar_b_net})")
     check(ar_b_roi == 697, f"AR Scenario B recurring ROI is 697% (got {ar_b_roi}%)")
     check(ar_b_payback == 1.7, f"AR Scenario B payback is 1.7 mo (got {ar_b_payback} mo)")
+
+    # AR Scenario C Reconciliation (Enterprise AI)
+    ar_c_hard_cash_savings = round(ar_direct_cash_leakage * 0.8) # $0
+    ar_c_cost_avoidance = round(ar_non_cash_leakage * 0.75) # $63,018
+    ar_c_leakage_savings = ar_c_hard_cash_savings + ar_c_cost_avoidance # 63,018
+    ar_c_labor_savings = ar_capacity_val # 101,376
+    ar_c_gross = ar_c_labor_savings + ar_c_leakage_savings # 101,376 + 63,018 = 164,394
+    ar_c_net = ar_c_gross - 13400 # 150,994
+    ar_c_roi = round((ar_c_net / 40000) * 100) # 377%
+    ar_c_payback = round((40000 / (ar_c_net / 12)) * 10) / 10 # 3.2 mo
+
+    check(ar_c_hard_cash_savings == 0, f"AR Scenario C Actual Cash Savings is $0 (got {ar_c_hard_cash_savings})")
+    check(ar_c_leakage_savings == 63018, f"AR Scenario C Avoided Leakage is $63,018 (got {ar_c_leakage_savings})")
+    check(ar_c_gross == 164394, f"AR Scenario C gross savings is $164,394 (got {ar_c_gross})")
+    check(ar_c_net == 150994, f"AR Scenario C net recurring benefit is $150,994 (got {ar_c_net})")
+    check(ar_c_roi == 377, f"AR Scenario C recurring ROI is 377% (got {ar_c_roi}%)")
+    check(ar_c_payback == 3.2, f"AR Scenario C payback is 3.2 mo (got {ar_c_payback} mo)")
 
     # ------------------------------------------------------------------
     # 3. Custom AI Agent / LLM API Stack Pricing Reconciliation

@@ -1,6 +1,6 @@
 ======================================================================
 PROCESSIQ v1.0 — FINAL COMPREHENSIVE AUTOMATED TEST AUDIT LOG
-Generated: 2026-11-17 19:28:09
+Generated: 2026-11-18 01:39:29
 Workspace: ProcessIQ Enterprise Project Root
 ======================================================================
 
@@ -319,7 +319,7 @@ PROCESSIQ BROWSER INTEGRATION AUDIT (HEADLESS CHROME)
   [PASS] 65. printExecutiveReport function is defined
   [PASS] 66. Print Report contains ProcessIQ branding
   [PASS] 67. Print Report contains mandatory tagline
-  [PASS] 68. Print Report contains author attribution Created by Yuvraj Malpure
+  [PASS] 68. Print Report omits creator attribution (creator reflects on Home page only)
   [PASS] 69. Print Report displays DEMONSTRATION SAMPLE badge when sample data active
   [PASS] 70. Print Report includes evaluated process name
   [PASS] 71. KPI Card 1 displays baseline labor $617,652
@@ -433,7 +433,7 @@ PROCESSIQ MASTER END-TO-END RELEASE AUDIT (ALL 15 WORKFLOW STEPS)
   [PASS] S12.6: Preserved 15 previously answered questions
   [PASS] S12.7: Advanced tier is incomplete
   [PASS] S12.8: UI reverts to Assessment Pending in Advanced tier
-  [PASS] S13.1: Detailed Business Case PDF compiled (130435 chars datauri)
+  [PASS] S13.1: Detailed Business Case PDF compiled (131739 chars datauri)
   [PASS] S13.2: PDF data URI header verified
   [PASS] S15.1: isSampleData restored to true
   [PASS] S15.2: AP sample process restored
@@ -452,12 +452,12 @@ Return Code: 0
 PROCESSIQ DETAILED BUSINESS CASE PDF GENERATION & AUDIT
 ======================================================================
 [PASS] Successfully generated: ProcessIQ_Detailed_Business_Case_Demo.pdf
-       File Size: 97781 bytes (95.5 KB)
+       File Size: 98766 bytes (96.5 KB)
        Report Filename: ProcessIQ_Accounts_Payable_Report.pdf
 [PASS] Page Count: 10 pages (Expected: 10)
   [PASS] ProcessIQ Platform Branding: Found 'PROCESSIQ'
   [PASS] Mandatory Tagline: Found 'Know your process cost before you invest in AI.'
-  [PASS] Creator Attribution: Found 'Created by Yuvraj Malpure'
+  [PASS] Solutions Architecture Attribution: Found 'Enterprise Solutions Architecture'
   [PASS] Sample Demonstration Mode Badge: Found 'DEMONSTRATION SAMPLE REPORT'
   [PASS] Evaluated Target Process: Found 'Accounts Payable'
   [PASS] Evaluated Department: Found 'Finance & Shared Services'
@@ -524,10 +524,20 @@ TREASURY & ACCOUNTS RECEIVABLE RECONCILIATION & PDF AUDIT SUITE
   [PASS] AR Scenario B labor savings is $67,584 (20% cap; got 67584)
   [PASS] AR Scenario B remaining labor is $270,336 (got 270336)
   [PASS] AR total annual leakage is $84,024 (got 84024)
+  [PASS] AR direct cash leakage is $0 (got 0)
+  [PASS] AR non-cash leakage is 100% of leakage ($84,024; got 84024)
+  [PASS] AR Scenario B Actual Cash Savings is $0 (got 0)
+  [PASS] AR Scenario B Avoided Leakage is $42,012 (got 42012)
   [PASS] AR Scenario B gross savings is $109,596 (got 109596)
   [PASS] AR Scenario B net recurring benefit is $104,596 (got 104596)
   [PASS] AR Scenario B recurring ROI is 697% (got 697%)
   [PASS] AR Scenario B payback is 1.7 mo (got 1.7 mo)
+  [PASS] AR Scenario C Actual Cash Savings is $0 (got 0)
+  [PASS] AR Scenario C Avoided Leakage is $63,018 (got 63018)
+  [PASS] AR Scenario C gross savings is $164,394 (got 164394)
+  [PASS] AR Scenario C net recurring benefit is $150,994 (got 150994)
+  [PASS] AR Scenario C recurring ROI is 377% (got 377%)
+  [PASS] AR Scenario C payback is 3.2 mo (got 3.2 mo)
 
 --- 3. Custom AI Agent / LLM API Stack Pricing Reconciliation ---
   [PASS] Custom AI Agent Year 1 Licenses is 2,700 (got 2700)
@@ -577,7 +587,7 @@ TREASURY & ACCOUNTS RECEIVABLE RECONCILIATION & PDF AUDIT SUITE
   [PASS] AR report contains Custom AI Agent 3-Year Total '$73,450'
 
 ======================================================================
-RECONCILIATION SUITE SUMMARY: 68 PASSED, 0 FAILED (TOTAL 68)
+RECONCILIATION SUITE SUMMARY: 78 PASSED, 0 FAILED (TOTAL 78)
 ======================================================================
 Return Code: 0
 
@@ -586,7 +596,7 @@ Return Code: 0
 PROCESSIQ AUTOMATED STATIC SECURITY SCANNER
 ======================================================================
 
-Scanned 20 source and configuration files.
+Scanned 77 source and configuration files.
 
   [PASS] Anti-MIME sniffing header (nosniff) present.
 
@@ -600,7 +610,647 @@ Scan Results:
 ======================================================================
 Return Code: 0
 
+>>> Executing: business_analyst_qa_test.py (Business Analyst Review, Currency Consistency & Module 4 Pricing Audit)
 ======================================================================
-ALL TEST SUITES SUMMARY: 9 PASSED, 0 FAILED
+PROCESSIQ: FINAL FINANCIAL, CURRENCY & ANTI-DOUBLE-COUNTING AUDIT
+======================================================================
+
+--- 1. Currency Conversion & Reference FX Registry Audit ---
+  [PASS] Currency Registry: CURRENCY_REGISTRY defined in app.js
+  [PASS] FX Metadata: FX_METADATA defined in app.js
+  [PASS] FX Source: ECB & IMF reference benchmark verified
+  [PASS] FX Date: Verification timestamp (November 17, 2026) verified
+  [PASS] Registry Currency: USD registered with code and rate
+  [PASS] Registry Currency: EUR registered with code and rate
+  [PASS] Registry Currency: GBP registered with code and rate
+  [PASS] Registry Currency: CAD registered with code and rate
+  [PASS] Registry Currency: AUD registered with code and rate
+  [PASS] Registry Currency: INR registered with code and rate
+  [PASS] Registry Currency: JPY registered with code and rate
+  [PASS] Base Currency: USD verified as canonical base with rate 1.0
+  [PASS] Engine Architecture: captureCanonicalBase() implemented in app.js
+  [PASS] Engine Architecture: applyCanonicalBaseToActiveCurrency() implemented in app.js
+  [PASS] Dynamic Badges: updateCurrencyBadges() function implemented
+  [PASS] Navbar FX Badge: #currency-fx-badge dynamically updated
+  [PASS] Form Labels: .currency-tag elements dynamically updated
+  [PASS] Unit Pills: .currency-unit-pill elements dynamically updated
+  [PASS] Template Badges: .template-benchmark-badge elements dynamically updated
+  [PASS] HTML Integrity: #currency-fx-badge present in navbar next to selector
+
+--- 2. Currency Conversion Across All 7 Supported Currencies (USD 100 Example) ---
+  [PASS] FX Conversion: USD 100.00 converts to USD 100.0 (rate: 1.0)
+  [PASS] FX Conversion: USD 100.00 converts to EUR 92.0 (rate: 0.92)
+  [PASS] FX Conversion: USD 100.00 converts to GBP 79.0 (rate: 0.79)
+  [PASS] FX Conversion: USD 100.00 converts to CAD 136.0 (rate: 1.36)
+  [PASS] FX Conversion: USD 100.00 converts to AUD 152.0 (rate: 1.52)
+  [PASS] FX Conversion: USD 100.00 converts to INR 8400.0 (rate: 84.0)
+  [PASS] FX Conversion: USD 100.00 converts to JPY 15200.0 (rate: 152.0)
+
+--- 3. Repeated Currency-Switching & Zero Numerical Drift Audit ---
+  [PASS] Zero Drift: Completed full 7-currency cycle and returned to exact USD 100.0 (0.000% drift)
+
+--- 4. Non-Monetary Parameter Preservation Audit ---
+  [PASS] Non-Monetary Invariance: 'Employee Count (FTE)' (12) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Hours Per Day' (4.5) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Working Days' (22) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Recoverable Capacity Target (%)' (35.0) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Annual Salary Increase (%)' (4.0) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Monthly Transaction Volume' (8500) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Error Rate (%)' (2.8) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Monthly Rework Hours' (75) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Delayed Volume' (120) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Missed Discounts Count' (15) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Duplicate Payments Count' (4) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Unrecovered Duplicates (%)' (40.0) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Target User Licenses' (15) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Contract Duration (Years)' (3) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'Expected Monthly Interactions' (12000) is strictly preserved and NEVER scaled by FX
+  [PASS] Non-Monetary Invariance: 'AI Readiness Score' (60) is strictly preserved and NEVER scaled by FX
+
+--- 5. Module 4 Dynamic Assumptions & 9-Column Alignment Audit ---
+  [PASS] HTML Integrity: #m4-assumptions-callout container present in index.html
+  [PASS] Dynamic Callout: Assumptions message dynamically rendered in renderM4()
+  [PASS] Callout State: Delineates custom user overrides when entered
+  [PASS] Callout State: Displays enterprise default baseline when untouched
+  [PASS] Callout Transparency: Explicitly tags individual overridden investment parameters
+  [PASS] Defect Resolution: Hardcoded static $25k text eradicated from index.html
+  [PASS] Table Header: 'Platform & Tier' column present in <thead>
+  [PASS] Table Header: 'Monthly Sub' column present in <thead>
+  [PASS] Table Header: 'Year 1 Subscriptions' column present in <thead>
+  [PASS] Table Header: 'Year 1 Usage / Tokens' column present in <thead>
+  [PASS] Table Header: 'Annual Support & Maint.' column present in <thead>
+  [PASS] Table Header: 'Implementation Capex' column present in <thead>
+  [PASS] Table Header: 'Total Year 1 Investment' column present in <thead>
+  [PASS] Table Header: '3-Year Contract Cost' column present in <thead>
+  [PASS] Table Header: 'Active Selection' column present in <thead>
+  [PASS] Table Body Cell 2: Monthly subscription rendered in own column
+  [PASS] Table Body Cell 3: Year 1 subscription rendered with Edit Price button
+  [PASS] Table Body Cell 4: Year 1 usage rendered in column 4
+  [PASS] Table Body Cell 5: Annual support rendered in column 5
+  [PASS] Table Body Cell 6: Implementation Capex rendered in column 6
+  [PASS] Table Body Cell 7: Total Year 1 investment rendered in column 7
+  [PASS] Table Body Cell 8: 3-Year contract total rendered in column 8
+  [PASS] Table Body Cell 9: Active selection action button rendered in column 9
+
+--- 6. Financial Double-Counting Audit: Tracing AR Internal Rework (INR 27,000) ---
+  [PASS] AR Annual Labor Cost: 8 FTE × 4 hrs × 22 days × 12 × 40 = INR 337,920
+  [PASS] AR Recoverable Capacity Value: 30% of INR 337,920 = INR 101,376 (2534.4 hrs)
+  [PASS] AR Internal Rework Cost: 50 hrs/mo × INR 45/hr × 12 = INR 27,000 (600 hrs)
+  [PASS] Anti-Double-Counting Governance: ProcessIQ formally defines Capacity Value as liberated labor bandwidth, NOT cash payroll reduction
+  [PASS] Component Isolation: Hard cash savings strictly isolated from non-cash rework avoidance
+  [PASS] AR Total Cost Leakage: Errors (57,024) + Rework (27,000) = INR 84,024
+  [PASS] AR Scenario C Gross Savings: INR 164,394 (Capacity: 101,376 + Avoided: 63,018)
+
+--- 7. ROI Formulations & Vendor Pricing Transparency Audit ---
+  [PASS] Recurring ROI: Net Recurring ($463,820) / Capex ($40,000) = 1160%
+  [PASS] First-Year Net ROI: First-Year Net ($423,820) / Capex ($40,000) = 1060% (Recurring ROI - 100%)
+  [PASS] Realized Cash ROI: First-Year Net ($423,820) / Total Year 1 Spend ($53,400) = 794%
+  [PASS] Payback Period: Capex ($40,000) / Monthly Net ($38,651.67) = 1.0 months
+  [PASS] Vendor Transparency: Microsoft Copilot source verified
+  [PASS] Vendor Transparency: Copilot Studio source verified
+  [PASS] Vendor Transparency: Claude Enterprise source verified
+  [PASS] Vendor Transparency: Applicable verification date verified
+  [PASS] Language Governance: Fixed reference FX rates are NOT mislabeled as 'real-time'
+
+--- 8. Cross-Platform Consistency (UI, PDF, CSV) ---
+  [PASS] CSV Integrity: Currency code row included in CSV export
+  [PASS] CSV Integrity: Currency symbol row included in CSV export
+  [PASS] CSV Integrity: FX Benchmark Source row included in CSV export
+  [PASS] CSV Integrity: FX Rate to Base USD row included in CSV export
+
+======================================================================
+BUSINESS ANALYST & FINANCIAL QA AUDIT SUMMARY: 87 PASSED, 0 FAILED (TOTAL 87)
+======================================================================
+Return Code: 0
+
+>>> Executing: financial_governance_validation_test.py (Independent Financial Governance, Anti-Double-Counting & ROI Audit)
+======================================================================
+PROCESSIQ v1.0 — INDEPENDENT FINANCIAL GOVERNANCE & ROI AUDIT SUITE
+======================================================================
+
+--- 1. AR with Frontline Rework (Conservative Non-Double-Counted) ---
+  [PASS] Scenario C Overlap is INR 20,250 (450 hrs @ INR 45/hr; got 20250)
+  [PASS] AR Frontline Gross Economic Benefit is INR 144,144 (got 144144.0)
+  [PASS] AR Frontline Net Recurring Benefit is INR 130,744 (got 130744.0)
+  [PASS] AR Frontline Annual Economic ROI is 327% (got 327%)
+  [PASS] AR Frontline First-Year Net ROI is 227% (got 227%)
+  [PASS] AR Frontline Productivity Breakeven is 3.7 mo (got 3.7 mo)
+
+--- 2. AR with Separate Specialists (Incremental & Additive) ---
+  [PASS] AR Separate Specialists Gross Benefit is INR 164,394 (got 164394.0)
+  [PASS] AR Separate Specialists Net Recurring is INR 150,994 (got 150994.0)
+  [PASS] AR Separate Specialists Economic ROI is 377% (got 377%)
+  [PASS] AR Separate Specialists Breakeven Horizon is 3.2 mo (got 3.2 mo)
+
+--- 3. AR with Unconfirmed Staffing Allocation (Conservative + Advisory) ---
+  [PASS] Unconfirmed Staffing uses conservative deduction (INR 144,144)
+  [PASS] Unconfirmed Staffing uses conservative ROI (327%)
+
+--- 4. AP with Genuine Direct Cash Savings ---
+  [PASS] AP Direct Cash Savings is $94,272 (got 94272.0)
+  [PASS] AP Net Recurring Direct Cash is $80,872 (got 80872.0)
+  [PASS] AP Realized Cash Payback is 5.9 mo (got 5.9 mo)
+  [PASS] AP Realized Cash ROI is 77% (got 77%)
+
+--- 5. Process with Zero Direct Cash Savings ---
+  [PASS] AR Direct Cash Savings is strictly 0
+  [PASS] Cash Payback displays N/A when cash savings are 0
+
+--- 6. Process with Zero Capex (Zero Division Protection) ---
+  [PASS] Zero Capex produces 0% ROI without error (got 0)
+  [PASS] Zero Capex produces 0.0 mo Breakeven without error (got 0)
+
+--- 7. Process with Negative Net Benefits ---
+  [PASS] Negative Net Benefit produces 'Not Achievable' instead of negative payback
+
+--- 8. Currency Invariance Verification ---
+  [PASS] Economic ROI is strictly invariant across FX: USD(327%), EUR(327%), INR(327%)
+  [PASS] Breakeven Horizon is strictly invariant across FX: USD(3.7), EUR(3.7), INR(3.7)
+
+--- 9. Multi-Scenario Consistency (A vs B vs C) ---
+  [PASS] Scenario B Overlap is INR 13,500 (got 13500)
+  [PASS] Scenario B Frontline Gross is INR 96,096 (got 96096)
+  [PASS] Scenario B Frontline Net Recurring is INR 91,096 (got 91096)
+  [PASS] Scenario B Frontline Economic ROI is 607% (got 607%)
+  [PASS] Scenario B Frontline Breakeven Horizon is 2.0 mo (got 2.0 mo)
+
+--- 10. Diverse Labor Rates & Volume Profiles ---
+  [PASS] Specialist Profile Economic ROI is 524% (got 524%)
+  [PASS] Specialist Profile Breakeven Horizon is 2.3 mo (got 2.3 mo)
+
+======================================================================
+FINANCIAL GOVERNANCE AUDIT SUMMARY: 30 PASSED, 0 FAILED (TOTAL 30)
+======================================================================
+Return Code: 0
+
+>>> Executing: global_currency_conversion_test.py (Global Currency Conversion 5-Step Cycle & 10 Rules Validation)
+======================================================================
+PROCESSIQ v1.0 — GLOBAL CURRENCY CONVERSION COMPREHENSIVE AUDIT
+All 10 Rules & Full 5-Step Cycle (INR -> USD -> EUR -> GBP -> JPY -> INR)
+======================================================================
+
+--- 1. Headless Chrome Browser DOM & Interaction Audit ---
+  [PASS] Init: Active currency is INR
+  [PASS] Init: Currency dropdown synced to INR
+  [PASS] Init: FX badge shows 1 USD = ₹84 Reference
+  [PASS] Init INR: Hourly rate is ₹3,528/hr (got ₹3528)
+  [PASS] Init INR: Annual labor cost is ₹51,882,768 (got ₹51882768)
+  [PASS] Init INR: Annual leakage is ₹28,576,800 (got ₹28576800)
+  [PASS] Init INR: Scenario C ROI is 1160% (got 1160%)
+  [PASS] Init INR: Scenario C Breakeven is 1.0 mo (got 1 mo)
+  [PASS] Step 1 USD: Currency updated to USD
+  [PASS] Step 1 USD: Dropdown shows USD
+  [PASS] Step 1 USD: Hourly rate converted to $42.00 (got $42)
+  [PASS] Step 1 USD: Annual labor converted to $617,652 (got $617652)
+  [PASS] Step 1 USD: Annual leakage converted to $340,200 (got $340200)
+  [PASS] Step 1 USD: Scenario C Capex converted to $40,000 (got $40000)
+  [PASS] Step 1 USD: Scenario C Net Benefit is $463,820 (got $463820)
+  [PASS] Step 1 USD: ROI is INVARIANT at 1160% (got 1160%)
+  [PASS] Step 1 USD: Breakeven is INVARIANT at 1.0 mo (got 1 mo)
+  [PASS] Step 1 USD: Readiness Score strictly invariant at 60/100 (got 60)
+  [PASS] Step 1 USD Print: Contains formatted $617,652
+  [PASS] Step 1 USD Print: Contains formatted $340,200
+  [PASS] Step 1 USD Print: Currency is USD
+  [PASS] Step 2 EUR: Currency updated to EUR
+  [PASS] Step 2 EUR: Dropdown shows EUR
+  [PASS] Step 2 EUR: Hourly rate converted to €38.64 (got €38.64)
+  [PASS] Step 2 EUR: Annual labor converted to €568,240 (got €568240)
+  [PASS] Step 2 EUR: Annual leakage converted to €312,984 (got €312984)
+  [PASS] Step 2 EUR: Scenario C Capex converted to €36,800 (got €36800)
+  [PASS] Step 2 EUR: Scenario C Net Benefit is €426,715 (got €426715)
+  [PASS] Step 2 EUR: ROI is INVARIANT at 1160% (got 1160%)
+  [PASS] Step 2 EUR: Breakeven is INVARIANT at 1.0 mo (got 1 mo)
+  [PASS] Step 2 EUR Print: Contains formatted €568,240
+  [PASS] Step 2 EUR Print: Contains formatted €312,984
+  [PASS] Step 2 EUR Print: Currency is EUR
+  [PASS] Step 3 GBP: Currency updated to GBP
+  [PASS] Step 3 GBP: Dropdown shows GBP
+  [PASS] Step 3 GBP: Hourly rate converted to £33.18 (got £33.18)
+  [PASS] Step 3 GBP: Annual labor converted to £487,945 (got £487945)
+  [PASS] Step 3 GBP: Annual leakage converted to £268,758 (got £268758)
+  [PASS] Step 3 GBP: Scenario C Capex converted to £31,600 (got £31600)
+  [PASS] Step 3 GBP: Scenario C Net Benefit is £366,418 (got £366418)
+  [PASS] Step 3 GBP: ROI is INVARIANT at 1160% (got 1160%)
+  [PASS] Step 3 GBP: Breakeven is INVARIANT at 1.0 mo (got 1 mo)
+  [PASS] Step 3 GBP Print: Contains formatted £487,945
+  [PASS] Step 3 GBP Print: Contains formatted £268,758
+  [PASS] Step 3 GBP Print: Currency is GBP
+  [PASS] Step 4 JPY: Currency updated to JPY
+  [PASS] Step 4 JPY: Dropdown shows JPY
+  [PASS] Step 4 JPY: Hourly rate converted to ¥6,384 (got ¥6384)
+  [PASS] Step 4 JPY: Annual labor converted to ¥93,883,104 (got ¥93883104)
+  [PASS] Step 4 JPY: Annual leakage converted to ¥51,710,400 (got ¥51710400)
+  [PASS] Step 4 JPY: Scenario C Capex converted to ¥6,080,000 (got ¥6080000)
+  [PASS] Step 4 JPY: Scenario C Net Benefit is ¥70,500,670 (got ¥70500670)
+  [PASS] Step 4 JPY: ROI is INVARIANT at 1160% (got 1160%)
+  [PASS] Step 4 JPY: Breakeven is INVARIANT at 1.0 mo (got 1 mo)
+  [PASS] Step 4 JPY Print: Contains formatted ¥93,883,104
+  [PASS] Step 4 JPY Print: Contains formatted ¥51,710,400
+  [PASS] Step 4 JPY Print: Currency is JPY
+  [PASS] Step 5 INR: Currency restored to INR
+  [PASS] Step 5 INR: Dropdown shows INR
+  [PASS] Zero Drift Rule: Hourly rate drift is 0.0000% (initial=3528, final=3528)
+  [PASS] Zero Drift Rule: Annual labor drift is 0.0000% (initial=51882768, final=51882768)
+  [PASS] Zero Drift Rule: Annual leakage drift is 0.0000% (initial=28576800, final=28576800)
+  [PASS] Zero Drift Rule: Gross benefit drift is 0.0000% (initial=40086497, final=40086497)
+  [PASS] Zero Drift Rule: Capex drift is 0.0000% (initial=3360000, final=3360000)
+  [PASS] Zero Drift Rule: Net benefit drift is 0.0000% (initial=38960897, final=38960897)
+  [PASS] Zero Drift Rule: ROI is identical at 1160%
+  [PASS] Zero Drift Rule: Breakeven is identical at 1 mo
+  [PASS] Step 5 INR Print: Contains formatted ₹51,882,768
+  [PASS] Step 5 INR Print: Contains formatted ₹28,576,800
+  [PASS] Step 5 INR Print: Currency is INR
+  [PASS] Non-Monetary Rule: FTE Count is strictly 12 (unconverted)
+  [PASS] Non-Monetary Rule: Hours Per Day is strictly 4.5 (unconverted)
+  [PASS] Non-Monetary Rule: Working Days is strictly 22 (unconverted)
+  [PASS] Non-Monetary Rule: Recoverable Capacity is strictly 35% (unconverted)
+  [PASS] Non-Monetary Rule: Monthly volume is strictly 8,500 (unconverted)
+  [PASS] Non-Monetary Rule: Error rate % is strictly 2.8% (unconverted)
+  [PASS] Non-Monetary Rule: Monthly rework hours is strictly 75 (unconverted)
+  [PASS] Rule 4: User-entered ₹4,200 in INR updates canonical base to $50.00 USD (got $50)
+  [PASS] Rule 4: Converted from updated canonical base: EUR hourly rate is €46.00 (got €46)
+  [PASS] Rule 4: Converted back to base: USD hourly rate is $50.00 (got $50)
+
+--- 2. Standalone Mathematical Engine & 5-Step Cycle Audit ---
+  [PASS] Step 0 (INR): Annual Labor is ₹51,882,768 (got ₹51882768)
+  [PASS] Step 0 (INR): Annual Leakage is ₹28,576,800 (got ₹28576800)
+  [PASS] Step 0 (INR): Scenario C Gross Benefit is ₹40,086,497 (got ₹40086497)
+  [PASS] Step 0 (INR): Scenario C Net Benefit is ₹38,960,897 (got ₹38960897)
+  [PASS] Step 0 (INR): Scenario C ROI is 1160% (got 1160%)
+  [PASS] Step 0 (INR): Scenario C Breakeven is 1.0 mo (got 1.0 mo)
+  [PASS] Step 1 (USD): Annual Labor is $617,652 (got $617652)
+  [PASS] Step 1 (USD): Annual Leakage is $340,200 (got $340200)
+  [PASS] Step 1 (USD): Scenario C Gross Benefit is $477,220 (got $477220)
+  [PASS] Step 1 (USD): Scenario C Net Benefit is $463,820 (got $463820)
+  [PASS] Step 1 (USD): Scenario C ROI is strictly invariant at 1160% (got 1160%)
+  [PASS] Step 2 (EUR): Annual Labor is €568,240 (got €568240)
+  [PASS] Step 2 (EUR): Annual Leakage is €312,984 (got €312984)
+  [PASS] Step 2 (EUR): Scenario C Gross Benefit is €439,042 (got €439042)
+  [PASS] Step 2 (EUR): Scenario C Net Benefit is €426,715 (got €426714)
+  [PASS] Step 2 (EUR): Scenario C ROI is strictly invariant at 1160% (got 1160%)
+  [PASS] Step 3 (GBP): Annual Labor is £487,945 (got £487945)
+  [PASS] Step 3 (GBP): Annual Leakage is £268,758 (got £268758)
+  [PASS] Step 3 (GBP): Scenario C Gross Benefit is £377,004 (got £377004)
+  [PASS] Step 3 (GBP): Scenario C Net Benefit is £366,418 (got £366418)
+  [PASS] Step 3 (GBP): Scenario C ROI is strictly invariant at 1160% (got 1160%)
+  [PASS] Step 4 (JPY): Annual Labor is ¥93,883,104 (got ¥93883104)
+  [PASS] Step 4 (JPY): Annual Leakage is ¥51,710,400 (got ¥51710400)
+  [PASS] Step 4 (JPY): Scenario C Gross Benefit is ¥72,537,470 (got ¥72537470)
+  [PASS] Step 4 (JPY): Scenario C Net Benefit is ¥70,500,670 (got ¥70500670)
+  [PASS] Step 4 (JPY): Scenario C ROI is strictly invariant at 1160% (got 1160%)
+  [PASS] Rule 9 Zero Drift: Labor cost drift is 0.0000% (initial=51882768, final=51882768)
+  [PASS] Rule 9 Zero Drift: Leakage cost drift is 0.0000% (initial=28576800, final=28576800)
+  [PASS] Rule 9 Zero Drift: Gross Benefit drift is 0.0000% (initial=40086497, final=40086497)
+  [PASS] Rule 9 Zero Drift: Capex drift is 0.0000% (initial=3360000, final=3360000)
+  [PASS] Rule 9 Zero Drift: Net Benefit drift is 0.0000% (initial=38960897, final=38960897)
+  [PASS] Rule 9 Zero Drift: ROI is identical at 1160%
+  [PASS] Rule 9 Zero Drift: Breakeven is identical at 1.0 mo
+
+--- 3. Accounts Receivable Cycle Audit (With Frontline Overlap) ---
+  [PASS] AR (INR): Annual Economic ROI strictly 327% (got 327%)
+  [PASS] AR (INR): First-Year Net ROI strictly 227% (got 227%)
+  [PASS] AR (INR): Productivity Breakeven strictly 3.7 mo (got 3.7 mo)
+  [PASS] AR (USD): Annual Economic ROI strictly 327% (got 327%)
+  [PASS] AR (USD): First-Year Net ROI strictly 227% (got 227%)
+  [PASS] AR (USD): Productivity Breakeven strictly 3.7 mo (got 3.7 mo)
+  [PASS] AR (EUR): Annual Economic ROI strictly 327% (got 327%)
+  [PASS] AR (EUR): First-Year Net ROI strictly 227% (got 227%)
+  [PASS] AR (EUR): Productivity Breakeven strictly 3.7 mo (got 3.7 mo)
+  [PASS] AR (GBP): Annual Economic ROI strictly 327% (got 327%)
+  [PASS] AR (GBP): First-Year Net ROI strictly 227% (got 227%)
+  [PASS] AR (GBP): Productivity Breakeven strictly 3.7 mo (got 3.7 mo)
+  [PASS] AR (CAD): Annual Economic ROI strictly 327% (got 327%)
+  [PASS] AR (CAD): First-Year Net ROI strictly 227% (got 227%)
+  [PASS] AR (CAD): Productivity Breakeven strictly 3.7 mo (got 3.7 mo)
+  [PASS] AR (AUD): Annual Economic ROI strictly 327% (got 327%)
+  [PASS] AR (AUD): First-Year Net ROI strictly 227% (got 227%)
+  [PASS] AR (AUD): Productivity Breakeven strictly 3.7 mo (got 3.7 mo)
+  [PASS] AR (JPY): Annual Economic ROI strictly 327% (got 327%)
+  [PASS] AR (JPY): First-Year Net ROI strictly 227% (got 227%)
+  [PASS] AR (JPY): Productivity Breakeven strictly 3.7 mo (got 3.7 mo)
+
+======================================================================
+GLOBAL CURRENCY AUDIT SUMMARY: 134 PASSED, 0 FAILED
+FINAL STATUS: 100% COMPLIANT & VERIFIED ACROSS ALL 10 CONVERSION RULES
+======================================================================
+Return Code: 0
+
+>>> Executing: cross_template_validation_engine.py (12-Template Cross-Industry Financial Calculation & Currency Invariance Validation)
+======================================================================
+PROCESSIQ V1.0 — 12-TEMPLATE CROSS-INDUSTRY CALCULATION VALIDATION
+======================================================================
+
+>>> Phase 1: Validating Baseline Financial Governance for All 12 Templates...
+  [PASS] Template [ap] 'Accounts Payable': Total Annual Labor is positive ($617,652.00)
+  [PASS] Template [ap]: Recoverable Capacity ($209,563.20) < Total Labor ($617,652.00)
+  [PASS] Template [ap]: Scenario C Gross Benefits is positive ($470,605.20)
+  [PASS] AP Direct Cash Leakage matches $117,840.00 exact (got 117840.0)
+  [PASS] AP Scenario C Direct Cash Savings matches $94,272.00 exact (got 94272.0)
+  [PASS] AP Scenario C First-Year Cash ROI is 77% exact (got 77%)
+  [PASS] AP Scenario C Cash Payback is 5.9 mo (got 5.9 mo)
+  [PASS] Template [ar] 'Accounts Receivable': Total Annual Labor is positive ($337,920.00)
+  [PASS] Template [ar]: Recoverable Capacity ($101,376.00) < Total Labor ($337,920.00)
+  [PASS] Template [ar]: Scenario C Gross Benefits is positive ($144,144.00)
+  [PASS] Template [ar]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [ar]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [ar]: Cash Payback is N/A (represented as 0, got 0)
+  [PASS] Template [bank_rec] 'Bank Reconciliation': Total Annual Labor is positive ($162,624.00)
+  [PASS] Template [bank_rec]: Recoverable Capacity ($65,049.60) < Total Labor ($162,624.00)
+  [PASS] Template [bank_rec]: Scenario C Gross Benefits is positive ($89,349.60)
+  [PASS] Template [bank_rec]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [bank_rec]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [bank_rec]: Cash Payback is N/A (represented as 0, got 0)
+  [PASS] Template [gl] 'General Ledger Closing': Total Annual Labor is positive ($439,920.00)
+  [PASS] Template [gl]: Recoverable Capacity ($123,552.00) < Total Labor ($439,920.00)
+  [PASS] Template [gl]: Scenario C Gross Benefits is positive ($153,036.00)
+  [PASS] Template [gl]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [gl]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [gl]: Cash Payback is N/A (represented as 0, got 0)
+  [PASS] Template [journal] 'Journal Processing': Total Annual Labor is positive ($237,600.00)
+  [PASS] Template [journal]: Recoverable Capacity ($83,160.00) < Total Labor ($237,600.00)
+  [PASS] Template [journal]: Scenario C Gross Benefits is positive ($110,700.00)
+  [PASS] Template [journal]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [journal]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [journal]: Cash Payback is N/A (represented as 0, got 0)
+  [PASS] Template [treasury] 'Treasury Operations': Total Annual Labor is positive ($183,744.00)
+  [PASS] Template [treasury]: Recoverable Capacity ($45,936.00) < Total Labor ($183,744.00)
+  [PASS] Template [treasury]: Scenario C Gross Benefits is positive ($56,304.00)
+  [PASS] Template [treasury]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [treasury]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [treasury]: Cash Payback is N/A (represented as 0, got 0)
+  [PASS] Template [fin_rep] 'Financial Reporting': Total Annual Labor is positive ($346,500.00)
+  [PASS] Template [fin_rep]: Recoverable Capacity ($114,345.00) < Total Labor ($346,500.00)
+  [PASS] Template [fin_rep]: Scenario C Gross Benefits is positive ($122,553.00)
+  [PASS] Template [fin_rep]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [fin_rep]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [fin_rep]: Cash Payback is N/A (represented as 0, got 0)
+  [PASS] Template [procurement] 'Procurement & Purchasing': Total Annual Labor is positive ($504,252.00)
+  [PASS] Template [procurement]: Recoverable Capacity ($147,549.60) < Total Labor ($504,252.00)
+  [PASS] Template [procurement]: Scenario C Gross Benefits is positive ($209,424.60)
+  [PASS] Template [procurement]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [procurement]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [procurement]: Cash Payback is N/A (represented as 0, got 0)
+  [PASS] Template [order_proc] 'Order Processing': Total Annual Labor is positive ($726,180.00)
+  [PASS] Template [order_proc]: Recoverable Capacity ($280,896.00) < Total Labor ($726,180.00)
+  [PASS] Template [order_proc]: Scenario C Gross Benefits is positive ($432,096.00)
+  [PASS] Template [order_proc]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [order_proc]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [order_proc]: Cash Payback is N/A (represented as 0, got 0)
+  [PASS] Template [cust_service] 'Customer Service & Ticketing': Total Annual Labor is positive ($766,464.00)
+  [PASS] Template [cust_service]: Recoverable Capacity ($334,540.80) < Total Labor ($766,464.00)
+  [PASS] Template [cust_service]: Scenario C Gross Benefits is positive ($507,790.80)
+  [PASS] Template [cust_service]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [cust_service]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [cust_service]: Cash Payback is N/A (represented as 0, got 0)
+  [PASS] Template [inventory] 'Inventory Management': Total Annual Labor is positive ($266,112.00)
+  [PASS] Template [inventory]: Recoverable Capacity ($79,833.60) < Total Labor ($266,112.00)
+  [PASS] Template [inventory]: Scenario C Gross Benefits is positive ($155,568.60)
+  [PASS] Template [inventory]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [inventory]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [inventory]: Cash Payback is N/A (represented as 0, got 0)
+  [PASS] Template [hr_ops] 'HR Operations': Total Annual Labor is positive ($194,040.00)
+  [PASS] Template [hr_ops]: Recoverable Capacity ($67,914.00) < Total Labor ($194,040.00)
+  [PASS] Template [hr_ops]: Scenario C Gross Benefits is positive ($78,309.00)
+  [PASS] Template [hr_ops]: Direct Cash Leakage is strictly $0.00 (non-cash operational leakage)
+  [PASS] Template [hr_ops]: Cash ROI is N/A (represented as 0, got 0)
+  [PASS] Template [hr_ops]: Cash Payback is N/A (represented as 0, got 0)
+
+>>> Phase 2: Mandatory AR Overlap Reconciliation (Conservative vs Separate)...
+  [PASS] AR Frontline Capacity Value: $101,376.00 (got 101376.0)
+  [PASS] AR Overlap Deduction: $20,250.00 (got 20250)
+  [PASS] AR Conservative Gross Economic Benefit: $144,144.00 (got 144144.0)
+  [PASS] AR Conservative Net Recurring Benefit: $130,744.00 (got 130744.0)
+  [PASS] AR Conservative Recurring ROI: 327% (got 327%)
+  [PASS] AR Conservative First-Year ROI: 227% (got 227%)
+  [PASS] AR Conservative Productivity Breakeven: 3.7 mo (got 3.7 mo)
+  [PASS] AR Separate Team Overlap Deduction: $0.00 (got 0.0)
+  [PASS] AR Separate Team Gross Benefit: $164,394.00 ($144,144 + $20,250 rework additive, got 164394.0)
+
+>>> Phase 3: Seven-Currency Invariant Verification Across All 12 Templates...
+  [PASS] Template [ap] ROI invariance under EUR: 1143% == 1143%
+  [PASS] Template [ap] Breakeven invariance under EUR: 1.0 mo == 1.0 mo
+  [PASS] AP Cash ROI invariance under EUR: 77% == 77%
+  [PASS] AP Cash Payback invariance under EUR: 5.9 mo == 5.9 mo
+  [PASS] Template [ap] ROI invariance under GBP: 1143% == 1143%
+  [PASS] Template [ap] Breakeven invariance under GBP: 1.0 mo == 1.0 mo
+  [PASS] AP Cash ROI invariance under GBP: 77% == 77%
+  [PASS] AP Cash Payback invariance under GBP: 5.9 mo == 5.9 mo
+  [PASS] Template [ap] ROI invariance under CAD: 1143% == 1143%
+  [PASS] Template [ap] Breakeven invariance under CAD: 1.0 mo == 1.0 mo
+  [PASS] AP Cash ROI invariance under CAD: 77% == 77%
+  [PASS] AP Cash Payback invariance under CAD: 5.9 mo == 5.9 mo
+  [PASS] Template [ap] ROI invariance under AUD: 1143% == 1143%
+  [PASS] Template [ap] Breakeven invariance under AUD: 1.0 mo == 1.0 mo
+  [PASS] AP Cash ROI invariance under AUD: 77% == 77%
+  [PASS] AP Cash Payback invariance under AUD: 5.9 mo == 5.9 mo
+  [PASS] Template [ap] ROI invariance under INR: 1143% == 1143%
+  [PASS] Template [ap] Breakeven invariance under INR: 1.0 mo == 1.0 mo
+  [PASS] AP Cash ROI invariance under INR: 77% == 77%
+  [PASS] AP Cash Payback invariance under INR: 5.9 mo == 5.9 mo
+  [PASS] Template [ap] ROI invariance under JPY: 1143% == 1143%
+  [PASS] Template [ap] Breakeven invariance under JPY: 1.0 mo == 1.0 mo
+  [PASS] AP Cash ROI invariance under JPY: 77% == 77%
+  [PASS] AP Cash Payback invariance under JPY: 5.9 mo == 5.9 mo
+  [PASS] Template [ar] ROI invariance under EUR: 327% == 327%
+  [PASS] Template [ar] Breakeven invariance under EUR: 3.7 mo == 3.7 mo
+  [PASS] Template [ar] ROI invariance under GBP: 327% == 327%
+  [PASS] Template [ar] Breakeven invariance under GBP: 3.7 mo == 3.7 mo
+  [PASS] Template [ar] ROI invariance under CAD: 327% == 327%
+  [PASS] Template [ar] Breakeven invariance under CAD: 3.7 mo == 3.7 mo
+  [PASS] Template [ar] ROI invariance under AUD: 327% == 327%
+  [PASS] Template [ar] Breakeven invariance under AUD: 3.7 mo == 3.7 mo
+  [PASS] Template [ar] ROI invariance under INR: 327% == 327%
+  [PASS] Template [ar] Breakeven invariance under INR: 3.7 mo == 3.7 mo
+  [PASS] Template [ar] ROI invariance under JPY: 327% == 327%
+  [PASS] Template [ar] Breakeven invariance under JPY: 3.7 mo == 3.7 mo
+  [PASS] Template [bank_rec] ROI invariance under EUR: 190% == 190%
+  [PASS] Template [bank_rec] Breakeven invariance under EUR: 6.3 mo == 6.3 mo
+  [PASS] Template [bank_rec] ROI invariance under GBP: 190% == 190%
+  [PASS] Template [bank_rec] Breakeven invariance under GBP: 6.3 mo == 6.3 mo
+  [PASS] Template [bank_rec] ROI invariance under CAD: 190% == 190%
+  [PASS] Template [bank_rec] Breakeven invariance under CAD: 6.3 mo == 6.3 mo
+  [PASS] Template [bank_rec] ROI invariance under AUD: 190% == 190%
+  [PASS] Template [bank_rec] Breakeven invariance under AUD: 6.3 mo == 6.3 mo
+  [PASS] Template [bank_rec] ROI invariance under INR: 190% == 190%
+  [PASS] Template [bank_rec] Breakeven invariance under INR: 6.3 mo == 6.3 mo
+  [PASS] Template [bank_rec] ROI invariance under JPY: 190% == 190%
+  [PASS] Template [bank_rec] Breakeven invariance under JPY: 6.3 mo == 6.3 mo
+  [PASS] Template [gl] ROI invariance under EUR: 349% == 349%
+  [PASS] Template [gl] Breakeven invariance under EUR: 3.4 mo == 3.4 mo
+  [PASS] Template [gl] ROI invariance under GBP: 349% == 349%
+  [PASS] Template [gl] Breakeven invariance under GBP: 3.4 mo == 3.4 mo
+  [PASS] Template [gl] ROI invariance under CAD: 349% == 349%
+  [PASS] Template [gl] Breakeven invariance under CAD: 3.4 mo == 3.4 mo
+  [PASS] Template [gl] ROI invariance under AUD: 349% == 349%
+  [PASS] Template [gl] Breakeven invariance under AUD: 3.4 mo == 3.4 mo
+  [PASS] Template [gl] ROI invariance under INR: 349% == 349%
+  [PASS] Template [gl] Breakeven invariance under INR: 3.4 mo == 3.4 mo
+  [PASS] Template [gl] ROI invariance under JPY: 349% == 349%
+  [PASS] Template [gl] Breakeven invariance under JPY: 3.4 mo == 3.4 mo
+  [PASS] Template [journal] ROI invariance under EUR: 243% == 243%
+  [PASS] Template [journal] Breakeven invariance under EUR: 4.9 mo == 4.9 mo
+  [PASS] Template [journal] ROI invariance under GBP: 243% == 243%
+  [PASS] Template [journal] Breakeven invariance under GBP: 4.9 mo == 4.9 mo
+  [PASS] Template [journal] ROI invariance under CAD: 243% == 243%
+  [PASS] Template [journal] Breakeven invariance under CAD: 4.9 mo == 4.9 mo
+  [PASS] Template [journal] ROI invariance under AUD: 243% == 243%
+  [PASS] Template [journal] Breakeven invariance under AUD: 4.9 mo == 4.9 mo
+  [PASS] Template [journal] ROI invariance under INR: 243% == 243%
+  [PASS] Template [journal] Breakeven invariance under INR: 4.9 mo == 4.9 mo
+  [PASS] Template [journal] ROI invariance under JPY: 243% == 243%
+  [PASS] Template [journal] Breakeven invariance under JPY: 4.9 mo == 4.9 mo
+  [PASS] Template [treasury] ROI invariance under EUR: 107% == 107%
+  [PASS] Template [treasury] Breakeven invariance under EUR: 11.2 mo == 11.2 mo
+  [PASS] Template [treasury] ROI invariance under GBP: 107% == 107%
+  [PASS] Template [treasury] Breakeven invariance under GBP: 11.2 mo == 11.2 mo
+  [PASS] Template [treasury] ROI invariance under CAD: 107% == 107%
+  [PASS] Template [treasury] Breakeven invariance under CAD: 11.2 mo == 11.2 mo
+  [PASS] Template [treasury] ROI invariance under AUD: 107% == 107%
+  [PASS] Template [treasury] Breakeven invariance under AUD: 11.2 mo == 11.2 mo
+  [PASS] Template [treasury] ROI invariance under INR: 107% == 107%
+  [PASS] Template [treasury] Breakeven invariance under INR: 11.2 mo == 11.2 mo
+  [PASS] Template [treasury] ROI invariance under JPY: 107% == 107%
+  [PASS] Template [treasury] Breakeven invariance under JPY: 11.2 mo == 11.2 mo
+  [PASS] Template [fin_rep] ROI invariance under EUR: 273% == 273%
+  [PASS] Template [fin_rep] Breakeven invariance under EUR: 4.4 mo == 4.4 mo
+  [PASS] Template [fin_rep] ROI invariance under GBP: 273% == 273%
+  [PASS] Template [fin_rep] Breakeven invariance under GBP: 4.4 mo == 4.4 mo
+  [PASS] Template [fin_rep] ROI invariance under CAD: 273% == 273%
+  [PASS] Template [fin_rep] Breakeven invariance under CAD: 4.4 mo == 4.4 mo
+  [PASS] Template [fin_rep] ROI invariance under AUD: 273% == 273%
+  [PASS] Template [fin_rep] Breakeven invariance under AUD: 4.4 mo == 4.4 mo
+  [PASS] Template [fin_rep] ROI invariance under INR: 273% == 273%
+  [PASS] Template [fin_rep] Breakeven invariance under INR: 4.4 mo == 4.4 mo
+  [PASS] Template [fin_rep] ROI invariance under JPY: 273% == 273%
+  [PASS] Template [fin_rep] Breakeven invariance under JPY: 4.4 mo == 4.4 mo
+  [PASS] Template [procurement] ROI invariance under EUR: 490% == 490%
+  [PASS] Template [procurement] Breakeven invariance under EUR: 2.4 mo == 2.4 mo
+  [PASS] Template [procurement] ROI invariance under GBP: 490% == 490%
+  [PASS] Template [procurement] Breakeven invariance under GBP: 2.4 mo == 2.4 mo
+  [PASS] Template [procurement] ROI invariance under CAD: 490% == 490%
+  [PASS] Template [procurement] Breakeven invariance under CAD: 2.4 mo == 2.4 mo
+  [PASS] Template [procurement] ROI invariance under AUD: 490% == 490%
+  [PASS] Template [procurement] Breakeven invariance under AUD: 2.4 mo == 2.4 mo
+  [PASS] Template [procurement] ROI invariance under INR: 490% == 490%
+  [PASS] Template [procurement] Breakeven invariance under INR: 2.4 mo == 2.4 mo
+  [PASS] Template [procurement] ROI invariance under JPY: 490% == 490%
+  [PASS] Template [procurement] Breakeven invariance under JPY: 2.4 mo == 2.4 mo
+  [PASS] Template [order_proc] ROI invariance under EUR: 1047% == 1047%
+  [PASS] Template [order_proc] Breakeven invariance under EUR: 1.1 mo == 1.1 mo
+  [PASS] Template [order_proc] ROI invariance under GBP: 1047% == 1047%
+  [PASS] Template [order_proc] Breakeven invariance under GBP: 1.1 mo == 1.1 mo
+  [PASS] Template [order_proc] ROI invariance under CAD: 1047% == 1047%
+  [PASS] Template [order_proc] Breakeven invariance under CAD: 1.1 mo == 1.1 mo
+  [PASS] Template [order_proc] ROI invariance under AUD: 1047% == 1047%
+  [PASS] Template [order_proc] Breakeven invariance under AUD: 1.1 mo == 1.1 mo
+  [PASS] Template [order_proc] ROI invariance under INR: 1047% == 1047%
+  [PASS] Template [order_proc] Breakeven invariance under INR: 1.1 mo == 1.1 mo
+  [PASS] Template [order_proc] ROI invariance under JPY: 1047% == 1047%
+  [PASS] Template [order_proc] Breakeven invariance under JPY: 1.1 mo == 1.1 mo
+  [PASS] Template [cust_service] ROI invariance under EUR: 1236% == 1236%
+  [PASS] Template [cust_service] Breakeven invariance under EUR: 1.0 mo == 1.0 mo
+  [PASS] Template [cust_service] ROI invariance under GBP: 1236% == 1236%
+  [PASS] Template [cust_service] Breakeven invariance under GBP: 1.0 mo == 1.0 mo
+  [PASS] Template [cust_service] ROI invariance under CAD: 1236% == 1236%
+  [PASS] Template [cust_service] Breakeven invariance under CAD: 1.0 mo == 1.0 mo
+  [PASS] Template [cust_service] ROI invariance under AUD: 1236% == 1236%
+  [PASS] Template [cust_service] Breakeven invariance under AUD: 1.0 mo == 1.0 mo
+  [PASS] Template [cust_service] ROI invariance under INR: 1236% == 1236%
+  [PASS] Template [cust_service] Breakeven invariance under INR: 1.0 mo == 1.0 mo
+  [PASS] Template [cust_service] ROI invariance under JPY: 1236% == 1236%
+  [PASS] Template [cust_service] Breakeven invariance under JPY: 1.0 mo == 1.0 mo
+  [PASS] Template [inventory] ROI invariance under EUR: 355% == 355%
+  [PASS] Template [inventory] Breakeven invariance under EUR: 3.4 mo == 3.4 mo
+  [PASS] Template [inventory] ROI invariance under GBP: 355% == 355%
+  [PASS] Template [inventory] Breakeven invariance under GBP: 3.4 mo == 3.4 mo
+  [PASS] Template [inventory] ROI invariance under CAD: 355% == 355%
+  [PASS] Template [inventory] Breakeven invariance under CAD: 3.4 mo == 3.4 mo
+  [PASS] Template [inventory] ROI invariance under AUD: 355% == 355%
+  [PASS] Template [inventory] Breakeven invariance under AUD: 3.4 mo == 3.4 mo
+  [PASS] Template [inventory] ROI invariance under INR: 355% == 355%
+  [PASS] Template [inventory] Breakeven invariance under INR: 3.4 mo == 3.4 mo
+  [PASS] Template [inventory] ROI invariance under JPY: 355% == 355%
+  [PASS] Template [inventory] Breakeven invariance under JPY: 3.4 mo == 3.4 mo
+  [PASS] Template [hr_ops] ROI invariance under EUR: 162% == 162%
+  [PASS] Template [hr_ops] Breakeven invariance under EUR: 7.4 mo == 7.4 mo
+  [PASS] Template [hr_ops] ROI invariance under GBP: 162% == 162%
+  [PASS] Template [hr_ops] Breakeven invariance under GBP: 7.4 mo == 7.4 mo
+  [PASS] Template [hr_ops] ROI invariance under CAD: 162% == 162%
+  [PASS] Template [hr_ops] Breakeven invariance under CAD: 7.4 mo == 7.4 mo
+  [PASS] Template [hr_ops] ROI invariance under AUD: 162% == 162%
+  [PASS] Template [hr_ops] Breakeven invariance under AUD: 7.4 mo == 7.4 mo
+  [PASS] Template [hr_ops] ROI invariance under INR: 162% == 162%
+  [PASS] Template [hr_ops] Breakeven invariance under INR: 7.4 mo == 7.4 mo
+  [PASS] Template [hr_ops] ROI invariance under JPY: 162% == 162%
+  [PASS] Template [hr_ops] Breakeven invariance under JPY: 7.4 mo == 7.4 mo
+
+======================================================================
+CROSS-TEMPLATE VALIDATION SUMMARY: 238 PASSED, 0 FAILED
+======================================================================
+Return Code: 0
+
+>>> Executing: production_readiness_comprehensive_test.py (Production Readiness, Deployment Caching, Persistence & Edge Cases)
+======================================================================
+PROCESSIQ v1.0 — PRODUCTION READINESS & MULTI-DISCIPLINARY AUDIT
+======================================================================
+
+--- 1. Deployment & Browser Cache Configuration Audit ---
+  [PASS] Vercel Config: Explicit cache rule configured for HTML entry point
+  [PASS] HTML Caching: HTML entry point has zero-stale revalidation header (public, max-age=0, must-revalidate)
+  [PASS] Vercel Config: Explicit cache rule configured for static JS & CSS assets
+  [PASS] Asset Caching: Static assets have proper client caching policy (public, max-age=3600, stale-while-revalidate=86400)
+  [PASS] Cache Busting: styles.css loaded with version parameter (?v=1.0.0)
+  [PASS] Cache Busting: app.js loaded with version parameter (?v=1.0.0)
+  [PASS] Version Consistency: app.js PROCESSIQ_VERSION matches package.json (1.0.0)
+  [PASS] UI Version: index.html footer displays active version v1.0.0
+  [PASS] Update Detection: checkForApplicationUpdates() implemented
+  [PASS] Update UI: showUpdateBanner() non-intrusive update prompt implemented
+
+--- 2. Data Persistence & Fault Tolerance Audit ---
+  [PASS] Persistence Schema: saveProgress includes schemaVersion: '1.0.0'
+  [PASS] Canonical Base Persistence: saveProgress saves canonicalBase
+  [PASS] Restoration Fidelity: loadProgress restores canonicalBase directly
+  [PASS] Legacy Fallback: loadProgress reconstructs canonical base if missing
+  [PASS] Corrupted Storage Protection: loadProgress safely catches malformed JSON
+  [PASS] UI Resync: loadProgress updates currency badges upon restore
+
+--- 3. Accessibility & Keyboard Navigation Audit ---
+  [PASS] A11y: Process cards and steppers given tabindex='0'
+  [PASS] A11y: Custom cards assigned role='button'
+  [PASS] A11y: Keyboard handler supports Enter and Space activation
+
+--- 4. Template Leakage Isolation Audit (Non-AP Templates) ---
+  [PASS] Template Isolation: Delays zeroed for non-AP templates
+  [PASS] Template Isolation: Duplicate payments zeroed for non-AP templates
+  [PASS] Template Isolation: Missed discounts zeroed for non-AP templates
+
+--- 5. Financial Boundary & Edge Case Mathematical Validation ---
+  [PASS] Edge Case 1: Zero Capex yields 0% ROI without exception (got 0%)
+  [PASS] Edge Case 1: Zero Capex yields 0 mo payback without exception (got 0 mo)
+  [PASS] Edge Case 2: Negative Net Benefit calculates -40% ROI (got -40%)
+  [PASS] Edge Case 2: Negative Net Benefit displays 'Not Achievable' payback (got 'Not Achievable')
+  [PASS] Edge Case 3: Zero Error Rate results in exact 0.0 leakage (got 0.0)
+
+--- 6. All 12 Industry Templates Baseline Integrity ---
+  [PASS] Template Catalog: Accounts Payable (ap) registered in catalog
+  [PASS] Template Catalog: Accounts Receivable (ar) registered in catalog
+  [PASS] Template Catalog: Bank Reconciliation (bank_rec) registered in catalog
+  [PASS] Template Catalog: General Ledger Closing (gl) registered in catalog
+  [PASS] Template Catalog: Journal Processing (journal) registered in catalog
+  [PASS] Template Catalog: Treasury Operations (treasury) registered in catalog
+  [PASS] Template Catalog: Financial Reporting (fin_rep) registered in catalog
+  [PASS] Template Catalog: Procurement & Purchasing (procurement) registered in catalog
+  [PASS] Template Catalog: Order Processing (order_proc) registered in catalog
+  [PASS] Template Catalog: Customer Service & Inquiries (cust_service) registered in catalog
+  [PASS] Template Catalog: Inventory Management (inventory) registered in catalog
+  [PASS] Template Catalog: HR Onboarding & Operations (hr_ops) registered in catalog
+
+======================================================================
+PRODUCTION READINESS SUITE SUMMARY: 39 PASSED, 0 FAILED
+======================================================================
+Return Code: 0
+
+======================================================================
+ALL TEST SUITES SUMMARY: 14 PASSED, 0 FAILED
 FINAL STATUS: RELEASE READY (100% SUCCESS)
 ======================================================================

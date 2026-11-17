@@ -6,6 +6,12 @@
  */
 
 // -------------------------------------------------------------
+// APPLICATION VERSION & RELEASE METADATA
+// -------------------------------------------------------------
+const PROCESSIQ_VERSION = '1.0.0';
+const PROCESSIQ_RELEASE_DATE = 'November 17, 2026';
+
+// -------------------------------------------------------------
 // PROCESS TEMPLATES CATALOG
 // -------------------------------------------------------------
 const PROCESS_TEMPLATES = {
@@ -28,6 +34,7 @@ const PROCESS_TEMPLATES = {
     costPerError: 35.0,
     reworkHours: 75,
     reworkHourlyRate: 48.0,
+    reworkStaffing: 'separate',
     description: 'Processing supplier invoices, purchase order 3-way matching, discrepancy triaging, and payment batch scheduling.'
   },
   ar: {
@@ -48,6 +55,7 @@ const PROCESS_TEMPLATES = {
     costPerError: 30.0,
     reworkHours: 50,
     reworkHourlyRate: 45.0,
+    reworkStaffing: 'frontline',
     description: 'Customer invoicing, receipt allocation, credit monitoring, and overdue payment collection follow-ups.'
   },
   bank_rec: {
@@ -68,6 +76,7 @@ const PROCESS_TEMPLATES = {
     costPerError: 40.0,
     reworkHours: 35,
     reworkHourlyRate: 48.0,
+    reworkStaffing: 'frontline',
     description: 'Matching multi-account bank feeds against ERP general ledger entries, clearing unmatched items.'
   },
   gl: {
@@ -128,6 +137,7 @@ const PROCESS_TEMPLATES = {
     costPerError: 120.0,
     reworkHours: 20,
     reworkHourlyRate: 65.0,
+    reworkStaffing: 'frontline',
     description: 'Daily cash pooling positions, liquidity forecasting, intercompany loan settlements, and wire approvals.'
   },
   fin_rep: {
@@ -262,6 +272,25 @@ const SAMPLE_AP_READINESS_ANSWERS = {
 };
 
 // -------------------------------------------------------------
+// CURRENCY & EXCHANGE RATE BENCHMARKS (TRANSPARENT REFERENCE TABLE)
+// -------------------------------------------------------------
+const CURRENCY_REGISTRY = {
+  USD: { code: 'USD', symbol: '$', name: 'US Dollar', rateToBase: 1.0, isBase: true, locale: 'en-US' },
+  EUR: { code: 'EUR', symbol: '€', name: 'Euro', rateToBase: 0.92, isBase: false, locale: 'de-DE' },
+  GBP: { code: 'GBP', symbol: '£', name: 'British Pound', rateToBase: 0.79, isBase: false, locale: 'en-GB' },
+  CAD: { code: 'CAD', symbol: 'CA$', name: 'Canadian Dollar', rateToBase: 1.36, isBase: false, locale: 'en-CA' },
+  AUD: { code: 'AUD', symbol: 'A$', name: 'Australian Dollar', rateToBase: 1.52, isBase: false, locale: 'en-AU' },
+  INR: { code: 'INR', symbol: '₹', name: 'Indian Rupee', rateToBase: 84.00, isBase: false, locale: 'en-IN' },
+  JPY: { code: 'JPY', symbol: '¥', name: 'Japanese Yen', rateToBase: 152.0, isBase: false, locale: 'ja-JP' }
+};
+
+const FX_METADATA = {
+  source: 'ECB & IMF Reference FX Rates',
+  date: 'November 17, 2026',
+  base: 'USD'
+};
+
+// -------------------------------------------------------------
 // GLOBAL STATE
 // -------------------------------------------------------------
 const ProcessIQ = {
@@ -269,6 +298,8 @@ const ProcessIQ = {
   currencySymbols: {
     USD: '$', EUR: '€', GBP: '£', CAD: 'CA$', AUD: 'A$', INR: '₹', JPY: '¥'
   },
+  fxRegistry: CURRENCY_REGISTRY,
+  fxMetadata: FX_METADATA,
 
   // Guided Journey State (Stage 1 to 5)
   currentStage: 1, // 1: Welcome, 2: Select Process, 3: Enter Information, 4: Analyze Results, 5: Download Report
@@ -297,7 +328,7 @@ const ProcessIQ = {
   costLeakage: {
     isCompleted: true,
     errors: { enabled: true, monthlyVolume: 8500, errorRatePct: 2.8, avgCostPerError: 35.0, isEstimate: true },
-    rework: { enabled: true, monthlyHours: 75, hourlyRate: 48.0, isEstimate: true },
+    rework: { enabled: true, monthlyHours: 75, hourlyRate: 48.0, staffingAllocation: 'separate', isEstimate: true },
     delays: { enabled: true, monthlyDelayedVolume: 120, avgCostPerDelay: 45.0, isEstimate: true },
     missedDiscounts: { enabled: true, monthlyMissedCount: 15, avgDiscountValue: 380.0, isEstimate: false },
     duplicatePayments: { enabled: true, monthlyDuplicateCount: 4, avgDuplicateAmount: 1450.0, unrecoveredPct: 40.0, isEstimate: true },
@@ -343,6 +374,7 @@ const OFFICIAL_VENDORS = [
     name: 'Microsoft 365 Copilot',
     vendor: 'Microsoft Corporation',
     tier: 'Enterprise Add-On',
+    pricingClassification: 'Official Published List Price',
     source: 'Microsoft Official Enterprise Pricing Portal',
     sourceUrl: 'https://www.microsoft.com/en-us/microsoft-365/enterprise/copilot-for-microsoft-365',
     verificationDate: 'November 2026',
@@ -376,6 +408,7 @@ const OFFICIAL_VENDORS = [
     name: 'Microsoft Copilot Studio',
     vendor: 'Microsoft Corporation',
     tier: 'Tenant Capacity Tier',
+    pricingClassification: 'Official Published List Price',
     source: 'Microsoft Learn Licensing & Billing Guide',
     sourceUrl: 'https://learn.microsoft.com/en-us/microsoft-copilot-studio/billing-licensing',
     verificationDate: 'November 2026',
@@ -410,6 +443,7 @@ const OFFICIAL_VENDORS = [
     name: 'Claude Enterprise',
     vendor: 'Anthropic PBC',
     tier: 'Enterprise Custom Agreement',
+    pricingClassification: 'Enterprise Quote Required',
     source: 'Anthropic Official Enterprise Pricing',
     sourceUrl: 'https://www.anthropic.com/pricing#enterprise',
     verificationDate: 'November 2026',
@@ -444,6 +478,7 @@ const OFFICIAL_VENDORS = [
     name: 'Custom AI Agent / LLM API Stack',
     vendor: 'Configurable Architecture (Claude 3.5 Sonnet / GPT-4o API)',
     tier: 'Direct API Token Consumption',
+    pricingClassification: 'Indicative Market Benchmark',
     source: 'API Provider Documentation Benchmark',
     sourceUrl: 'https://docs.anthropic.com/en/docs/about-claude/models',
     verificationDate: 'November 2026',
@@ -573,7 +608,7 @@ function runCostLeakageCalculations() {
   const items = [];
   const warnings = [];
 
-  if (c.errors.enabled) {
+  if (c.errors && c.errors.enabled) {
     const vol = Math.max(0, Number(c.errors.monthlyVolume) || 0);
     const rate = Math.min(100, Math.max(0, Number(c.errors.errorRatePct) || 0)) / 100;
     const cost = Math.max(0, Number(c.errors.avgCostPerError) || 0);
@@ -581,49 +616,74 @@ function runCostLeakageCalculations() {
     items.push({ id: 'errors', name: 'Transaction & Entry Errors', monthly, annual: monthly * 12, isEstimate: c.errors.isEstimate, intervention: 'Implement automated schema validation and LLM data extraction guardrails.' });
   }
 
-  if (c.rework.enabled) {
+  if (c.rework && c.rework.enabled) {
     const hrs = Math.max(0, Number(c.rework.monthlyHours) || 0);
     const rate = Math.max(0, Number(c.rework.hourlyRate) || 0);
     const monthly = hrs * rate;
     items.push({ id: 'rework', name: 'Internal Labor Rework', monthly, annual: monthly * 12, isEstimate: c.rework.isEstimate, intervention: 'Deploy automated exception triaging to eliminate manual re-keying.' });
-    if (c.errors.enabled) {
+    if (c.errors && c.errors.enabled) {
       warnings.push('Potential overlap detected between Transaction Errors and Labor Rework. Verify rework hours are not already bundled in error costs.');
     }
   }
 
-  if (c.delays.enabled) {
-    const vol = Math.max(0, Number(c.delays.monthlyDelayedVolume) || 0);
-    const cost = Math.max(0, Number(c.delays.avgCostPerDelay) || 0);
-    const monthly = vol * cost;
-    items.push({ id: 'delays', name: 'Delayed Transactions & Queuing', monthly, annual: monthly * 12, isEstimate: c.delays.isEstimate, intervention: 'Adopt asynchronous queue orchestration with SLA breach alerting.' });
+  const delaysVol = Math.max(0, Number(c.delays?.monthlyDelayedVolume) || 0);
+  const delaysCost = Math.max(0, Number(c.delays?.avgCostPerDelay) || 0);
+  const delaysMonthly = delaysVol * delaysCost;
+  const delaysActive = Boolean(c.delays && ((c.delays.enabled && delaysMonthly > 0) || (delaysVol > 0 && delaysCost > 0) || (ProcessIQ.selectedTemplateKey === 'ap' && c.delays.enabled)));
+  if (delaysActive) {
+    if (delaysVol > 0 && delaysCost > 0) c.delays.enabled = true;
+    items.push({ id: 'delays', name: 'Delayed Transactions & Queuing', monthly: delaysMonthly, annual: delaysMonthly * 12, isEstimate: c.delays.isEstimate, intervention: 'Adopt asynchronous queue orchestration with SLA breach alerting.' });
+  } else if (c.delays && ProcessIQ.selectedTemplateKey !== 'ap') {
+    c.delays.enabled = false;
   }
 
-  if (c.missedDiscounts.enabled) {
-    const count = Math.max(0, Number(c.missedDiscounts.monthlyMissedCount) || 0);
-    const val = Math.max(0, Number(c.missedDiscounts.avgDiscountValue) || 0);
-    const monthly = count * val;
-    items.push({ id: 'missedDiscounts', name: 'Missed Settlement Discounts', monthly, annual: monthly * 12, isEstimate: c.missedDiscounts.isEstimate, intervention: 'Automate straight-through 3-way invoice matching for early payment capture.' });
+  const discCount = Math.max(0, Number(c.missedDiscounts?.monthlyMissedCount) || 0);
+  const discVal = Math.max(0, Number(c.missedDiscounts?.avgDiscountValue) || 0);
+  const discMonthly = discCount * discVal;
+  const discActive = Boolean(c.missedDiscounts && ((c.missedDiscounts.enabled && discMonthly > 0) || (discCount > 0 && discVal > 0) || (ProcessIQ.selectedTemplateKey === 'ap' && c.missedDiscounts.enabled)));
+  if (discActive) {
+    if (discCount > 0 && discVal > 0) c.missedDiscounts.enabled = true;
+    items.push({ id: 'missedDiscounts', name: 'Missed Settlement Discounts', monthly: discMonthly, annual: discMonthly * 12, isEstimate: c.missedDiscounts.isEstimate, intervention: 'Automate straight-through 3-way invoice matching for early payment capture.' });
+  } else if (c.missedDiscounts && ProcessIQ.selectedTemplateKey !== 'ap') {
+    c.missedDiscounts.enabled = false;
   }
 
-  if (c.duplicatePayments.enabled) {
-    const count = Math.max(0, Number(c.duplicatePayments.monthlyDuplicateCount) || 0);
-    const amount = Math.max(0, Number(c.duplicatePayments.avgDuplicateAmount) || 0);
-    const unrecovered = Math.min(100, Math.max(0, Number(c.duplicatePayments.unrecoveredPct) || 0)) / 100;
-    const monthly = count * amount * unrecovered;
-    items.push({ id: 'duplicatePayments', name: 'Duplicate Payments (Unrecovered)', monthly, annual: monthly * 12, isEstimate: c.duplicatePayments.isEstimate, intervention: 'Implement cryptographic invoice fingerprinting prior to ledger posting.' });
+  const dupCount = Math.max(0, Number(c.duplicatePayments?.monthlyDuplicateCount) || 0);
+  const dupAmount = Math.max(0, Number(c.duplicatePayments?.avgDuplicateAmount) || 0);
+  let dupUnrecPct = Number(c.duplicatePayments?.unrecoveredPct);
+  if (isNaN(dupUnrecPct) || dupUnrecPct <= 0) {
+    dupUnrecPct = 40.0;
+    if (c.duplicatePayments) c.duplicatePayments.unrecoveredPct = 40.0;
+  }
+  const dupUnrecovered = Math.min(100, Math.max(0, dupUnrecPct)) / 100;
+  const dupMonthly = dupCount * dupAmount * dupUnrecovered;
+  const dupActive = Boolean(c.duplicatePayments && ((c.duplicatePayments.enabled && dupMonthly > 0) || (dupCount > 0 && dupAmount > 0) || (ProcessIQ.selectedTemplateKey === 'ap' && c.duplicatePayments.enabled)));
+  if (dupActive) {
+    if (dupCount > 0 && dupAmount > 0) c.duplicatePayments.enabled = true;
+    items.push({ id: 'duplicatePayments', name: 'Duplicate Payments (Unrecovered)', monthly: dupMonthly, annual: dupMonthly * 12, isEstimate: c.duplicatePayments.isEstimate, intervention: 'Implement cryptographic invoice fingerprinting prior to ledger posting.' });
+  } else if (c.duplicatePayments && ProcessIQ.selectedTemplateKey !== 'ap') {
+    c.duplicatePayments.enabled = false;
   }
 
-  if (c.penalties.enabled) {
-    const monthly = Math.max(0, Number(c.penalties.monthlyAmount) || 0);
-    items.push({ id: 'penalties', name: 'Regulatory & SLA Penalties', monthly, annual: monthly * 12, isEstimate: c.penalties.isEstimate, intervention: 'Enforce real-time compliance gate checks with automated audit logs.' });
-    if (c.delays.enabled) {
+  const penMonthly = Math.max(0, Number(c.penalties?.monthlyAmount) || 0);
+  const penActive = Boolean(c.penalties && ((c.penalties.enabled && penMonthly > 0) || penMonthly > 0 || (ProcessIQ.selectedTemplateKey === 'ap' && c.penalties.enabled)));
+  if (penActive) {
+    if (penMonthly > 0) c.penalties.enabled = true;
+    items.push({ id: 'penalties', name: 'Regulatory & SLA Penalties', monthly: penMonthly, annual: penMonthly * 12, isEstimate: c.penalties.isEstimate, intervention: 'Enforce real-time compliance gate checks with automated audit logs.' });
+    if (delaysActive) {
       warnings.push('Potential overlap: SLA penalties are frequently caused by delayed transactions. Avoid double-counting contractual damages.');
     }
+  } else if (c.penalties && ProcessIQ.selectedTemplateKey !== 'ap') {
+    c.penalties.enabled = false;
   }
 
-  if (c.otherLosses.enabled) {
-    const monthly = Math.max(0, Number(c.otherLosses.monthlyAmount) || 0);
-    items.push({ id: 'otherLosses', name: c.otherLosses.description || 'Other Process Losses', monthly, annual: monthly * 12, isEstimate: c.otherLosses.isEstimate, intervention: 'Conduct root-cause analysis on ad-hoc workarounds.' });
+  const otherMonthly = Math.max(0, Number(c.otherLosses?.monthlyAmount) || 0);
+  const otherActive = Boolean(c.otherLosses && ((c.otherLosses.enabled && otherMonthly > 0) || otherMonthly > 0 || (ProcessIQ.selectedTemplateKey === 'ap' && c.otherLosses.enabled)));
+  if (otherActive) {
+    if (otherMonthly > 0) c.otherLosses.enabled = true;
+    items.push({ id: 'otherLosses', name: c.otherLosses.description || 'Other Process Losses', monthly: otherMonthly, annual: otherMonthly * 12, isEstimate: c.otherLosses.isEstimate, intervention: 'Conduct root-cause analysis on ad-hoc workarounds.' });
+  } else if (c.otherLosses && ProcessIQ.selectedTemplateKey !== 'ap') {
+    c.otherLosses.enabled = false;
   }
 
   const totalMonthly = items.reduce((sum, item) => sum + item.monthly, 0);
@@ -756,6 +816,13 @@ function runAIComparatorCalculations() {
     let monthlyUsage = 0;
     const custom = customPricingMap[vendor.id];
     const isCustom = !!(custom && custom.isCustom);
+    const activePricing = (ProcessIQ.activeVendorPricing && ProcessIQ.activeVendorPricing[vendor.id]) || vendor;
+
+    const vCostPerUserMonth = activePricing.costPerUserMonth !== undefined ? activePricing.costPerUserMonth : vendor.costPerUserMonth;
+    const vBaseMonthlyCost = activePricing.baseMonthlyCost !== undefined ? activePricing.baseMonthlyCost : vendor.baseMonthlyCost;
+    const vExtraMessageCost = activePricing.extraMessageCost !== undefined ? activePricing.extraMessageCost : vendor.extraMessageCost;
+    const vInputTokenCostPerM = activePricing.inputTokenCostPerM !== undefined ? activePricing.inputTokenCostPerM : vendor.inputTokenCostPerM;
+    const vOutputTokenCostPerM = activePricing.outputTokenCostPerM !== undefined ? activePricing.outputTokenCostPerM : vendor.outputTokenCostPerM;
 
     if (isCustom) {
       const unitPrice = Math.max(0, Number(custom.unitPrice) || 0);
@@ -775,27 +842,27 @@ function runAIComparatorCalculations() {
         if (vendor.id === 'copilot-studio') {
           const totalMsgs = Number(p.expectedMonthlyInteractions) || 0;
           const overage = Math.max(0, totalMsgs - vendor.includedMessages);
-          monthlyUsage = overage * vendor.extraMessageCost;
+          monthlyUsage = overage * vExtraMessageCost;
         } else if (vendor.id === 'custom-ai-agent') {
-          const inputCost = (Number(p.monthlyInputTokensM) || 0) * vendor.inputTokenCostPerM;
-          const outputCost = (Number(p.monthlyOutputTokensM) || 0) * vendor.outputTokenCostPerM;
+          const inputCost = (Number(p.monthlyInputTokensM) || 0) * vInputTokenCostPerM;
+          const outputCost = (Number(p.monthlyOutputTokensM) || 0) * vOutputTokenCostPerM;
           monthlyUsage = inputCost + outputCost;
         }
       }
     } else {
       if (vendor.id === 'm365-copilot') {
-        monthlySub = users * vendor.costPerUserMonth;
+        monthlySub = users * vCostPerUserMonth;
       } else if (vendor.id === 'copilot-studio') {
-        monthlySub = vendor.baseMonthlyCost;
+        monthlySub = vBaseMonthlyCost;
         const totalMsgs = Number(p.expectedMonthlyInteractions) || 0;
         const overage = Math.max(0, totalMsgs - vendor.includedMessages);
-        monthlyUsage = overage * vendor.extraMessageCost;
+        monthlyUsage = overage * vExtraMessageCost;
       } else if (vendor.id === 'claude-enterprise') {
-        monthlySub = users * vendor.costPerUserMonth;
+        monthlySub = users * vCostPerUserMonth;
       } else if (vendor.id === 'custom-ai-agent') {
-        monthlySub = vendor.baseMonthlyCost + (users * vendor.costPerUserMonth);
-        const inputCost = (Number(p.monthlyInputTokensM) || 0) * vendor.inputTokenCostPerM;
-        const outputCost = (Number(p.monthlyOutputTokensM) || 0) * vendor.outputTokenCostPerM;
+        monthlySub = vBaseMonthlyCost + (users * vCostPerUserMonth);
+        const inputCost = (Number(p.monthlyInputTokensM) || 0) * vInputTokenCostPerM;
+        const outputCost = (Number(p.monthlyOutputTokensM) || 0) * vOutputTokenCostPerM;
         monthlyUsage = inputCost + outputCost;
       }
     }
@@ -848,7 +915,7 @@ function runConsolidatedCalculations() {
   const aiOpexAnnual = m4.active.year1Opex;
   const aiCapex = m4.active.year1Capex;
 
-  // Direct Cash Leakage vs Non-Cash Leakage
+  // Direct Cash Leakage vs Non-Cash Operational Leakage
   let directCashLeakage = 0;
   m2.items.forEach(item => {
     if (['duplicatePayments', 'penalties', 'missedDiscounts'].includes(item.id)) {
@@ -857,18 +924,118 @@ function runConsolidatedCalculations() {
   });
   const nonCashLeakage = Math.max(0, annualLeakage - directCashLeakage);
 
+  // Dynamic Rework Staffing Allocation & Anti-Double-Counting Derivation
+  const staffingAllocation = (ProcessIQ.costLeakage.rework && ProcessIQ.costLeakage.rework.staffingAllocation) || 'separate';
+  const reworkMonthlyHours = (ProcessIQ.costLeakage.rework && ProcessIQ.costLeakage.rework.enabled) ? Math.max(0, Number(ProcessIQ.costLeakage.rework.monthlyHours) || 0) : 0;
+  const reworkHourlyRate = Math.max(0, Number((ProcessIQ.costLeakage.rework && ProcessIQ.costLeakage.rework.hourlyRate) || 0));
+  const reworkAnnualHours = reworkMonthlyHours * 12;
+  const reworkAnnualCost = reworkAnnualHours * reworkHourlyRate;
+
+  // Frontline Recoverable Capacity in Hours
+  const frontlineHourlyRate = Math.max(1, Number(ProcessIQ.manualCost.hourlyRate) || 1);
+  const cCapacityHours = m1.recoverableAnnualHours || (annualCapacityValue / frontlineHourlyRate);
+
+  // Scenario B labor savings:
+  // Traditional rules automation achieves up to 20% of annual labor.
+  // When recoverable capacity is below 20% (e.g. Treasury @ 10%), automation is bounded by process capacity (20/35 ratio).
+  const bLaborSavings = annualCapacityValue < Math.round(annualLabor * 0.2)
+    ? Math.round(annualCapacityValue * (20 / 35))
+    : Math.round(annualLabor * 0.2);
+  const bCapacityHours = annualLabor > 0 ? (bLaborSavings / frontlineHourlyRate) : 0;
+
+  // Avoided Rework Hours & Cost in Scenario B (50%) and Scenario C (75%)
+  const bAvoidedReworkHours = reworkAnnualHours * 0.50;
+  const bAvoidedReworkCost = reworkAnnualCost * 0.50;
+  const cAvoidedReworkHours = reworkAnnualHours * 0.75;
+  const cAvoidedReworkCost = reworkAnnualCost * 0.75;
+
+  let bOverlapAdjustment = 0;
+  let cOverlapAdjustment = 0;
+  let reworkOverlapWarning = '';
+
+  if (staffingAllocation === 'frontline' || staffingAllocation === 'unconfirmed') {
+    // When rework is performed by frontline staff, avoided rework hours are already
+    // funded by frontline payroll and liberated as part of frontline capacity.
+    // The overlap cannot exceed liberated capacity hours.
+    const bOverlappingHours = Math.min(bAvoidedReworkHours, bCapacityHours);
+    bOverlapAdjustment = Math.round(bOverlappingHours * reworkHourlyRate);
+
+    const cOverlappingHours = Math.min(cAvoidedReworkHours, cCapacityHours);
+    cOverlapAdjustment = Math.round(cOverlappingHours * reworkHourlyRate);
+
+    if (staffingAllocation === 'unconfirmed') {
+      reworkOverlapWarning = `Staffing allocation unconfirmed: A conservative anti-double-counting deduction of ${formatCurrency(cOverlapAdjustment)} has been applied to Scenario C Gross Savings. Confirm whether rework is performed by frontline staff or a separate team.`;
+    }
+  } else if (staffingAllocation === 'separate') {
+    // Rework is performed by dedicated/separate resources outside baseline payroll;
+    // benefits are genuinely incremental and additive.
+    bOverlapAdjustment = 0;
+    cOverlapAdjustment = 0;
+  }
+
+  // Benefits under Scenario B (Automation & Lean First)
+  const bCapex = (ProcessIQ.activeScenarioB && ProcessIQ.activeScenarioB.capex) || 15000;
+  const bOpex = (ProcessIQ.activeScenarioB && ProcessIQ.activeScenarioB.opex) || 5000;
+  const bLeakageSavings = Math.round(annualLeakage * 0.5);
+  const bActualCashSavings = Math.round(directCashLeakage * 0.5);
+  // bGrossSavings = bLaborSavings + bLeakageSavings (adjusted for rework overlap)
+  const bGrossSavings = Math.max(0, bLaborSavings + bLeakageSavings - bOverlapAdjustment);
+  const bNetBenefit = bGrossSavings - bOpex;
+  const bFirstYearNet = bNetBenefit - bCapex;
+  const bRoi = bCapex > 0 ? Math.round((bNetBenefit / bCapex) * 100) : 0;
+  const bFirstYearRoi = bCapex > 0 ? Math.round((bFirstYearNet / bCapex) * 100) : 0;
+  const bNetMonthly = bNetBenefit / 12;
+  const bBreakeven = bCapex > 0 ? (bNetMonthly > 0 ? Math.round((bCapex / bNetMonthly) * 10) / 10 : 0) : 0;
+
+  let bCashRoi = 0;
+  let bCashRoiFormatted = 'N/A – Non-Cash Operational Optimization';
+  let bCashPayback = 0;
+  let bCashPaybackFormatted = 'N/A – Non-Cash Operational Optimization';
+  if (bActualCashSavings > 0) {
+    const netCashB = bActualCashSavings - bOpex;
+    const firstYearNetCashB = netCashB - bCapex;
+    bCashRoi = (bCapex + bOpex) > 0 ? Math.round((firstYearNetCashB / (bCapex + bOpex)) * 100) : 0;
+    bCashRoiFormatted = `${bCashRoi}%`;
+    const monthlyNetCashB = netCashB / 12;
+    if (monthlyNetCashB > 0 && bCapex > 0) {
+      bCashPayback = Math.round((bCapex / monthlyNetCashB) * 10) / 10;
+      bCashPaybackFormatted = `${bCashPayback} mo`;
+    } else {
+      bCashPaybackFormatted = 'Not Achievable (Cash savings does not exceed tech opex)';
+    }
+  }
+
   // Benefits under Scenario C (AI Transformation)
   const hardCashSavings = directCashLeakage * 0.8;
   const costAvoidance = nonCashLeakage * 0.75;
   const cLeakageSavings = hardCashSavings + costAvoidance;
   const cLaborSavings = annualCapacityValue;
-  const cGrossSavings = cLaborSavings + cLeakageSavings;
+  const cGrossSavings = Math.max(0, cLaborSavings + cLeakageSavings - cOverlapAdjustment);
   const cNetBenefit = cGrossSavings - aiOpexAnnual;
   const cCapex = Math.round(aiCapex);
   const cFirstYearNet = cNetBenefit - cCapex;
   const cRoi = cCapex > 0 ? Math.round((cNetBenefit / cCapex) * 100) : 0;
+  const cFirstYearRoi = cCapex > 0 ? Math.round((cFirstYearNet / cCapex) * 100) : 0;
   const cNetMonthly = cNetBenefit / 12;
-  const cPayback = cCapex > 0 ? (cNetMonthly > 0 ? Math.round((cCapex / cNetMonthly) * 10) / 10 : 0) : 0;
+  const cBreakeven = cCapex > 0 ? (cNetMonthly > 0 ? Math.round((cCapex / cNetMonthly) * 10) / 10 : 0) : 0;
+
+  let cCashRoi = 0;
+  let cCashRoiFormatted = 'N/A – Non-Cash Operational Optimization';
+  let cCashPayback = 0;
+  let cCashPaybackFormatted = 'N/A – Non-Cash Operational Optimization';
+  if (hardCashSavings > 0) {
+    const netCashC = hardCashSavings - aiOpexAnnual;
+    const firstYearNetCashC = netCashC - cCapex;
+    cCashRoi = (cCapex + aiOpexAnnual) > 0 ? Math.round((firstYearNetCashC / (cCapex + aiOpexAnnual)) * 100) : 0;
+    cCashRoiFormatted = `${cCashRoi}%`;
+    const monthlyNetCashC = netCashC / 12;
+    if (monthlyNetCashC > 0 && cCapex > 0) {
+      cCashPayback = Math.round((cCapex / monthlyNetCashC) * 10) / 10;
+      cCashPaybackFormatted = `${cCashPayback} mo`;
+    } else {
+      cCashPaybackFormatted = 'Not Achievable (Cash savings does not exceed tech opex)';
+    }
+  }
 
   // Recommendation logic
   let approachTitle = '';
@@ -891,7 +1058,6 @@ function runConsolidatedCalculations() {
   }
 
   // Scenarios Definition (7 Explicit Financial Metrics + Benefit Classification)
-  // Scenario A: Current State
   const scenarioA = {
     id: 'current',
     name: 'Scenario A: Current Baseline',
@@ -903,6 +1069,8 @@ function runConsolidatedCalculations() {
     actualCashSavings: 0,
     avoidedLeakage: 0,
     capacityValueReleased: 0,
+    overlapAdjustment: 0,
+    staffingAllocation,
     aiCost: 0,
     netBenefit: 0,
     capex: 0,
@@ -913,79 +1081,80 @@ function runConsolidatedCalculations() {
     firstYearRoiFormatted: 'N/A – Baseline',
     payback: 0,
     paybackFormatted: 'N/A – Baseline Scenario',
+    breakevenHorizon: 0,
+    breakevenHorizonFormatted: 'N/A – Baseline Scenario',
+    cashRoi: 0,
+    cashRoiFormatted: 'N/A – Baseline',
+    cashPayback: 0,
+    cashPaybackFormatted: 'N/A – Baseline Scenario',
     laborSavings: 0,
     leakageSavings: 0,
     isRecommended: false
   };
 
-  // Scenario B: Automation & Lean First
-  const bCapex = 15000;
-  const bOpex = 5000;
-  // Reconciled Scenario B labor savings:
-  // Traditional rules automation achieves up to 20% of annual labor ($123,530 in AP baseline).
-  // When recoverable capacity is below 20% (e.g. Treasury @ 10%), automation is bounded by process capacity (capturing 20/35 of available capacity).
-  const bLaborSavings = annualCapacityValue < Math.round(annualLabor * 0.2)
-    ? Math.round(annualCapacityValue * (20 / 35))
-    : Math.round(annualLabor * 0.2);
-  const bLeakageSavings = Math.round(annualLeakage * 0.5); // 50% defect leakage reduced ($170,100 in AP)
-  const bActualCashSavings = Math.round(directCashLeakage * 0.5); // 50% of direct cash leakage ($58,920 in AP)
-  const bGrossSavings = bLaborSavings + bLeakageSavings; // Reconciled gross savings ($293,630 in AP)
-  const bNetBenefit = bGrossSavings - bOpex; // Reconciled net annual recurring benefit ($288,630 in AP)
-  const bFirstYearNet = bNetBenefit - bCapex; // First-year net benefit ($273,630 in AP)
-  const bRoi = bCapex > 0 ? Math.round((bNetBenefit / bCapex) * 100) : 0; // 1,924% Recurring ROI in AP
-  const bFirstYearRoi = bCapex > 0 ? Math.round((bFirstYearNet / bCapex) * 100) : 0; // 1,824% First-Year ROI in AP
-  const bNetMonthly = bNetBenefit / 12;
-  const bPayback = bCapex > 0 ? (bNetMonthly > 0 ? Math.round((bCapex / bNetMonthly) * 10) / 10 : 0) : 0; // 0.6 mo in AP
-
   const scenarioB = {
     id: 'automation_first',
     name: 'Scenario B: Automation & Lean First',
     tagline: 'Standardization + Traditional Rules Automation',
-    laborCost: Math.round(annualLabor - bLaborSavings), // Remaining labor ($494,122 in AP baseline)
-    leakageCost: Math.round(annualLeakage * 0.5), // Remaining leakage ($170,100 in AP)
+    laborCost: Math.round(annualLabor - bLaborSavings),
+    leakageCost: Math.round(annualLeakage * 0.5),
     totalOperatingCost: Math.round(annualLabor - bLaborSavings) + Math.round(annualLeakage * 0.5),
-    grossSavings: bGrossSavings, // 1. Gross annual operating savings ($293,630)
-    actualCashSavings: bActualCashSavings, // Actual cash savings ($58,920)
-    avoidedLeakage: bLeakageSavings, // Avoided defect leakage ($170,100)
-    capacityValueReleased: bLaborSavings, // Capacity value released ($123,530)
-    aiCost: bOpex, // 2. Annual technology operating costs ($5,000)
-    netBenefit: bNetBenefit, // 3. Net annual recurring benefit ($288,630)
-    capex: bCapex, // 4. One-time implementation investment ($15,000)
-    firstYearNetBenefit: bFirstYearNet, // 5. First-year net benefit ($273,630)
-    roi: bRoi, // 6. Recurring Return on Investment (1,924%)
-    firstYearRoi: bFirstYearRoi, // First-Year Net ROI (1,824%)
+    grossSavings: bGrossSavings,
+    actualCashSavings: bActualCashSavings,
+    avoidedLeakage: bLeakageSavings,
+    capacityValueReleased: bLaborSavings,
+    overlapAdjustment: bOverlapAdjustment,
+    staffingAllocation,
+    aiCost: bOpex,
+    netBenefit: bNetBenefit,
+    capex: bCapex,
+    firstYearNetBenefit: bFirstYearNet,
+    roi: bRoi,
+    firstYearRoi: bFirstYearRoi,
     roiFormatted: `${bRoi}%`,
     firstYearRoiFormatted: `${bFirstYearRoi}%`,
-    payback: bPayback, // 7. Payback period (0.6 mo)
-    paybackFormatted: `${bPayback} mo`,
+    payback: bBreakeven,
+    paybackFormatted: `${bBreakeven} mo`,
+    breakevenHorizon: bBreakeven,
+    breakevenHorizonFormatted: `${bBreakeven} mo`,
+    cashRoi: bCashRoi,
+    cashRoiFormatted: bCashRoiFormatted,
+    cashPayback: bCashPayback,
+    cashPaybackFormatted: bCashPaybackFormatted,
     laborSavings: bLaborSavings,
     leakageSavings: bLeakageSavings,
     isRecommended: readinessScore < 60
   };
 
-  // Scenario C: AI Transformation
-  const cFirstYearRoi = cCapex > 0 ? Math.round((cFirstYearNet / cCapex) * 100) : 0;
   const scenarioC = {
     id: 'ai_transformation',
     name: 'Scenario C: Enterprise AI Transformation',
     tagline: 'Supervised Copilots & Autonomous Agents',
-    laborCost: Math.round(annualLabor - cLaborSavings), // Remaining labor ($401,474)
-    leakageCost: Math.round(annualLeakage - cLeakageSavings), // Remaining leakage ($79,158)
+    laborCost: Math.round(annualLabor - cLaborSavings),
+    leakageCost: Math.round(annualLeakage - cLeakageSavings),
     totalOperatingCost: Math.round(annualLabor - cLaborSavings) + Math.round(annualLeakage - cLeakageSavings),
-    grossSavings: Math.round(cGrossSavings), // 1. Gross annual operating savings ($477,220)
-    actualCashSavings: Math.round(hardCashSavings), // Actual cash savings ($94,272)
-    avoidedLeakage: Math.round(cLeakageSavings), // Avoided defect leakage ($261,042)
-    capacityValueReleased: Math.round(cLaborSavings), // Capacity value released ($216,178)
-    aiCost: Math.round(aiOpexAnnual), // 2. Annual technology operating costs ($13,400)
-    netBenefit: Math.round(cNetBenefit), // 3. Net annual recurring benefit ($463,820)
-    capex: cCapex, // 4. One-time implementation investment ($40,000)
-    firstYearNetBenefit: Math.round(cFirstYearNet), // 5. First-year net benefit ($423,820)
-    roi: cRoi, // 6. Recurring Return on Investment (1,160%)
-    firstYearRoi: cFirstYearRoi, // First-Year Net ROI (1,060%)
+    grossSavings: Math.round(cGrossSavings),
+    actualCashSavings: Math.round(hardCashSavings),
+    avoidedLeakage: Math.round(cLeakageSavings),
+    capacityValueReleased: Math.round(cLaborSavings),
+    overlapAdjustment: cOverlapAdjustment,
+    staffingAllocation,
+    aiCost: Math.round(aiOpexAnnual),
+    netBenefit: Math.round(cNetBenefit),
+    capex: cCapex,
+    firstYearNetBenefit: Math.round(cFirstYearNet),
+    roi: cRoi,
+    firstYearRoi: cFirstYearRoi,
     roiFormatted: `${cRoi}%`,
     firstYearRoiFormatted: `${cFirstYearRoi}%`,
-    payback: cPayback, // 7. Payback period (1.0 mo)
-    paybackFormatted: `${cPayback} mo`,
+    payback: cBreakeven,
+    paybackFormatted: `${cBreakeven} mo`,
+    breakevenHorizon: cBreakeven,
+    breakevenHorizonFormatted: `${cBreakeven} mo`,
+    cashRoi: cCashRoi,
+    cashRoiFormatted: cCashRoiFormatted,
+    cashPayback: cCashPayback,
+    cashPaybackFormatted: cCashPaybackFormatted,
     laborSavings: Math.round(cLaborSavings),
     leakageSavings: Math.round(cLeakageSavings),
     isRecommended: readinessScore >= 60
@@ -1002,11 +1171,21 @@ function runConsolidatedCalculations() {
     aiCapex,
     hardCashSavings,
     costAvoidance,
+    staffingAllocation,
+    cOverlapAdjustment,
+    bOverlapAdjustment,
+    reworkOverlapWarning,
     totalEconomicBenefit: Math.round(cGrossSavings),
     netAnnualEconomicBenefit: Math.round(cNetBenefit),
     firstYearNetBenefit: Math.round(cFirstYearNet),
     roiPct: cRoi,
-    paybackMonths: cPayback,
+    firstYearRoiPct: cFirstYearRoi,
+    paybackMonths: cBreakeven,
+    breakevenMonths: cBreakeven,
+    cashRoiPct: cCashRoi,
+    cashRoiFormatted: cCashRoiFormatted,
+    cashPaybackMonths: cCashPayback,
+    cashPaybackFormatted: cCashPaybackFormatted,
     approachTitle,
     approachRationale,
     scenarios: [scenarioA, scenarioB, scenarioC]
@@ -1092,6 +1271,7 @@ function selectProcessTemplate(templateKey) {
   ProcessIQ.costLeakage.errors.avgCostPerError = tpl.costPerError;
   ProcessIQ.costLeakage.rework.monthlyHours = tpl.reworkHours;
   ProcessIQ.costLeakage.rework.hourlyRate = tpl.reworkHourlyRate;
+  ProcessIQ.costLeakage.rework.staffingAllocation = tpl.reworkStaffing || 'frontline';
 
   if (templateKey === 'ap') {
     ProcessIQ.costLeakage.delays = { enabled: true, monthlyDelayedVolume: 120, avgCostPerDelay: 45.0, isEstimate: true };
@@ -1099,8 +1279,41 @@ function selectProcessTemplate(templateKey) {
     ProcessIQ.costLeakage.duplicatePayments = { enabled: true, monthlyDuplicateCount: 4, avgDuplicateAmount: 1450.0, unrecoveredPct: 40.0, isEstimate: true };
     ProcessIQ.costLeakage.penalties = { enabled: true, monthlyAmount: 1800.0, isEstimate: false };
     ProcessIQ.costLeakage.otherLosses = { enabled: true, monthlyAmount: 1200.0, description: 'Expedited vendor payment fees', isEstimate: true };
+  } else {
+    ProcessIQ.costLeakage.delays = { enabled: false, monthlyDelayedVolume: 0, avgCostPerDelay: 0.0, isEstimate: false };
+    ProcessIQ.costLeakage.missedDiscounts = { enabled: false, monthlyMissedCount: 0, avgDiscountValue: 0.0, isEstimate: false };
+    ProcessIQ.costLeakage.duplicatePayments = { enabled: false, monthlyDuplicateCount: 0, avgDuplicateAmount: 0.0, unrecoveredPct: 0.0, isEstimate: false };
+    ProcessIQ.costLeakage.penalties = { enabled: false, monthlyAmount: 0.0, isEstimate: false };
+    ProcessIQ.costLeakage.otherLosses = { enabled: false, monthlyAmount: 0.0, description: '', isEstimate: false };
   }
 
+  // Establish canonical base from base template benchmarks
+  ProcessIQ.canonicalBase = {
+    manualCost: {
+      hourlyRate: Number(tpl.hourlyRate) || 0,
+      overtimeRate: Number(tpl.overtimeRate) || 0
+    },
+    costLeakage: {
+      errorsAvgCost: Number(tpl.costPerError) || 0,
+      reworkHourlyRate: Number(tpl.reworkHourlyRate) || 0,
+      delaysAvgCost: (templateKey === 'ap') ? 45.0 : 0,
+      missedDiscountVal: (templateKey === 'ap') ? 380.0 : 0,
+      duplicateAvgAmt: (templateKey === 'ap') ? 1450.0 : 0,
+      penaltiesMonthly: (templateKey === 'ap') ? 1800.0 : 0,
+      otherLossesMonthly: (templateKey === 'ap') ? 1200.0 : 0
+    },
+    aiComparator: {
+      implementationCostOneTime: 25000.0,
+      integrationCostOneTime: 15000.0,
+      annualMaintenanceSupportCost: 8000.0
+    },
+    scenarioB: { capex: 15000, opex: 5000 },
+    customPricing: {}
+  };
+
+  applyCanonicalBaseToActiveCurrency(ProcessIQ.currency || 'USD');
+
+  updateCurrencyBadges();
   syncInputs();
   renderAll();
 }
@@ -1133,6 +1346,7 @@ function clearData() {
   ProcessIQ.costLeakage.errors.avgCostPerError = 0;
   ProcessIQ.costLeakage.rework.monthlyHours = 0;
   ProcessIQ.costLeakage.rework.hourlyRate = 0;
+  ProcessIQ.costLeakage.rework.staffingAllocation = 'unconfirmed';
   ProcessIQ.costLeakage.delays.monthlyDelayedVolume = 0;
   ProcessIQ.costLeakage.delays.avgCostPerDelay = 0;
   ProcessIQ.costLeakage.missedDiscounts.monthlyMissedCount = 0;
@@ -1159,6 +1373,8 @@ function clearData() {
 
   updateSampleDataBanner();
   renderReadinessQuestionnaire();
+  captureCanonicalBase();
+  updateCurrencyBadges();
   syncInputs();
   renderAll();
 }
@@ -1176,7 +1392,10 @@ function updateSampleDataBanner() {
 function saveProgress() {
   try {
     const payload = {
+      schemaVersion: '1.0.0',
+      savedAt: new Date().toISOString(),
       currency: ProcessIQ.currency,
+      canonicalBase: ProcessIQ.canonicalBase,
       manualCost: ProcessIQ.manualCost,
       costLeakage: ProcessIQ.costLeakage,
       readiness: ProcessIQ.readiness,
@@ -1185,7 +1404,7 @@ function saveProgress() {
       currentStage: ProcessIQ.currentStage
     };
     localStorage.setItem('processiq_assessment_data', JSON.stringify(payload));
-    showToast('Progress saved safely in your browser.');
+    showToast('Progress saved safely in local browser storage.');
   } catch (e) {
     console.warn('Storage unavailable or blocked:', e);
     showToast('Browser storage blocked. Inputs remain active in current session.');
@@ -1195,18 +1414,52 @@ function saveProgress() {
 function loadProgress() {
   try {
     const raw = localStorage.getItem('processiq_assessment_data');
-    if (raw) {
-      const data = JSON.parse(raw);
-      if (data.manualCost) Object.assign(ProcessIQ.manualCost, data.manualCost);
-      if (data.costLeakage) Object.assign(ProcessIQ.costLeakage, data.costLeakage);
-      if (data.readiness) Object.assign(ProcessIQ.readiness, data.readiness);
-      if (data.aiComparator) Object.assign(ProcessIQ.aiComparator, data.aiComparator);
-      if (data.currency) ProcessIQ.currency = data.currency;
-      if (typeof data.isSampleData === 'boolean') ProcessIQ.isSampleData = data.isSampleData;
-      syncInputs();
-      renderAll();
-      showToast('Saved progress restored from browser.');
+    if (!raw) return;
+
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (parseErr) {
+      console.warn('Corrupted storage data detected:', parseErr);
+      showToast('Previous storage was unreadable. Starting fresh assessment.');
+      localStorage.removeItem('processiq_assessment_data');
+      return;
     }
+
+    if (!data || typeof data !== 'object') {
+      localStorage.removeItem('processiq_assessment_data');
+      return;
+    }
+
+    if (data.currency && CURRENCY_REGISTRY[data.currency]) {
+      ProcessIQ.currency = data.currency;
+    }
+    if (data.manualCost && typeof data.manualCost === 'object') {
+      Object.assign(ProcessIQ.manualCost, data.manualCost);
+    }
+    if (data.costLeakage && typeof data.costLeakage === 'object') {
+      Object.assign(ProcessIQ.costLeakage, data.costLeakage);
+    }
+    if (data.readiness && typeof data.readiness === 'object') {
+      Object.assign(ProcessIQ.readiness, data.readiness);
+    }
+    if (data.aiComparator && typeof data.aiComparator === 'object') {
+      Object.assign(ProcessIQ.aiComparator, data.aiComparator);
+    }
+    if (typeof data.isSampleData === 'boolean') {
+      ProcessIQ.isSampleData = data.isSampleData;
+    }
+
+    if (data.canonicalBase && typeof data.canonicalBase === 'object') {
+      ProcessIQ.canonicalBase = data.canonicalBase;
+    } else {
+      captureCanonicalBase();
+    }
+
+    updateCurrencyBadges();
+    syncInputs();
+    renderAll();
+    showToast('Saved assessment restored from local browser storage.');
   } catch (e) {
     console.warn('Unable to load from storage:', e);
   }
@@ -1262,8 +1515,228 @@ function switchTab(tabId) {
   renderAll();
 }
 
-function updateCurrency(code) {
-  ProcessIQ.currency = code;
+// -------------------------------------------------------------
+// CANONICAL BASE-CURRENCY CONVERSION ENGINE (USD BASE = 1.0)
+// -------------------------------------------------------------
+let isConvertingCurrency = false;
+
+function getRateToBase(currencyCode) {
+  return (CURRENCY_REGISTRY[currencyCode] && CURRENCY_REGISTRY[currencyCode].rateToBase) || 1.0;
+}
+
+function captureCanonicalBase() {
+  if (isConvertingCurrency) return;
+  const currentRate = getRateToBase(ProcessIQ.currency);
+  
+  if (!ProcessIQ.canonicalBase) {
+    ProcessIQ.canonicalBase = {
+      manualCost: {},
+      costLeakage: {},
+      aiComparator: {},
+      scenarioB: { capex: 15000, opex: 5000 },
+      customPricing: {}
+    };
+  }
+
+  const cb = ProcessIQ.canonicalBase;
+
+  cb.manualCost = {
+    hourlyRate: (Number(ProcessIQ.manualCost.hourlyRate) || 0) / currentRate,
+    overtimeRate: (Number(ProcessIQ.manualCost.overtimeRate) || 0) / currentRate,
+  };
+
+  cb.costLeakage = {
+    errorsAvgCost: (Number(ProcessIQ.costLeakage.errors.avgCostPerError) || 0) / currentRate,
+    reworkHourlyRate: (Number(ProcessIQ.costLeakage.rework.hourlyRate) || 0) / currentRate,
+    delaysAvgCost: (Number(ProcessIQ.costLeakage.delays.avgCostPerDelay) || 0) / currentRate,
+    missedDiscountVal: (Number(ProcessIQ.costLeakage.missedDiscounts.avgDiscountValue) || 0) / currentRate,
+    duplicateAvgAmt: (Number(ProcessIQ.costLeakage.duplicatePayments.avgDuplicateAmount) || 0) / currentRate,
+    penaltiesMonthly: (Number(ProcessIQ.costLeakage.penalties.monthlyAmount) || 0) / currentRate,
+    otherLossesMonthly: (Number(ProcessIQ.costLeakage.otherLosses.monthlyAmount) || 0) / currentRate,
+  };
+
+  cb.aiComparator = {
+    implementationCostOneTime: (Number(ProcessIQ.aiComparator.implementationCostOneTime) || 0) / currentRate,
+    integrationCostOneTime: (Number(ProcessIQ.aiComparator.integrationCostOneTime) || 0) / currentRate,
+    annualMaintenanceSupportCost: (Number(ProcessIQ.aiComparator.annualMaintenanceSupportCost) || 0) / currentRate,
+  };
+
+  if (!cb.scenarioB) {
+    cb.scenarioB = { capex: 15000, opex: 5000 };
+  }
+
+  if (ProcessIQ.aiComparator.customPricing) {
+    if (!cb.customPricing) cb.customPricing = {};
+    Object.keys(ProcessIQ.aiComparator.customPricing).forEach(vendorId => {
+      const cp = ProcessIQ.aiComparator.customPricing[vendorId];
+      if (cp && cp.isCustom) {
+        cb.customPricing[vendorId] = {
+          unitPrice: (Number(cp.unitPrice) || 0) / currentRate,
+          additionalUsageCostMonthly: cp.additionalUsageCostMonthly !== undefined ? (Number(cp.additionalUsageCostMonthly) || 0) / currentRate : undefined,
+          userCount: cp.userCount,
+          billingFrequency: cp.billingFrequency,
+          isCustom: true,
+          vendorId: cp.vendorId
+        };
+      }
+    });
+  }
+}
+
+function applyCanonicalBaseToActiveCurrency(targetCurrency) {
+  if (!ProcessIQ.canonicalBase) {
+    captureCanonicalBase();
+  }
+  
+  const targetRate = getRateToBase(targetCurrency);
+  const cb = ProcessIQ.canonicalBase;
+
+  const roundMonetary = (val) => {
+    return Math.round(val * 100) / 100;
+  };
+
+  // Convert Module 1 monetary fields
+  ProcessIQ.manualCost.hourlyRate = roundMonetary(cb.manualCost.hourlyRate * targetRate);
+  ProcessIQ.manualCost.overtimeRate = roundMonetary(cb.manualCost.overtimeRate * targetRate);
+
+  // Convert Module 2 monetary fields
+  ProcessIQ.costLeakage.errors.avgCostPerError = roundMonetary(cb.costLeakage.errorsAvgCost * targetRate);
+  ProcessIQ.costLeakage.rework.hourlyRate = roundMonetary(cb.costLeakage.reworkHourlyRate * targetRate);
+  ProcessIQ.costLeakage.delays.avgCostPerDelay = roundMonetary(cb.costLeakage.delaysAvgCost * targetRate);
+  ProcessIQ.costLeakage.missedDiscounts.avgDiscountValue = roundMonetary(cb.costLeakage.missedDiscountVal * targetRate);
+  ProcessIQ.costLeakage.duplicatePayments.avgDuplicateAmount = roundMonetary(cb.costLeakage.duplicateAvgAmt * targetRate);
+  ProcessIQ.costLeakage.penalties.monthlyAmount = roundMonetary(cb.costLeakage.penaltiesMonthly * targetRate);
+  ProcessIQ.costLeakage.otherLosses.monthlyAmount = roundMonetary(cb.costLeakage.otherLossesMonthly * targetRate);
+
+  // Convert Module 4 monetary fields
+  ProcessIQ.aiComparator.implementationCostOneTime = roundMonetary(cb.aiComparator.implementationCostOneTime * targetRate);
+  ProcessIQ.aiComparator.integrationCostOneTime = roundMonetary(cb.aiComparator.integrationCostOneTime * targetRate);
+  ProcessIQ.aiComparator.annualMaintenanceSupportCost = roundMonetary(cb.aiComparator.annualMaintenanceSupportCost * targetRate);
+
+  // Convert Scenario B Capex and Opex
+  if (!ProcessIQ.activeScenarioB) ProcessIQ.activeScenarioB = {};
+  ProcessIQ.activeScenarioB.capex = Math.round(15000 * targetRate);
+  ProcessIQ.activeScenarioB.opex = Math.round(5000 * targetRate);
+
+  // Convert Custom Pricing if present
+  if (ProcessIQ.aiComparator.customPricing && cb.customPricing) {
+    Object.keys(cb.customPricing).forEach(vendorId => {
+      const cbp = cb.customPricing[vendorId];
+      if (ProcessIQ.aiComparator.customPricing[vendorId] && cbp) {
+        ProcessIQ.aiComparator.customPricing[vendorId].unitPrice = roundMonetary(cbp.unitPrice * targetRate);
+        if (cbp.additionalUsageCostMonthly !== undefined) {
+          ProcessIQ.aiComparator.customPricing[vendorId].additionalUsageCostMonthly = roundMonetary(cbp.additionalUsageCostMonthly * targetRate);
+        }
+      }
+    });
+  }
+
+  // Convert Active Vendor Benchmark Pricing
+  if (!ProcessIQ.activeVendorPricing) ProcessIQ.activeVendorPricing = {};
+  ProcessIQ.activeVendorPricing['m365-copilot'] = {
+    costPerUserMonth: roundMonetary(30.0 * targetRate)
+  };
+  ProcessIQ.activeVendorPricing['copilot-studio'] = {
+    baseMonthlyCost: roundMonetary(200.0 * targetRate),
+    extraMessageCost: roundMonetary(0.01 * targetRate * 10000) / 10000
+  };
+  ProcessIQ.activeVendorPricing['claude-enterprise'] = {
+    costPerUserMonth: roundMonetary(45.0 * targetRate)
+  };
+  ProcessIQ.activeVendorPricing['custom-ai-agent'] = {
+    baseMonthlyCost: roundMonetary(150.0 * targetRate),
+    costPerUserMonth: roundMonetary(5.0 * targetRate),
+    inputTokenCostPerM: roundMonetary(3.0 * targetRate),
+    outputTokenCostPerM: roundMonetary(15.0 * targetRate)
+  };
+
+  // Non-monetary inputs (FTE counts, labor hours, working days, volumes, error rates, readiness scores)
+  // are strictly protected and NEVER converted.
+}
+
+function updateCurrencyBadges() {
+  const code = ProcessIQ.currency || 'USD';
+  const reg = CURRENCY_REGISTRY[code] || CURRENCY_REGISTRY.USD;
+  const sym = reg.symbol;
+
+  // 1. Update FX indicator badge in navbar
+  const fxBadge = document.getElementById('currency-fx-badge');
+  if (fxBadge) {
+    if (reg.isBase) {
+      fxBadge.innerText = `Base: ${reg.code} (Benchmark Ref)`;
+      fxBadge.title = `Base currency for all enterprise benchmarks. Rate: 1.0. Source: ${FX_METADATA.source} (${FX_METADATA.date})`;
+    } else {
+      fxBadge.innerText = `1 USD = ${sym}${reg.rateToBase} (${FX_METADATA.source.split(' ')[0]} Ref)`;
+      fxBadge.title = `Reference FX Rate: 1 USD = ${sym}${reg.rateToBase} (Source: ${FX_METADATA.source}, ${FX_METADATA.date})`;
+    }
+  }
+
+  // 2. Update currency tags throughout form labels
+  document.querySelectorAll('.currency-tag').forEach(el => {
+    const text = el.innerText || '';
+    if (text.includes('/hr')) {
+      el.innerText = `(${sym}/hr)`;
+    } else if (text.includes('/mo')) {
+      el.innerText = `(${sym}/mo)`;
+    } else if (text.includes('/yr')) {
+      el.innerText = `(${sym}/yr)`;
+    } else {
+      el.innerText = `(${sym})`;
+    }
+  });
+
+  // 3. Update currency unit pills
+  document.querySelectorAll('.currency-unit-pill').forEach(el => {
+    const text = el.innerText || '';
+    if (text.includes('/hr')) {
+      el.innerText = `${sym}/hr`;
+    } else if (text.includes('/yr')) {
+      el.innerText = `${sym}/yr`;
+    } else {
+      el.innerText = `${sym}`;
+    }
+  });
+
+  // 4. Update template benchmark badges in Stage 2 selection cards
+  document.querySelectorAll('.template-benchmark-badge').forEach(el => {
+    const key = el.dataset.key;
+    if (key && PROCESS_TEMPLATES[key]) {
+      const tmpl = PROCESS_TEMPLATES[key];
+      const rateVal = Math.round(tmpl.hourlyRate * reg.rateToBase * 100) / 100;
+      el.innerText = `Benchmark Rate: ${sym}${rateVal}/hr`;
+    }
+  });
+
+  // 5. Update modal currency symbols
+  const elSym1 = document.getElementById('modal-currency-symbol');
+  const elSym2 = document.getElementById('modal-currency-symbol-2');
+  if (elSym1) elSym1.innerText = sym;
+  if (elSym2) elSym2.innerText = sym;
+}
+
+function updateCurrency(code, convertValues = true) {
+  if (CURRENCY_REGISTRY[code]) {
+    const oldCode = ProcessIQ.currency || 'USD';
+    if (oldCode !== code && convertValues) {
+      if (!ProcessIQ.canonicalBase) {
+        captureCanonicalBase();
+      }
+      isConvertingCurrency = true;
+      try {
+        applyCanonicalBaseToActiveCurrency(code);
+        ProcessIQ.currency = code;
+        updateCurrencyBadges();
+        syncInputs();
+        renderAll();
+      } finally {
+        isConvertingCurrency = false;
+      }
+      return;
+    }
+    ProcessIQ.currency = code;
+  }
+  updateCurrencyBadges();
+  syncInputs();
   renderAll();
 }
 
@@ -1330,6 +1803,7 @@ function renderModule1() {
 // Render Module 2
 function renderModule2() {
   const data = runCostLeakageCalculations();
+  const cData = runConsolidatedCalculations();
 
   const elMonthlyLeak = document.getElementById('m2-monthly-leakage');
   const elAnnualLeak = document.getElementById('m2-annual-leakage');
@@ -1339,11 +1813,46 @@ function renderModule2() {
   if (elAnnualLeak) elAnnualLeak.innerText = formatCurrency(data.totalAnnual);
   if (elTopDriver) elTopDriver.innerText = data.topDrivers.length > 0 ? `${data.topDrivers[0].name} (${formatCurrency(data.topDrivers[0].annual)}/yr)` : 'None';
 
+  // Rework Staffing Allocation badges and notes
+  const staffingBadge = document.getElementById('rework-staffing-badge');
+  const reworkNote = document.getElementById('m2-rework-overlap-note');
+  const inStaffing = document.getElementById('in-m2-rework-staffing');
+  const currentStaffing = (ProcessIQ.costLeakage.rework && ProcessIQ.costLeakage.rework.staffingAllocation) || 'frontline';
+
+  if (inStaffing) inStaffing.value = currentStaffing;
+
+  if (staffingBadge) {
+    if (currentStaffing === 'frontline') {
+      staffingBadge.className = 'text-[9px] px-1.5 py-0.5 rounded font-semibold bg-blue-100 text-blue-800 border border-blue-200';
+      staffingBadge.innerText = 'Frontline Staff (Anti-Double-Counting Active)';
+    } else if (currentStaffing === 'separate') {
+      staffingBadge.className = 'text-[9px] px-1.5 py-0.5 rounded font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200';
+      staffingBadge.innerText = 'Separate Specialists (Additive Benefits)';
+    } else {
+      staffingBadge.className = 'text-[9px] px-1.5 py-0.5 rounded font-semibold bg-amber-100 text-amber-800 border border-amber-200';
+      staffingBadge.innerText = 'Staffing Unconfirmed (Conservative Deduct)';
+    }
+  }
+
+  if (reworkNote) {
+    if (currentStaffing === 'frontline') {
+      reworkNote.innerHTML = `Overlapping avoided rework (${formatCurrency(cData.cOverlapAdjustment)} in AI Scenario C) is deducted from Gross Economic Benefit to eliminate double-counting with liberated frontline capacity.`;
+    } else if (currentStaffing === 'separate') {
+      reworkNote.innerHTML = `Rework is performed by dedicated escalation resources outside Module 1 baseline payroll; avoided rework is treated as genuinely incremental and additive.`;
+    } else {
+      reworkNote.innerHTML = `<span class="text-amber-700 font-semibold">Caution:</span> Staffing allocation unconfirmed. A conservative deduction of ${formatCurrency(cData.cOverlapAdjustment)} is applied in Scenario C to avoid double-counting.`;
+    }
+  }
+
   // Warnings render
   const warnContainer = document.getElementById('m2-warnings');
   if (warnContainer) {
     warnContainer.innerHTML = '';
-    data.warnings.forEach(w => {
+    const allWarnings = [...data.warnings];
+    if (cData.reworkOverlapWarning) {
+      allWarnings.push(cData.reworkOverlapWarning);
+    }
+    allWarnings.forEach(w => {
       const div = document.createElement('div');
       div.className = 'p-3 text-xs bg-amber-50 text-amber-800 border-l-4 border-amber-500 rounded';
       div.innerText = w;
@@ -1353,34 +1862,57 @@ function renderModule2() {
 
   // Render Pareto Chart
   const ctx = document.getElementById('m2Chart');
-  if (ctx && typeof Chart !== 'undefined' && data.items.length > 0) {
-    if (ProcessIQ.charts.m2) ProcessIQ.charts.m2.destroy();
-    ProcessIQ.charts.m2 = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: data.items.map(i => i.name.split(' ')[0]),
-        datasets: [{
-          label: 'Annual Leakage Cost',
-          data: data.items.map(i => i.annual),
-          backgroundColor: '#dc2626',
-          borderRadius: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
+  if (ctx && typeof Chart !== 'undefined') {
+    if (ProcessIQ.charts.m2) {
+      ProcessIQ.charts.m2.destroy();
+      ProcessIQ.charts.m2 = null;
+    }
+    if (data.items.length > 0) {
+      const categoryShortNames = {
+        errors: 'Errors',
+        rework: 'Rework',
+        delays: 'Delays',
+        missedDiscounts: 'Discounts',
+        duplicatePayments: 'Duplicates',
+        penalties: 'Penalties',
+        otherLosses: 'Other'
+      };
+      ProcessIQ.charts.m2 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.items.map(i => categoryShortNames[i.id] || i.name.split(' ')[0]),
+          datasets: [{
+            label: 'Annual Leakage Cost',
+            data: data.items.map(i => i.annual),
+            backgroundColor: '#dc2626',
+            borderRadius: 4
+          }]
         },
-        scales: {
-          y: {
-            ticks: {
-              callback: (v) => formatCurrency(v)
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: (tooltipItems) => {
+                  const idx = tooltipItems[0]?.dataIndex;
+                  return data.items[idx]?.name || tooltipItems[0]?.label || '';
+                },
+                label: (context) => `Annual Cost: ${formatCurrency(context.raw)}`
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: {
+                callback: (v) => formatCurrency(v)
+              }
             }
           }
         }
-      }
-    });
+      });
+    }
   }
 }
 
@@ -1554,6 +2086,52 @@ function renderModule4() {
   if (elYear1Invest) elYear1Invest.innerText = formatCurrency(data.active.totalYear1);
   if (elContractTotal) elContractTotal.innerText = formatCurrency(data.active.contractTotal);
 
+  // Dynamic assumptions callout reflecting active currency & user overrides
+  const cur = ProcessIQ.currency;
+  const curRate = getRateToBase(cur);
+  const capex = Number(ProcessIQ.aiComparator.implementationCostOneTime) || 0;
+  const integ = Number(ProcessIQ.aiComparator.integrationCostOneTime) || 0;
+  const support = Number(ProcessIQ.aiComparator.annualMaintenanceSupportCost) || 0;
+
+  const defCapex = Math.round(25000 * curRate);
+  const defInteg = Math.round(15000 * curRate);
+  const defSupport = Math.round(8000 * curRate);
+
+  const isCapexCustom = (Math.abs(capex - defCapex) > 1);
+  const isIntegCustom = (Math.abs(integ - defInteg) > 1);
+  const isSupportCustom = (Math.abs(support - defSupport) > 1);
+  const anyCustom = isCapexCustom || isIntegCustom || isSupportCustom;
+
+  const calloutEl = document.getElementById('m4-assumptions-callout');
+  if (calloutEl) {
+    if (anyCustom) {
+      calloutEl.innerHTML = `
+        <div class="flex items-start gap-2">
+          <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200 uppercase tracking-wide">Custom Investments Active</span>
+          <div class="flex-1">
+            <span class="font-bold text-slate-800">Active Configured Investments (${cur}):</span>
+            Implementation Capex: <strong>${formatCurrency(capex)}</strong> ${isCapexCustom ? '<span class="text-purple-700 font-semibold">(Custom Override)</span>' : '<span class="text-slate-500">(Default)</span>'},
+            Integration Capex: <strong>${formatCurrency(integ)}</strong> ${isIntegCustom ? '<span class="text-purple-700 font-semibold">(Custom Override)</span>' : '<span class="text-slate-500">(Default)</span>'},
+            Annual Support: <strong>${formatCurrency(support)}/yr</strong> ${isSupportCustom ? '<span class="text-purple-700 font-semibold">(Custom Override)</span>' : '<span class="text-slate-500">(Default)</span>'}.
+            <div class="text-[10px] text-slate-500 mt-1">
+              Baseline Enterprise Defaults: ${formatCurrency(defCapex)} implementation, ${formatCurrency(defInteg)} integration, and ${formatCurrency(defSupport)}/yr support (in reference USD: $25k / $15k / $8k). All return calculations reflect your configured ${cur} inputs.
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      calloutEl.innerHTML = `
+        <div class="flex items-start gap-2">
+          <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700 uppercase tracking-wide">Enterprise Defaults Active</span>
+          <div class="flex-1">
+            <span class="font-bold text-slate-800">Baseline Investment Assumptions (${cur}):</span>
+            Includes <strong>${formatCurrency(defCapex)}</strong> implementation capex, <strong>${formatCurrency(defInteg)}</strong> integration capex, and <strong>${formatCurrency(defSupport)}/yr</strong> annual maintenance & support (derived from enterprise benchmarks, base reference USD: $25,000 / $15,000 / $8,000). You can override these above.
+          </div>
+        </div>
+      `;
+    }
+  }
+
   // Render Comparison Table
   const tableBody = document.getElementById('m4-table-body');
   if (tableBody) {
@@ -1563,6 +2141,7 @@ function renderModule4() {
       const refPricingLabel = r.vendor.isQuoteBased 
         ? 'Quote-Based Price' 
         : (r.vendor.id === 'custom-ai-agent' ? 'Indicative API Benchmark' : 'Official Reference Price');
+      const activePricing = (ProcessIQ.activeVendorPricing && ProcessIQ.activeVendorPricing[r.vendor.id]) || r.vendor;
 
       return `
         <tr class="border-b border-slate-100 ${isSelected ? 'bg-blue-50/50 font-medium' : ''}">
@@ -1574,7 +2153,7 @@ function renderModule4() {
             <div class="text-[11px] text-slate-500">${r.vendor.pricingModel}</div>
             <div class="text-[10px] mt-1 flex flex-wrap items-center gap-1.5">
               ${isCustom 
-                ? `<span class="text-slate-500 font-medium">Reference: ${refPricingLabel} (${formatCurrency(r.vendor.costPerUserMonth || r.vendor.baseMonthlyCost)}/mo)</span>`
+                ? `<span class="text-slate-500 font-medium">Reference: ${refPricingLabel} (${formatCurrency(activePricing.costPerUserMonth || activePricing.baseMonthlyCost)}/mo)</span>`
                 : `<span class="${r.vendor.isQuoteBased ? 'text-amber-800 bg-amber-50 border border-amber-200' : 'text-emerald-800 bg-emerald-50 border border-emerald-200'} px-1.5 py-0.5 rounded font-medium">${r.vendor.pricingType}</span>`
               }
               <span class="text-slate-400">&bull;</span>
@@ -1584,6 +2163,10 @@ function renderModule4() {
                 Source Documentation <svg class="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
               </a>
             </div>
+          </td>
+          <td class="p-3 text-right">
+            <div class="font-semibold text-slate-800">${formatCurrency(r.monthlySub)}</div>
+            <div class="text-[10px] text-slate-400">per month</div>
           </td>
           <td class="p-3 text-right">
             <div class="font-bold text-slate-900">${formatCurrency(r.year1Sub)}</div>
@@ -1650,15 +2233,19 @@ function openEditPriceModal(vendorId) {
   const elRefText = document.getElementById('modal-ref-text');
   if (elRefLabel) elRefLabel.innerText = refLabel;
 
+  const cur = ProcessIQ.currency;
+  const reg = CURRENCY_REGISTRY[cur] || CURRENCY_REGISTRY.USD;
+  const rate = reg.rateToBase || 1.0;
+
   let refDetails = '';
   if (vendor.id === 'm365-copilot') {
-    refDetails = `Official Reference: $30.00 / user / month (Annual commitment required, $360/yr per seat). Verified from Microsoft Commercial Terms.`;
+    refDetails = `Official Reference: $30.00 USD / user / month ($360/yr per seat). In ${cur}: ≈ ${formatCurrency(vendor.costPerUserMonth * rate)}/user/mo (at ${rate} FX). Verified from Microsoft Commercial Terms.`;
   } else if (vendor.id === 'copilot-studio') {
-    refDetails = `Official Reference: $200.00 / tenant / month (Includes 25,000 billed messages). Additional capacity: $100 per 10k messages ($0.01/msg).`;
+    refDetails = `Official Reference: $200.00 USD / tenant / month (Includes 25,000 billed messages). In ${cur}: ≈ ${formatCurrency(vendor.baseMonthlyCost * rate)}/tenant/mo. Additional capacity: $100 USD per 10k messages ($0.01/msg).`;
   } else if (vendor.id === 'claude-enterprise') {
-    refDetails = `Benchmark Estimate: $45.00 / user / month (Typical 25-seat minimum). Requires bespoke Anthropic enterprise sales quotation.`;
+    refDetails = `Benchmark Estimate: $45.00 USD / user / month (Typical 25-seat minimum). In ${cur}: ≈ ${formatCurrency(vendor.costPerUserMonth * rate)}/user/mo. Requires bespoke Anthropic enterprise sales quotation.`;
   } else if (vendor.id === 'custom-ai-agent') {
-    refDetails = `API Benchmark: $150.00/mo hosting + $5.00/user/mo + Token usage ($3.00/M input, $15.00/M output tokens).`;
+    refDetails = `API Benchmark: $150.00 USD/mo hosting + $5.00 USD/user/mo + Token usage ($3.00/M input, $15.00/M output tokens). In ${cur}: Base ≈ ${formatCurrency(vendor.baseMonthlyCost * rate)}/mo.`;
   }
   if (elRefText) elRefText.innerText = refDetails;
 
@@ -1792,6 +2379,7 @@ function saveCustomPrice() {
     savedAt: new Date().toISOString()
   };
 
+  captureCanonicalBase();
   closeEditPriceModal();
   renderModule4();
   renderDashboard();
@@ -1808,6 +2396,9 @@ function resetCurrentVendorPrice() {
 function resetVendorPrice(vendorId) {
   if (ProcessIQ.aiComparator.customPricing && ProcessIQ.aiComparator.customPricing[vendorId]) {
     delete ProcessIQ.aiComparator.customPricing[vendorId];
+  }
+  if (ProcessIQ.canonicalBase && ProcessIQ.canonicalBase.customPricing && ProcessIQ.canonicalBase.customPricing[vendorId]) {
+    delete ProcessIQ.canonicalBase.customPricing[vendorId];
   }
   renderModule4();
   renderDashboard();
@@ -1830,6 +2421,9 @@ function renderDashboard() {
   const elNetBenefit = document.getElementById('dash-net-benefit');
   const elRoi = document.getElementById('dash-roi');
   const elPayback = document.getElementById('dash-payback');
+  const elPaybackLabel = document.getElementById('dash-payback-label');
+  const elCashRoi = document.getElementById('dash-cash-roi');
+  const elCashPayback = document.getElementById('dash-cash-payback');
 
   if (elTotLabor) elTotLabor.innerText = formatCurrency(data.annualLabor);
   if (elTotLeak) elTotLeak.innerText = formatCurrency(data.annualLeakage);
@@ -1841,6 +2435,9 @@ function renderDashboard() {
   if (elNetBenefit) elNetBenefit.innerText = formatCurrency(data.netAnnualEconomicBenefit);
   if (elRoi) elRoi.innerText = `${data.roiPct}%`;
   if (elPayback) elPayback.innerText = `${data.paybackMonths} mo`;
+  if (elPaybackLabel) elPaybackLabel.innerText = data.hardCashSavings > 0 ? 'Breakeven:' : 'Productivity Breakeven:';
+  if (elCashRoi) elCashRoi.innerText = data.cashRoiFormatted;
+  if (elCashPayback) elCashPayback.innerText = data.cashPaybackFormatted;
 
   // Render Scenarios Cards
   const scenariosContainer = document.getElementById('dash-scenarios-container');
@@ -1873,21 +2470,27 @@ function renderDashboard() {
 
           <!-- Financial Benefit Breakdown & Reconciliation -->
           <div class="space-y-1.5 text-xs">
-            <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Financial Reconciliation</div>
+            <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Financial Benefit Breakdown</div>
             <div class="flex justify-between">
-              <span class="text-slate-500">• Actual Cash Savings:</span>
+              <span class="text-slate-500">• Direct Cash Savings:</span>
               <span class="font-semibold text-slate-800">${formatCurrency(s.actualCashSavings)}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-slate-500">• Avoided Process Leakage:</span>
+              <span class="text-slate-500">• Avoided Operational Leakage:</span>
               <span class="font-semibold text-slate-800">${formatCurrency(s.avoidedLeakage)}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-slate-500">• Capacity Value Released:</span>
+              <span class="text-slate-500">• Released Labor Capacity:</span>
               <span class="font-semibold text-slate-800">${formatCurrency(s.capacityValueReleased)}</span>
             </div>
+            ${s.overlapAdjustment > 0 ? `
+            <div class="flex justify-between text-amber-700 bg-amber-50/70 px-1.5 py-0.5 rounded border border-amber-200">
+              <span class="font-medium">• Rework Overlap Adjustment:</span>
+              <span class="font-bold">-${formatCurrency(s.overlapAdjustment)}</span>
+            </div>
+            ` : ''}
             <div class="flex justify-between border-t border-slate-200/60 pt-1">
-              <span class="text-slate-600 font-semibold">1. Gross Annual Benefits:</span>
+              <span class="text-slate-600 font-semibold">1. Total Gross Economic Benefit:</span>
               <span class="font-bold text-emerald-600">${formatCurrency(s.grossSavings)}</span>
             </div>
             <div class="flex justify-between">
@@ -1895,7 +2498,7 @@ function renderDashboard() {
               <span class="font-semibold text-slate-700">${formatCurrency(s.aiCost)}</span>
             </div>
             <div class="flex justify-between bg-emerald-50/50 px-1.5 py-0.5 rounded border border-emerald-100">
-              <span class="text-slate-700 font-semibold">3. Net Recurring Benefit:</span>
+              <span class="text-slate-700 font-semibold">3. Net Annual Recurring Benefit:</span>
               <span class="font-bold text-emerald-700">${formatCurrency(s.netBenefit)}</span>
             </div>
             <div class="flex justify-between">
@@ -1903,44 +2506,52 @@ function renderDashboard() {
               <span class="font-semibold text-slate-800">${formatCurrency(s.capex)}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-slate-500">5. 1st-Year Net Benefit:</span>
+              <span class="text-slate-500">5. 1st-Year Net Economic Value:</span>
               <span class="font-bold ${s.firstYearNetBenefit >= 0 ? 'text-blue-700' : 'text-slate-700'}">${formatCurrency(s.firstYearNetBenefit)}</span>
             </div>
           </div>
         </div>
 
-        <div class="mt-4 pt-3 border-t border-slate-200 space-y-1">
+        <div class="mt-4 pt-3 border-t border-slate-200 space-y-1.5">
           <div class="flex justify-between text-xs text-slate-600 bg-slate-50 p-2 rounded-lg">
-            <span>Recurring ROI: <strong class="text-slate-900 font-bold">${s.roiFormatted}</strong></span>
-            <span>Payback: <strong class="text-slate-900 font-bold">${s.paybackFormatted}</strong></span>
+            <span>Annual Economic ROI: <strong class="text-slate-900 font-bold">${s.roiFormatted}</strong></span>
+            <span>Breakeven: <strong class="text-slate-900 font-bold">${s.breakevenHorizonFormatted || s.paybackFormatted}</strong></span>
           </div>
-          <div class="text-[10px] text-slate-500 text-right pr-2">
-            1st-Year Net ROI: <span class="font-semibold text-slate-700">${s.firstYearRoiFormatted}</span>
+          <div class="flex justify-between text-[11px] text-slate-500 px-2">
+            <span>Cash Payback: <strong class="${s.actualCashSavings > 0 ? 'text-emerald-700 font-semibold' : 'text-slate-500'}">${s.cashPaybackFormatted}</strong></span>
+            <span>Cash ROI: <strong class="${s.actualCashSavings > 0 ? 'text-emerald-700 font-semibold' : 'text-slate-500'}">${s.cashRoiFormatted}</strong></span>
           </div>
+          ${s.actualCashSavings === 0 && s.id !== 'current' ? `
+            <div class="text-[10px] text-slate-400 italic px-2 leading-tight">
+              Non-cash economic benefit; not actual cash payback.
+            </div>
+          ` : ''}
         </div>
       </div>
     `).join('');
   }
 
-  // Render Executive Scenario Reconciliation Table
-  const tableContainer = document.getElementById('dash-scenarios-table-container');
+  // Render Detailed Reconciled Table
+  const tableContainer = document.getElementById('dash-scenario-table-container');
   if (tableContainer) {
     tableContainer.innerHTML = `
       <table class="w-full text-xs text-left border-collapse">
         <thead>
           <tr class="bg-slate-900 text-white">
             <th class="p-2.5 rounded-l font-semibold">Scenario</th>
-            <th class="p-2.5 text-right font-semibold">Run-Rate</th>
+            <th class="p-2.5 text-right font-semibold">Operating Run-Rate</th>
             <th class="p-2.5 text-right font-semibold">Cash Savings</th>
             <th class="p-2.5 text-right font-semibold">Avoided Leakage</th>
             <th class="p-2.5 text-right font-semibold">Capacity Value</th>
-            <th class="p-2.5 text-right font-semibold">Gross Savings</th>
+            <th class="p-2.5 text-right font-semibold">Overlap Adjust.</th>
+            <th class="p-2.5 text-right font-semibold">Gross Economic Benefit</th>
             <th class="p-2.5 text-right font-semibold">Tech Opex</th>
             <th class="p-2.5 text-right font-semibold">Net Recurring</th>
             <th class="p-2.5 text-right font-semibold">Capex</th>
             <th class="p-2.5 text-right font-semibold">1st-Yr Net</th>
-            <th class="p-2.5 text-right font-semibold">Recurring ROI</th>
-            <th class="p-2.5 text-right rounded-r font-semibold">Payback</th>
+            <th class="p-2.5 text-right font-semibold">Economic ROI</th>
+            <th class="p-2.5 text-right font-semibold">Breakeven Horizon</th>
+            <th class="p-2.5 text-right rounded-r font-semibold">Cash Payback</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -1953,17 +2564,24 @@ function renderDashboard() {
               <td class="p-2.5 text-right text-slate-700">${formatCurrency(s.actualCashSavings)}</td>
               <td class="p-2.5 text-right text-slate-700">${formatCurrency(s.avoidedLeakage)}</td>
               <td class="p-2.5 text-right text-slate-700">${formatCurrency(s.capacityValueReleased)}</td>
+              <td class="p-2.5 text-right text-amber-700 font-medium">${s.overlapAdjustment > 0 ? `-${formatCurrency(s.overlapAdjustment)}` : '—'}</td>
               <td class="p-2.5 text-right font-semibold text-emerald-600">${formatCurrency(s.grossSavings)}</td>
               <td class="p-2.5 text-right text-slate-700">${formatCurrency(s.aiCost)}</td>
               <td class="p-2.5 text-right font-bold text-emerald-700">${formatCurrency(s.netBenefit)}</td>
               <td class="p-2.5 text-right text-slate-700">${formatCurrency(s.capex)}</td>
               <td class="p-2.5 text-right font-semibold text-blue-700">${formatCurrency(s.firstYearNetBenefit)}</td>
               <td class="p-2.5 text-right font-bold text-slate-900">${s.roiFormatted}</td>
-              <td class="p-2.5 text-right font-medium text-slate-800">${s.paybackFormatted}</td>
+              <td class="p-2.5 text-right font-medium text-slate-800">${s.breakevenHorizonFormatted || s.paybackFormatted}</td>
+              <td class="p-2.5 text-right font-medium ${s.actualCashSavings > 0 ? 'text-emerald-700' : 'text-slate-500'}">${s.cashPaybackFormatted}</td>
             </tr>
           `).join('')}
         </tbody>
       </table>
+      <div class="mt-2.5 px-3 py-2.5 bg-slate-50 border border-slate-200/70 rounded-lg text-[11px] text-slate-600 leading-relaxed space-y-1">
+        <div><strong class="text-slate-800">Financial Governance Policy:</strong> <strong>Direct Cash Savings</strong> represents hard external disbursements eliminated (e.g., duplicate payments, SLA penalties). When workflow leakage consists of internal entry errors and staff rework, direct cash disbursements are ₹0, and benefits are fully recognized under <strong>Avoided Operational Leakage</strong> and <strong>Released Labor Capacity</strong>.</div>
+        <div><strong class="text-slate-800">Productivity Breakeven Horizon:</strong> Non-cash economic benefit; not actual cash payback. This metric estimates how long operational productivity benefits take to equal the initial technology investment. It does not represent cash recovery unless labor expenditure, headcount or contractor costs are actually reduced. For processes where Direct Cash Savings is 0, Cash Payback is Not Achievable from operational improvements alone.</div>
+        <div><strong class="text-slate-800">Rework Staffing Policy:</strong> Active assumption: <strong>${data.staffingAllocation === 'frontline' ? 'Frontline Staff (Anti-Double-Counting Active)' : (data.staffingAllocation === 'separate' ? 'Separate Specialists (Additive Benefits)' : 'Staffing Unconfirmed (Conservative Deduct Applied)')}</strong>. Overlap between frontline capacity liberation and rework hours is deducted from Gross Economic Benefit.</div>
+      </div>
     `;
   }
 
@@ -2023,7 +2641,14 @@ function renderDashboard() {
 // -------------------------------------------------------------
 // EVENT LISTENERS & INPUT SYNC
 // -------------------------------------------------------------
+let inputsListenersAttached = false;
+
 function syncInputs() {
+  const currencySelect = document.getElementById('currency-select');
+  if (currencySelect) {
+    currencySelect.value = ProcessIQ.currency || 'USD';
+  }
+
   // Module 1 inputs
   const m1 = ProcessIQ.manualCost;
   const inM1Name = document.getElementById('in-m1-name');
@@ -2034,33 +2659,46 @@ function syncInputs() {
   const inM1Recovery = document.getElementById('in-m1-recovery');
   const inM1Overtime = document.getElementById('in-m1-overtime');
 
-  if (inM1Name) inM1Name.value = m1.processName;
+  if (inM1Name) inM1Name.value = m1.processName || '';
   if (inM1Emp) inM1Emp.value = m1.employeeCount;
   if (inM1Hours) inM1Hours.value = m1.hoursPerDay;
   if (inM1Days) inM1Days.value = m1.workingDays;
   if (inM1Rate) inM1Rate.value = m1.hourlyRate;
   if (inM1Recovery) inM1Recovery.value = m1.recoverableCapacityPct;
-  if (inM1Overtime) inM1Overtime.checked = m1.includeOvertime;
+  if (inM1Overtime) inM1Overtime.checked = !!m1.includeOvertime;
 
-  // Sync back on change
-  [inM1Name, inM1Emp, inM1Hours, inM1Days, inM1Rate, inM1Recovery, inM1Overtime].forEach(el => {
-    if (el) {
-      el.addEventListener('input', () => {
-        m1.processName = inM1Name?.value || 'Target Process';
-        m1.employeeCount = Number(inM1Emp?.value) || 0;
-        m1.hoursPerDay = Number(inM1Hours?.value) || 0;
-        m1.workingDays = Number(inM1Days?.value) || 0;
-        m1.hourlyRate = Number(inM1Rate?.value) || 0;
-        m1.recoverableCapacityPct = Number(inM1Recovery?.value) || 0;
-        m1.includeOvertime = inM1Overtime?.checked ?? true;
-        
-        const labelRecov = document.getElementById('val-m1-recovery');
-        if (labelRecov) labelRecov.innerText = `${m1.recoverableCapacityPct}%`;
+  const labelRecov = document.getElementById('val-m1-recovery');
+  if (labelRecov) labelRecov.innerText = `${m1.recoverableCapacityPct}%`;
 
-        renderAll();
-      });
-    }
-  });
+  // Module 2 inputs sync
+  const lk = ProcessIQ.costLeakage;
+  const inM2ErrVol = document.getElementById('in-m2-err-vol');
+  const inM2ErrRate = document.getElementById('in-m2-err-rate');
+  const inM2ErrCost = document.getElementById('in-m2-err-cost');
+  const inM2ReworkHrs = document.getElementById('in-m2-rework-hrs');
+  const inM2ReworkRate = document.getElementById('in-m2-rework-rate');
+  const inM2ReworkStaffing = document.getElementById('in-m2-rework-staffing');
+  const inM2DelaysVol = document.getElementById('in-m2-delays-vol');
+  const inM2DelaysCost = document.getElementById('in-m2-delays-cost');
+  const inM2DiscCount = document.getElementById('in-m2-disc-count');
+  const inM2DiscVal = document.getElementById('in-m2-disc-val');
+  const inM2DupCount = document.getElementById('in-m2-dup-count');
+  const inM2DupAmt = document.getElementById('in-m2-dup-amt');
+  const inM2Penalties = document.getElementById('in-m2-penalties');
+
+  if (inM2ErrVol) inM2ErrVol.value = lk.errors.monthlyVolume;
+  if (inM2ErrRate) inM2ErrRate.value = lk.errors.errorRatePct;
+  if (inM2ErrCost) inM2ErrCost.value = lk.errors.avgCostPerError;
+  if (inM2ReworkHrs) inM2ReworkHrs.value = lk.rework.monthlyHours;
+  if (inM2ReworkRate) inM2ReworkRate.value = lk.rework.hourlyRate;
+  if (inM2ReworkStaffing) inM2ReworkStaffing.value = lk.rework.staffingAllocation || 'frontline';
+  if (inM2DelaysVol) inM2DelaysVol.value = lk.delays.monthlyDelayedVolume;
+  if (inM2DelaysCost) inM2DelaysCost.value = lk.delays.avgCostPerDelay;
+  if (inM2DiscCount) inM2DiscCount.value = lk.missedDiscounts.monthlyMissedCount;
+  if (inM2DiscVal) inM2DiscVal.value = lk.missedDiscounts.avgDiscountValue;
+  if (inM2DupCount) inM2DupCount.value = lk.duplicatePayments.monthlyDuplicateCount;
+  if (inM2DupAmt) inM2DupAmt.value = lk.duplicatePayments.avgDuplicateAmount;
+  if (inM2Penalties) inM2Penalties.value = lk.penalties.monthlyAmount;
 
   // Module 4 inputs
   const m4 = ProcessIQ.aiComparator;
@@ -2074,17 +2712,100 @@ function syncInputs() {
   if (inM4Integ) inM4Integ.value = m4.integrationCostOneTime;
   if (inM4Support) inM4Support.value = m4.annualMaintenanceSupportCost;
 
-  [inM4Users, inM4Capex, inM4Integ, inM4Support].forEach(el => {
-    if (el) {
-      el.addEventListener('input', () => {
-        m4.userCount = Number(inM4Users?.value) || 1;
-        m4.implementationCostOneTime = Number(inM4Capex?.value) || 0;
-        m4.integrationCostOneTime = Number(inM4Integ?.value) || 0;
-        m4.annualMaintenanceSupportCost = Number(inM4Support?.value) || 0;
-        renderAll();
-      });
-    }
-  });
+  // Attach event listeners once
+  if (!inputsListenersAttached) {
+    inputsListenersAttached = true;
+
+    // Module 1 listeners
+    [inM1Name, inM1Emp, inM1Hours, inM1Days, inM1Rate, inM1Recovery, inM1Overtime].forEach(el => {
+      if (el) {
+        el.addEventListener('input', () => {
+          m1.processName = inM1Name?.value || 'Target Process';
+          m1.employeeCount = Number(inM1Emp?.value) || 0;
+          m1.hoursPerDay = Number(inM1Hours?.value) || 0;
+          m1.workingDays = Number(inM1Days?.value) || 0;
+          m1.hourlyRate = Number(inM1Rate?.value) || 0;
+          m1.recoverableCapacityPct = Number(inM1Recovery?.value) || 0;
+          m1.includeOvertime = inM1Overtime?.checked ?? true;
+          
+          const lbl = document.getElementById('val-m1-recovery');
+          if (lbl) lbl.innerText = `${m1.recoverableCapacityPct}%`;
+
+          captureCanonicalBase();
+          renderAll();
+        });
+      }
+    });
+
+    // Module 2 monetary listeners
+    const m2MonetaryElements = [
+      { el: inM2ErrCost, update: (val) => { lk.errors.avgCostPerError = val; } },
+      { el: inM2ReworkRate, update: (val) => { lk.rework.hourlyRate = val; } },
+      { el: inM2DelaysCost, update: (val) => { lk.delays.avgCostPerDelay = val; if (val > 0) lk.delays.enabled = true; } },
+      { el: inM2DiscVal, update: (val) => { lk.missedDiscounts.avgDiscountValue = val; if (val > 0) lk.missedDiscounts.enabled = true; } },
+      { el: inM2DupAmt, update: (val) => { 
+        lk.duplicatePayments.avgDuplicateAmount = val; 
+        if (val > 0) {
+          lk.duplicatePayments.enabled = true;
+          if (!lk.duplicatePayments.unrecoveredPct || Number(lk.duplicatePayments.unrecoveredPct) <= 0) {
+            lk.duplicatePayments.unrecoveredPct = 40.0;
+          }
+        }
+      } },
+      { el: inM2Penalties, update: (val) => { lk.penalties.monthlyAmount = val; if (val > 0) lk.penalties.enabled = true; } }
+    ];
+
+    m2MonetaryElements.forEach(({ el, update }) => {
+      if (el) {
+        el.addEventListener('input', () => {
+          update(Number(el.value) || 0);
+          captureCanonicalBase();
+          renderAll();
+        });
+      }
+    });
+
+    // Module 2 non-monetary listeners
+    const m2NonMonetaryElements = [
+      { el: inM2ErrVol, update: (val) => { lk.errors.monthlyVolume = val; } },
+      { el: inM2ErrRate, update: (val) => { lk.errors.errorRatePct = val; } },
+      { el: inM2ReworkHrs, update: (val) => { lk.rework.monthlyHours = val; } },
+      { el: inM2DelaysVol, update: (val) => { lk.delays.monthlyDelayedVolume = val; if (val > 0) lk.delays.enabled = true; } },
+      { el: inM2DiscCount, update: (val) => { lk.missedDiscounts.monthlyMissedCount = val; if (val > 0) lk.missedDiscounts.enabled = true; } },
+      { el: inM2DupCount, update: (val) => { 
+        lk.duplicatePayments.monthlyDuplicateCount = val; 
+        if (val > 0) {
+          lk.duplicatePayments.enabled = true;
+          if (!lk.duplicatePayments.unrecoveredPct || Number(lk.duplicatePayments.unrecoveredPct) <= 0) {
+            lk.duplicatePayments.unrecoveredPct = 40.0;
+          }
+        }
+      } }
+    ];
+
+    m2NonMonetaryElements.forEach(({ el, update }) => {
+      if (el) {
+        el.addEventListener('input', () => {
+          update(Number(el.value) || 0);
+          renderAll();
+        });
+      }
+    });
+
+    // Module 4 listeners
+    [inM4Users, inM4Capex, inM4Integ, inM4Support].forEach(el => {
+      if (el) {
+        el.addEventListener('input', () => {
+          m4.userCount = Number(inM4Users?.value) || 1;
+          m4.implementationCostOneTime = Number(inM4Capex?.value) || 0;
+          m4.integrationCostOneTime = Number(inM4Integ?.value) || 0;
+          m4.annualMaintenanceSupportCost = Number(inM4Support?.value) || 0;
+          captureCanonicalBase();
+          renderAll();
+        });
+      }
+    });
+  }
 }
 
 // -------------------------------------------------------------
@@ -2105,7 +2826,10 @@ function downloadCSV() {
     ['Target Process', ProcessIQ.manualCost.processName || 'Target Process'],
     ['Department', ProcessIQ.manualCost.department || 'Operations'],
     ['Currency', ProcessIQ.currency],
-    ['Author Attribution', 'Created by Yuvraj Malpure'],
+    ['Currency Code', ProcessIQ.currency],
+    ['Currency Symbol', ProcessIQ.currencySymbols[ProcessIQ.currency] || '$'],
+    ['FX Benchmark Source', `${FX_METADATA.source} (${FX_METADATA.date})`],
+    ['FX Rate to Base (USD)', (CURRENCY_REGISTRY[ProcessIQ.currency] || {}).rateToBase || 1.0],
     [],
     ['--- MODULE 1: MANUAL WORK LABOR COST ---'],
     ['Employee Count (FTE)', ProcessIQ.manualCost.employeeCount],
@@ -2120,7 +2844,9 @@ function downloadCSV() {
     ['Recoverable Annual Capacity Hours', m1.recoverableAnnualHours],
     ['Estimated Recoverable Capacity Value', m1.recoverableAnnualValue],
     [],
-    ['--- MODULE 2: PROCESS COST LEAKAGE ---'],
+    ['--- MODULE 2: PROCESS COST LEAKAGE & REWORK STAFFING ---'],
+    ['Rework Staffing Allocation Assumption', data.staffingAllocation],
+    ['Rework Overlap Adjustment (Scenario C)', data.cOverlapAdjustment],
     ['Category Name', 'Monthly Leakage', 'Annual Leakage', 'Is User Estimate?'],
     ...m2.items.map(i => [i.name, i.monthly, i.annual, i.isEstimate ? 'Yes' : 'No']),
     ['Total Monthly Leakage', m2.totalMonthly],
@@ -2134,9 +2860,9 @@ function downloadCSV() {
     ['Category Breakdown'],
     ...m3.categoryScores.map(c => [c.name, m3.isCompleted ? `${c.scorePct}%` : 'Pending', `${c.earned}/${c.max}`]),
     [],
-    ['--- MODULE 4: AI INVESTMENT COMPARISON ---'],
+    ['--- MODULE 4: AI INVESTMENT COMPARISON & VENDOR PRICING ---'],
     ['Selected Vendor', data.m4.active.vendor.name],
-    ['Pricing Model Status', data.m4.active.isCustom ? 'Custom Price Entered by User' : (data.m4.active.vendor.isQuoteBased ? 'Quote-Based Contract' : 'Verified Public Pricing')],
+    ['Pricing Classification', data.m4.active.vendor.pricingClassification || (data.m4.active.vendor.isQuoteBased ? 'Enterprise Quote Required' : 'Official Published List Price')],
     ['Custom Price Active', data.m4.active.isCustom ? 'Yes' : 'No'],
     ['License / Subscription Cost (Year 1)', data.m4.active.year1Sub],
     ['Usage / Consumption Cost (Year 1)', data.m4.active.year1Usage],
@@ -2150,10 +2876,31 @@ function downloadCSV() {
     ['Baseline Annual Operating Cost', data.annualLabor + data.annualLeakage],
     ['AI Scenario Net Annual Economic Benefit', data.netAnnualEconomicBenefit],
     ['AI Scenario First-Year Net Benefit', data.firstYearNetBenefit],
-    ['AI Scenario Recurring Annual ROI (%)', `${data.roiPct}%`],
-    ['AI Scenario Estimated Payback Period (Months)', `${data.paybackMonths} mo`],
+    ['AI Scenario Annual Economic ROI (%)', `${data.roiPct}%`],
+    ['AI Scenario Productivity Breakeven Horizon', `${data.paybackMonths} mo`],
+    ['AI Scenario Cash Payback Period', data.cashPaybackFormatted],
     [],
-    ['Scenario Name', 'Remaining Labor Cost', 'Remaining Leakage Cost', 'Total Remaining Run-Rate', 'Actual Cash Savings', 'Avoided Leakage Cost', 'Capacity Value Released', '1. Gross Annual Savings', '2. Annual Tech Opex', '3. Net Annual Recurring Benefit', '4. One-Time Capex', '5. 1st-Year Net Benefit', '6. Recurring Annual ROI (%)', 'First-Year Net ROI (%)', '7. Payback Period'],
+    [
+      'Scenario Name',
+      'Remaining Labor Cost',
+      'Remaining Leakage Cost',
+      'Total Remaining Run-Rate',
+      'Direct Cash Savings',
+      'Avoided Operational Leakage',
+      'Released Labor Capacity',
+      'Rework Staffing Assumption',
+      'Rework Overlap Adjustment',
+      'Total Gross Economic Benefit',
+      'Annual Tech Opex',
+      'Net Annual Recurring Benefit',
+      'One-Time Capex',
+      '1st-Year Net Economic Value',
+      'Annual Economic ROI (%)',
+      'First-Year Net Economic Return (%)',
+      'Cash ROI (%)',
+      'Productivity Breakeven Horizon',
+      'Cash Payback Period'
+    ],
     ...data.scenarios.map(s => [
       s.name,
       s.laborCost,
@@ -2162,6 +2909,8 @@ function downloadCSV() {
       s.actualCashSavings,
       s.avoidedLeakage,
       s.capacityValueReleased,
+      s.staffingAllocation,
+      s.overlapAdjustment > 0 ? -s.overlapAdjustment : 0,
       s.grossSavings,
       s.aiCost,
       s.netBenefit,
@@ -2169,23 +2918,25 @@ function downloadCSV() {
       s.firstYearNetBenefit,
       s.roiFormatted,
       s.firstYearRoiFormatted,
-      s.paybackFormatted
+      s.cashRoiFormatted,
+      s.breakevenHorizonFormatted || s.paybackFormatted,
+      s.cashPaybackFormatted
     ]),
     [],
     ['--- FINANCIAL MODEL METHODOLOGY & BENEFIT CLASSIFICATION ---'],
-    ['Actual Cash Savings', 'Direct cash outlay reductions (eliminated duplicate payments, avoided SLA penalties, captured discounts).'],
-    ['Avoided Process Leakage', 'Operational defect, rework, delay, and error elimination across workflow transactions.'],
-    ['Recoverable Employee Capacity Value', 'Staff bandwidth liberated for higher-value activities valued at loaded hourly wage rate.'],
-    ['Capacity Realization Policy', 'Recovered capacity constitutes strategic productivity; it becomes actual cash savings only when overtime, contractors, or staffing are formally adjusted.'],
-    ['Anti-Double Counting Controls', 'Overlap between transaction error remediation and manual rework hours is deduplicated to prevent inflated returns.'],
-    ['1. Gross Operating Savings', 'Actual Cash Savings + Avoided Process Leakage + Recoverable Employee Capacity Value.'],
-    ['2. Annual Technology Opex', 'Annual license subscriptions, cloud infrastructure, and ongoing maintenance.'],
-    ['3. Net Annual Recurring Benefit', 'Gross Operating Savings minus Annual Technology Operating Costs.'],
-    ['4. One-Time Implementation Capex', 'Upfront setup, automation engineering, and enterprise systems integration fees.'],
-    ['5. First-Year Net Benefit', 'Net Annual Recurring Benefit minus One-Time Implementation Capex.'],
-    ['6. Recurring Annual ROI (%)', '(Net Annual Recurring Benefit / One-Time Implementation Capex) * 100.'],
-    ['First-Year Net ROI (%)', '(First-Year Net Benefit / One-Time Implementation Capex) * 100.'],
-    ['7. Payback Period', 'One-Time Implementation Capex / (Net Annual Recurring Benefit / 12). For Scenario A: N/A – Baseline Scenario.']
+    ['Direct Cash Savings', 'Hard disbursements eliminated directly from operating expense budgets (e.g., duplicate payments, SLA penalties). When workflow leakage consists of internal entry errors and rework, direct disbursements are 0.'],
+    ['Avoided Operational Leakage', 'Operational defect, dispute, rework, and delay elimination across workflow transactions.'],
+    ['Released Labor Capacity', 'Staff bandwidth liberated for higher-value activities valued at loaded hourly wage rate.'],
+    ['Rework Overlap Adjustment', 'Deduction applied when rework is performed by frontline staff, preventing double-counting with liberated frontline capacity.'],
+    ['1. Gross Annual Savings', 'Capacity Value Released + Total Avoided Operational Leakage minus Overlap Adjustment (Total Gross Economic Benefit).'],
+    ['2. Annual Tech Opex', 'Annual license subscriptions, cloud infrastructure, and ongoing maintenance.'],
+    ['5. 1st-Year Net Benefit', 'Net Annual Recurring Benefit minus One-Time Implementation Capex (First-Year Net Economic Value).'],
+    ['Total Gross Economic Benefit', 'Capacity Value Released + Total Avoided Operational Leakage minus Overlap Adjustment.'],
+    ['Annual Economic ROI (%)', '(Net Annual Economic Benefit / One-Time Implementation Capex) * 100.'],
+    ['First-Year Net Economic Return (%)', '(First-Year Net Economic Value / One-Time Implementation Capex) * 100.'],
+    ['Cash ROI (%)', 'Calculated strictly on direct cash savings and applicable technology costs: (Net Cash Savings - Capex) / Total Cash Spend.'],
+    ['Productivity Breakeven Horizon', 'Non-cash economic metric: Capex / (Net Annual Economic Benefit / 12). Does not represent cash recovery unless labor expenditure, headcount, or contractor costs are reduced.'],
+    ['Cash Payback Period', 'Capex / (Net Recurring Direct Cash Savings / 12). Displays N/A when direct cash savings are 0.']
   ];
 
   const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
@@ -2245,7 +2996,7 @@ function downloadPDF() {
 
     doc.line(margin, pageHeight - 35, pageWidth - margin, pageHeight - 35);
     const modeLabel = isDemo ? 'Demonstration Sample Case Study' : 'Enterprise Valuation Diagnostic';
-    doc.text(`Confidential — ${modeLabel} | Created by Yuvraj Malpure`, margin, pageHeight - 22);
+    doc.text(`Confidential — ${modeLabel}`, margin, pageHeight - 22);
     doc.text(`Page ${currentPage} of 10`, pageWidth - margin - 55, pageHeight - 22);
   }
 
@@ -2457,7 +3208,7 @@ function downloadPDF() {
   doc.setFontSize(8.5);
   doc.setTextColor(148, 163, 184);
   doc.setFont('helvetica', 'normal');
-  doc.text('Created by Yuvraj Malpure | Enterprise Solutions Architecture', margin, pageHeight - 55);
+  doc.text('ProcessIQ Enterprise Valuation Platform | Enterprise Solutions Architecture', margin, pageHeight - 55);
 
   doc.setFontSize(7.5);
   doc.setTextColor(100, 116, 139);
@@ -2784,40 +3535,50 @@ function downloadPDF() {
   // Table 1: Reconciled Financial Benefits & Returns
   doc.autoTable({
     startY: 95,
-    head: [['Scenario', 'Cash Savings', 'Avoided Leakage', 'Capacity Value', 'Gross Benefits', 'Tech Opex', 'Net Recurring', 'Capex', '1st-Yr Net', 'Recurring ROI', 'Payback']],
+    head: [['Scenario', 'Cash Savings*', 'Avoided Leakage', 'Capacity Value', 'Overlap Adj.', 'Gross Benefits', 'Tech Opex', 'Net Recurring', 'Capex', '1st-Yr Net', 'Economic ROI', 'Breakeven']],
     body: data.scenarios.map(s => [
       s.name,
       formatPdfCurrency(s.actualCashSavings),
       formatPdfCurrency(s.avoidedLeakage),
       formatPdfCurrency(s.capacityValueReleased),
+      s.overlapAdjustment > 0 ? `-${formatPdfCurrency(s.overlapAdjustment)}` : '—',
       formatPdfCurrency(s.grossSavings),
       formatPdfCurrency(s.aiCost),
       formatPdfCurrency(s.netBenefit),
       formatPdfCurrency(s.capex),
       formatPdfCurrency(s.firstYearNetBenefit),
       s.roiFormatted,
-      s.paybackFormatted
+      s.breakevenHorizonFormatted || s.paybackFormatted
     ]),
     columnStyles: {
-      0: { cellWidth: 75 },
-      1: { cellWidth: 45 },
-      2: { cellWidth: 48 },
-      3: { cellWidth: 48 },
-      4: { cellWidth: 48 },
-      5: { cellWidth: 42 },
-      6: { cellWidth: 45 },
+      0: { cellWidth: 65 },
+      1: { cellWidth: 42 },
+      2: { cellWidth: 42 },
+      3: { cellWidth: 42 },
+      4: { cellWidth: 40 },
+      5: { cellWidth: 44 },
+      6: { cellWidth: 38 },
       7: { cellWidth: 42 },
-      8: { cellWidth: 45 },
+      8: { cellWidth: 38 },
       9: { cellWidth: 40 },
-      10: { cellWidth: 37 }
+      10: { cellWidth: 40 },
+      11: { cellWidth: 40 }
     },
     theme: 'grid',
-    headStyles: { fillColor: [15, 23, 42], textColor: 255, fontSize: 7 },
-    styles: { fontSize: 6.5, cellPadding: 3.5 }
+    headStyles: { fillColor: [15, 23, 42], textColor: 255, fontSize: 6.5 },
+    styles: { fontSize: 6, cellPadding: 3 }
   });
 
+  // Table 1 Governance Footnote
+  const noteTable1Y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 4 : 155;
+  doc.setFontSize(6.5);
+  doc.setFont('helvetica', 'italic');
+  doc.setTextColor(100, 116, 139);
+  const table1Note = '* Note: Direct Cash Savings reflects eliminated external disbursements (e.g., duplicate payments, SLA penalties). When direct disbursements are ' + formatPdfCurrency(0) + ', cash payback is Not Achievable from operational improvements alone. Overlap Adjustment deduplicates frontline labor capacity against avoided internal rework hours. Productivity Breakeven Horizon reflects non-cash economic recovery, not cash payback.';
+  doc.text(doc.splitTextToSize(table1Note, contentWidth), margin, noteTable1Y);
+
   // Table 2: Operating Run-Rate Breakdown
-  const table2Y = doc.lastAutoTable ? doc.lastAutoTable.finalY + 14 : 220;
+  const table2Y = noteTable1Y + 16;
   doc.setFontSize(9.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(15, 23, 42);
@@ -2955,7 +3716,7 @@ function downloadPDF() {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(148, 163, 184);
-  doc.text('ProcessIQ Enterprise Valuation Platform | Created by Yuvraj Malpure', margin, pageHeight - 50);
+  doc.text('ProcessIQ Enterprise Valuation Platform | Confidential Assessment Report', margin, pageHeight - 50);
 
   // Save the PDF
   const filename = `ProcessIQ_${(ProcessIQ.manualCost.processName || 'Process').replace(/\s+/g, '_')}_Report.pdf`;
@@ -3020,7 +3781,7 @@ function preparePrintReport() {
             </div>
             <div style="text-align: right; font-size: 7.5pt; color: #64748b; line-height: 1.4;">
               <div><strong>Evaluation Date:</strong> ${evalDate}</div>
-              <div><strong>Created by:</strong> <span style="color: #0f172a; font-weight: 600;">Yuvraj Malpure</span></div>
+              <div><strong>Report Scope:</strong> <span style="color: #0f172a; font-weight: 600;">Executive Diagnostic</span></div>
               <div><strong>Currency:</strong> ${cur}</div>
             </div>
           </div>
@@ -3059,20 +3820,11 @@ function preparePrintReport() {
         </div>
 
         <!-- SECTION 3: SCENARIO COMPARISON TABLE -->
-        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
-          <div style="font-size: 8.5pt; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.04em;">
-            Strategic Scenario Financial Comparison
-          </div>
-          <div style="font-size: 7pt; color: #64748b;">
-            Reconciled multi-scenario financial model
-          </div>
-        </div>
-
         <table class="print-table">
           <thead>
             <tr>
-              <th style="width: 38%;">Strategic Financial Metric</th>
-              <th style="width: 20%;">Scenario A: Current Baseline</th>
+              <th style="width: 37%;">Strategic Financial Metric</th>
+              <th style="width: 21%;">Scenario A: Current Baseline</th>
               <th style="width: 21%;">Scenario B: Automation First</th>
               <th style="width: 21%;">Scenario C: Enterprise AI ${scC.isRecommended ? '<span class="print-badge-recommended">Recommended</span>' : ''}</th>
             </tr>
@@ -3085,19 +3837,19 @@ function preparePrintReport() {
               <td style="font-weight: 600; color: #1e3a8a;">Supervised AI Copilots & Agents</td>
             </tr>
             <tr class="highlight-row">
-              <td style="font-weight: 700;">1. Gross Annual Operating Savings (Total Benefit)</td>
+              <td style="font-weight: 700;">1. Total Gross Economic Benefit</td>
               <td style="font-weight: 700;">${formatCurrency(scA.grossSavings)}</td>
               <td style="font-weight: 700;">${formatCurrency(scB.grossSavings)}</td>
               <td style="font-weight: 800; color: #1e3a8a;">${formatCurrency(scC.grossSavings)}</td>
             </tr>
             <tr>
-              <td style="padding-left: 14px;">&bull; Capacity Value Released (Labor Bandwidth)</td>
+              <td style="padding-left: 14px;">&bull; Released Labor Capacity (Labor Bandwidth)</td>
               <td>${formatCurrency(scA.capacityValueReleased)}</td>
               <td>${formatCurrency(scB.capacityValueReleased)}</td>
               <td>${formatCurrency(scC.capacityValueReleased)}</td>
             </tr>
             <tr>
-              <td style="padding-left: 14px;">&bull; Avoided Defect & Dispute Leakage (Total Avoided)</td>
+              <td style="padding-left: 14px;">&bull; Avoided Operational Leakage (Errors & Defects)</td>
               <td>${formatCurrency(scA.avoidedLeakage)}</td>
               <td>${formatCurrency(scB.avoidedLeakage)}</td>
               <td>${formatCurrency(scC.avoidedLeakage)}</td>
@@ -3113,6 +3865,12 @@ function preparePrintReport() {
               <td style="font-style: italic;">${formatCurrency(0)}</td>
               <td style="font-style: italic;">${formatCurrency(scB.avoidedLeakage - scB.actualCashSavings)}</td>
               <td style="font-style: italic;">${formatCurrency(scC.avoidedLeakage - scC.actualCashSavings)}</td>
+            </tr>
+            <tr style="background-color: #fffbeb; font-size: 7.5pt; color: #92400e;">
+              <td style="padding-left: 14px; font-weight: 600;">&bull; Rework Overlap Adjustment (${scC.staffingAllocation === 'separate' ? 'Separate Staff' : 'Anti-Double-Counting'})</td>
+              <td>${formatCurrency(0)}</td>
+              <td>${scB.overlapAdjustment > 0 ? `-${formatCurrency(scB.overlapAdjustment)}` : formatCurrency(0)}</td>
+              <td style="font-weight: 700;">${scC.overlapAdjustment > 0 ? `-${formatCurrency(scC.overlapAdjustment)}` : formatCurrency(0)}</td>
             </tr>
             <tr>
               <td>2. Annual Technology Operating Costs (Opex)</td>
@@ -3139,16 +3897,22 @@ function preparePrintReport() {
               <td style="font-weight: 700; color: #047857;">${formatCurrency(scC.firstYearNetBenefit)}</td>
             </tr>
             <tr class="bold-row">
-              <td>6. Recurring Return on Investment (ROI)</td>
+              <td>6. Annual Economic ROI (Benefit-to-Investment Ratio)</td>
               <td>${scA.roiFormatted || 'N/A – Baseline'}</td>
               <td>${scB.roiFormatted}</td>
               <td style="color: #1d4ed8; font-weight: 800;">${scC.roiFormatted}</td>
             </tr>
             <tr class="bold-row">
-              <td>7. Estimated Payback Period</td>
-              <td>${scA.paybackFormatted || 'N/A – Baseline Scenario'}</td>
-              <td>${scB.paybackFormatted}</td>
-              <td style="color: #1d4ed8; font-weight: 800;">${scC.paybackFormatted}</td>
+              <td>7. Productivity Breakeven Horizon (Economic Payback)</td>
+              <td>${scA.breakevenHorizonFormatted || 'N/A – Baseline'}</td>
+              <td>${scB.breakevenHorizonFormatted || scB.paybackFormatted}</td>
+              <td style="color: #1d4ed8; font-weight: 800;">${scC.breakevenHorizonFormatted || scC.paybackFormatted}</td>
+            </tr>
+            <tr style="background-color: #f8fafc; font-size: 7.5pt; color: #334155;">
+              <td style="padding-left: 14px;">8. Cash Payback Period (Estimated Direct Cash)</td>
+              <td>N/A – Baseline</td>
+              <td style="font-weight: 600;">${scB.cashPaybackFormatted}</td>
+              <td style="font-weight: 600; color: ${scC.actualCashSavings > 0 ? '#047857' : '#64748b'};">${scC.cashPaybackFormatted}</td>
             </tr>
           </tbody>
         </table>
@@ -3156,7 +3920,9 @@ function preparePrintReport() {
         <!-- SECTION 3.1: FINANCIAL GOVERNANCE CALLOUT NOTE -->
         <div class="print-callout">
           <strong>Component Hierarchy & Anti-Double-Counting Governance:</strong>
-          Gross Annual Operating Savings is the mathematical sum of <em>Capacity Value Released</em> plus <em>Total Avoided Leakage</em>. Actual Cash Savings (Direct Hard Cash Savings) is an embedded component of Total Avoided Leakage (prevented direct cash disbursements such as duplicate vendor payments and SLA penalties) and is not additively combined with avoided leakage. Capacity Value Released represents operational labor bandwidth liberated for value-adding execution and converts to cash payroll reduction only upon formal staffing adjustments or overtime elimination.
+          Gross Annual Operating Savings is the mathematical sum of <em>Released Labor Capacity</em> plus <em>Avoided Operational Leakage</em> minus <em>Rework Overlap Adjustment</em>. <em>Actual Cash Savings</em> is an embedded component of Avoided Leakage (eliminating direct external disbursements like duplicate vendor payments and SLA penalties). Where process leakage consists exclusively of internal entry errors and staff rework (as in Accounts Receivable), direct external cash disbursements are ${formatCurrency(0)}; 100% of leakage reduction is captured under <em>Avoided Operational Leakage</em> and <em>Released Labor Capacity</em>. Capacity Value Released converts to cash payroll reduction only upon formal staffing adjustments or overtime elimination.
+          <br><strong>Productivity Breakeven Horizon:</strong> Non-cash economic benefit; not actual cash payback. This metric estimates how long operational productivity benefits take to equal initial technology investment. It does not represent cash recovery unless labor expenditure, headcount, or contractor spend is actually reduced.
+          <br><strong>Rework Staffing Policy:</strong> Active assumption: <strong>${scC.staffingAllocation === 'frontline' ? 'Frontline Staff (Anti-Double-Counting Active)' : (scC.staffingAllocation === 'separate' ? 'Separate Specialists (Additive Benefits)' : 'Staffing Unconfirmed (Conservative Deduct Applied)')}</strong>.
         </div>
 
         <!-- SECTION 3.2: EXECUTIVE FINANCIAL COMMENTARY & GUARDRAILS -->
@@ -3166,7 +3932,7 @@ function preparePrintReport() {
               Cash vs. Bandwidth Realization Policy
             </div>
             <div style="font-size: 7.25pt; color: #475569; line-height: 1.4;">
-              <strong>Direct Cash Savings:</strong> Hard disbursements eliminated directly from operating expense budgets.<br>
+              <strong>Direct Cash Savings:</strong> Hard disbursements eliminated directly from operating expense budgets (e.g. duplicate vendor payments, SLA penalties). For processes driven by internal clerical errors and rework, direct disbursements are ${formatCurrency(0)}, with benefits fully recognized in Avoided Leakage.<br>
               <strong>Capacity Value:</strong> Reclaimed productive hours enabling volume scaling, customer turnaround improvements, and higher-order analytical execution without headcount expansion.
             </div>
           </div>
@@ -3184,7 +3950,7 @@ function preparePrintReport() {
 
       <!-- PAGE 1 FOOTER -->
       <div class="print-footer">
-        <div><strong>ProcessIQ</strong> &bull; Know your process cost before you invest in AI &bull; Created by <strong>Yuvraj Malpure</strong></div>
+        <div><strong>ProcessIQ</strong> &bull; Know your process cost before you invest in AI</div>
         <div>Page 1 of 2</div>
       </div>
     </div>
@@ -3203,7 +3969,7 @@ function preparePrintReport() {
               <span style="font-size: 8.5pt; color: #64748b; font-weight: 500;">| Executive AI Readiness Diagnostic & Strategic Roadmap</span>
             </div>
             <div style="font-size: 7.5pt; color: #64748b;">
-              Process: <strong style="color: #0f172a;">${escapePrintHtml(processName)}</strong> &bull; Created by <strong style="color: #0f172a;">Yuvraj Malpure</strong>
+              Process: <strong style="color: #0f172a;">${escapePrintHtml(processName)}</strong>
               ${isSample ? ' &bull; <span class="print-badge-demo">DEMONSTRATION SAMPLE</span>' : ''}
             </div>
           </div>
@@ -3345,7 +4111,7 @@ function preparePrintReport() {
 
       <!-- PAGE 2 FOOTER -->
       <div class="print-footer">
-        <div><strong>ProcessIQ</strong> &bull; Confidential Executive Briefing &bull; Created by <strong>Yuvraj Malpure</strong></div>
+        <div><strong>ProcessIQ</strong> &bull; Confidential Executive Briefing</div>
         <div>Page 2 of 2</div>
       </div>
     </div>
@@ -3394,7 +4160,59 @@ window.addEventListener('DOMContentLoaded', () => {
   window.preparePrintReport = preparePrintReport;
   window.printExecutiveReport = printExecutiveReport;
 
+  // Accessibility: enable keyboard navigation (Enter/Space) on custom cards and steppers
+  document.querySelectorAll('.process-card, .stepper-item').forEach(el => {
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+    if (!el.hasAttribute('role')) el.setAttribute('role', 'button');
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        el.click();
+      }
+    });
+  });
+
+  // Non-blocking application update listener on window focus
+  if (typeof window !== 'undefined' && window.addEventListener) {
+    window.addEventListener('focus', checkForApplicationUpdates);
+  }
+
+  captureCanonicalBase();
+  updateCurrencyBadges();
   syncInputs();
   renderAll();
   loadProgress(); // Restore any previously saved session if safe
 });
+
+// -------------------------------------------------------------
+// CLIENT-SIDE UPDATE DETECTION & RECOVERY
+// -------------------------------------------------------------
+function checkForApplicationUpdates() {
+  if (typeof fetch === 'undefined') return;
+  fetch('./package.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(res => res.json())
+    .then(pkg => {
+      if (pkg && pkg.version && pkg.version !== PROCESSIQ_VERSION) {
+        showUpdateBanner(pkg.version);
+      }
+    })
+    .catch(() => {});
+}
+
+function showUpdateBanner(newVersion) {
+  let banner = document.getElementById('app-update-banner');
+  if (banner) return;
+  banner = document.createElement('div');
+  banner.id = 'app-update-banner';
+  banner.className = 'fixed top-16 left-0 right-0 bg-blue-600 text-white text-xs py-2 px-4 shadow-lg z-50 flex items-center justify-between';
+  banner.innerHTML = `
+    <div class="flex items-center space-x-2">
+      <span class="font-bold">Update Available:</span>
+      <span>A newer release of ProcessIQ (v${newVersion}) is available. Your inputs are preserved.</span>
+    </div>
+    <button onclick="saveProgress(); window.location.reload(true);" class="px-3 py-1 bg-white text-blue-700 font-bold rounded shadow hover:bg-blue-50 transition">
+      Refresh to Update
+    </button>
+  `;
+  document.body.prepend(banner);
+}

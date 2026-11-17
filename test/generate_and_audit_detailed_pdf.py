@@ -114,7 +114,7 @@ assert page_count >= 10, f"Expected at least 10 pages, got {page_count}"
 assertions = [
     ("PROCESSIQ", "ProcessIQ Platform Branding"),
     ("Know your process cost before you invest in AI.", "Mandatory Tagline"),
-    ("Created by Yuvraj Malpure", "Creator Attribution"),
+    ("Enterprise Solutions Architecture", "Solutions Architecture Attribution"),
     ("DEMONSTRATION SAMPLE REPORT", "Sample Demonstration Mode Badge"),
     ("Accounts Payable", "Evaluated Target Process"),
     ("Finance & Shared Services", "Evaluated Department"),

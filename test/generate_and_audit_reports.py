@@ -287,7 +287,7 @@ def audit_and_render_pdf(pdf_path, report_type):
         ("Executive Transformation Sign-Off & Governance Approval", "Sign-Off Block"),
         ("Calculation Methodology, Sources & Disclaimers", "Methodology & Disclaimers"),
         ("Client-Side Privacy, Local Storage & External Dependencies", "Privacy, Local Storage & CDN Disclosures"),
-        ("Created by Yuvraj Malpure", "Creator Attribution"),
+        ("Enterprise Solutions Architecture", "Solutions Architecture Attribution"),
         ("PROCESSIQ", "Platform Branding")
     ]
     for needle, desc in common_checks:

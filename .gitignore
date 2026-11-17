@@ -23,6 +23,7 @@ dist/
 
 # Local Scratch & Temporary Files
 scratch/
+backups/
 *.tmp
 
 # Local Environment Variables
